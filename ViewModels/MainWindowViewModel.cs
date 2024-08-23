@@ -55,11 +55,11 @@ namespace CowAuctionSmall.ViewModels
         private int _eachPanelHeight;
 
 
-        private int test = 1;
+        //private int test = 1;
         private bool first = true;
 
         //패널 인덱스(생성될 패널의 이름용)
-        private int k = 1;
+        //private int k = 1;
 
         private DisplaySelect displaySelect;
         private ServerGetData _serverGetData;

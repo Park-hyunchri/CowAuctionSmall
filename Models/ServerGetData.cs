@@ -34,7 +34,8 @@ namespace CowAuctionSmall.Models
 
         public ConcurrentQueue<string> mNetMessageList = new ConcurrentQueue<string>();// 비동기적 메시지
 
-        private readonly WeakReferenceMessenger _messenger; 
+        private readonly WeakReferenceMessenger _messenger;
+        private readonly WeakReferenceMessenger _messenger8007;
         private readonly WeakReferenceMessenger _messengerStringArr;
 
         private AnimalParseData _animParseData;
@@ -61,6 +62,10 @@ namespace CowAuctionSmall.Models
             _messengerStringArr = WeakReferenceMessenger.Default;
             _messengerStringArr.Register<DataToServerGetArrMsg>(this, OnStringArrMsg);
 
+            _messenger8007 = WeakReferenceMessenger.Default;
+            _messenger8007.Register<DataStringMessage8007>(this, OnStringMsg8007);
+            
+
             Task.Run(()=> init()) ;
         }
 
@@ -84,6 +89,7 @@ namespace CowAuctionSmall.Models
 
         }
 
+        private bool runProcessMessageAsync =true;
         private bool firstSetup = true;
         public async Task StartAsync()
         {
@@ -94,6 +100,12 @@ namespace CowAuctionSmall.Models
                 {
                     try
                     {
+                        if (runProcessMessageAsync)
+                        {
+                            await ProcessMessageAsync();
+                            await Task.Delay(1000); // 1초 대기
+                        }
+                        
                         if (firstSetup)
                         {
                             var currentTime = DateTime.Now;
@@ -104,8 +116,7 @@ namespace CowAuctionSmall.Models
                                 firstSetup = !isActiveNetty;
                             }
                         }
-                        await ProcessMessageAsync();
-                        await Task.Delay(1000); // 1초 대기
+                        
                     }
                     catch (Exception ex)
                     {
@@ -125,141 +136,278 @@ namespace CowAuctionSmall.Models
             await Task.Delay(1000); // 비동기 작업이 안전하게 종료될 시간을 준다.
         }
 
+        /* private async Task ProcessMessageAsync()
+         {
+             List<gValues> currentSyncList = new List<gValues>();
+             ConcurrentQueue<string>? differenceQueue = null; //변경할 데이터 목록
+             ConcurrentQueue<string>? logoQueue = null; //기존 표출 항목에서 변경후 로고화면을 띄워야 하는경우
+             try
+             {
+                 string message = "";
+                 if (mAPIList != null)
+                 {
+                     mAPIList.Clear();
+                 }
+
+
+                 // 매초마다 실행할 함수
+                 mAPIList = await _conn.SvInfoRequest(_userInfo, _token);
+
+                 if (mAPIList == null)
+                 { return; }
+
+
+                 if (beforemAPIList == null || beforemAPIList.Count <= 0)
+                 {
+                     // 새 ConcurrentQueue 생성
+                     beforemAPIList = new List<string>(mAPIList.Select(x => x));
+                     epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
+                     if (epdList != null)
+                     {
+                         beforemAPIList = _conn.JoinEpdnData(beforemAPIList, epdList);
+                         mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+                     }
+                 }
+                 else
+                 {
+                     if (epdList != null)
+                     {
+                         mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+                     }
+
+                     _isSame = beforemAPIList.SequenceEqual(mAPIList);
+                     if (_isSame)
+                     {
+                         //Debug.WriteLine("두 값이 동일함 =======");
+                         return;
+                     }
+                     else
+                     {
+                         bool IsDataDelete = false;
+                         Debug.WriteLine("두 값이 틀림 =======");
+                         differenceQueue = new ConcurrentQueue<string>(mAPIList.Except(beforemAPIList));
+                         if (differenceQueue.IsEmpty)
+                         {
+                             differenceQueue = new ConcurrentQueue<string>(beforemAPIList.Except(mAPIList));
+                             IsDataDelete = true;
+                         }
+                         // differenceQueue의 각 아이템의 5번째 구분자('|') 뒤의 문자열과 비교
+                         var tempList = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5])); //개체번호만 같은거
+
+                         var tempList2 = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5] && d.Split('|')[34] == item.Split('|')[34])); //개체 + 계류대번호가 같은거
+
+                         if (!tempList2.Any() || IsDataDelete == true) // 자리 변경인지
+                         {
+                             logoQueue = new ConcurrentQueue<string>(tempList);
+                         }
+                         else //아니면 단순 값 변경인지
+                         {
+                             //differenceQueue.Clear();
+                         }
+
+
+
+
+                         //beforemAPIList 업데이트
+                         beforemAPIList = new List<string>(mAPIList.Select(x => x));
+                     }
+                 }
+
+
+                 // Netty 접속
+                 foreach (string cowinfo in mAPIList)
+                 {
+                     currentSyncList.Add(_animParseData.Parse_PacketApi(cowinfo, _userInfo, _conn));
+                 }
+
+                 if (currentSyncList.Count > 0)
+                 {
+                     // 이전 데이터가 없는 경우
+                     if (differenceQueue == null && _isSame) //완전 처음이면서 
+                     {
+                         // MainWindowViewModel 쪽으로 데이터 전달
+                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                     }
+                     else if (differenceQueue == null)
+                     {
+                         // MainWindowViewModel 쪽으로 데이터 전달
+                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                     }
+                     else
+                     {
+                         if (differenceQueue != null || differenceQueue.Count > 0) //그 전 받아온 데이터와 현재 받아온 데이터가 다른 경우
+                         {
+                             currentSyncList.Clear();
+                             while (differenceQueue.TryDequeue(out message))
+                             {
+                                 currentSyncList.Add(_animParseData.Parse_PacketApi(message, _userInfo, _conn));
+                             }
+                             if (logoQueue != null && logoQueue.Any())
+                             {
+                                 while (logoQueue.TryDequeue(out message))
+                                 {
+                                     gValues gValues = new gValues();
+                                     gValues.SpaceIndex = message.Split('|')[34];
+                                     gValues.AuctionResultStatus = "00";
+
+                                     // 중복제거 (같은 이름의 거치대 숫자 제거)
+                                     bool isDuflicate = currentSyncList.Find(cow => cow.SpaceIndex == gValues.SpaceIndex) == null; //즉 중복된 거치대가 없을떄만 로고 추가
+                                     if (isDuflicate || currentSyncList.Count == 1)
+                                     {
+                                         currentSyncList.Add(gValues);
+                                     }
+                                 }
+
+
+                             }
+
+
+
+                             Debug.WriteLine("몇개가 틀리냐 ======={0}", currentSyncList.Count);
+
+                             // MainWindowViewModel 쪽으로 데이터 전달
+                             WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                         }
+                     }
+                 }
+             }
+             catch(Exception ex)
+             {
+                 logger.LogError("ProcessMessageAsync 내부 에서 예외 발생 : " + ex.Message);
+             }
+         }
+ */
+
+
         private async Task ProcessMessageAsync()
         {
             List<gValues> currentSyncList = new List<gValues>();
-            ConcurrentQueue<string>? differenceQueue = null; //변경할 데이터 목록
-            ConcurrentQueue<string>? logoQueue = null; //기존 표출 항목에서 변경후 로고화면을 띄워야 하는경우
-
-            string message = "";
-            if (mAPIList != null)
+            ConcurrentQueue<string>? differenceQueue = null; // 변경할 데이터 목록
+            ConcurrentQueue<string>? logoQueue = null; // 기존 표출 항목에서 변경후 로고화면을 띄워야 하는경우
+            try
             {
-                mAPIList.Clear();
-            }
-            
-
-            // 매초마다 실행할 함수
-            mAPIList = await _conn.SvInfoRequest(_userInfo, _token);
-
-            if (mAPIList == null)
-            { return; } 
-             
-
-            if (beforemAPIList == null || beforemAPIList.Count() <=0)
-            {
-                // 새 ConcurrentQueue 생성
-                beforemAPIList = new List<string>(mAPIList.Select(x => x));
-                epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
-                if (epdList != null)
+                string message = "";
+                if (mAPIList != null)
                 {
-                    beforemAPIList = _conn.JoinEpdnData(beforemAPIList, epdList);
-                    mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
-                }
-            }
-            else
-            {
-                if (epdList != null)
-                {
-                    mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+                    mAPIList.Clear();
                 }
 
-                _isSame = beforemAPIList.SequenceEqual(mAPIList);
-                if (_isSame)
+                // 매초마다 실행할 함수
+                mAPIList = await _conn.SvInfoRequest(_userInfo, _token);
+
+                if (mAPIList == null)
                 {
-                    //Debug.WriteLine("두 값이 동일함 =======");
                     return;
                 }
-                else
+
+                if (beforemAPIList == null || beforemAPIList.Count <= 0)
                 {
-                    bool IsDataDelete = false;
-                    Debug.WriteLine("두 값이 틀림 =======");
-                    differenceQueue = new ConcurrentQueue<string>(mAPIList.Except(beforemAPIList));
-                    if (differenceQueue.IsEmpty)
-                    {
-                        differenceQueue = new ConcurrentQueue<string>(beforemAPIList.Except(mAPIList));
-                        IsDataDelete = true;
-                    }
-                    // differenceQueue의 각 아이템의 5번째 구분자('|') 뒤의 문자열과 비교
-                    var tempList = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5])); //개체번호만 같은거
-
-                    var tempList2 = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5] && d.Split('|')[34] == item.Split('|')[34])); //개체 + 계류대번호가 같은거
-
-                    if (!tempList2.Any() || IsDataDelete == true) // 자리 변경인지
-                    {
-                        logoQueue = new ConcurrentQueue<string>(tempList);
-                    }
-                    else //아니면 단순 값 변경인지
-                    {
-                        //differenceQueue.Clear();
-                    }
-
-                    
-                    
-
-                    //beforemAPIList 업데이트
+                    // 새 ConcurrentQueue 생성
                     beforemAPIList = new List<string>(mAPIList.Select(x => x));
-                }
-            }
-
-            // Netty 접속
-            foreach (string cowinfo in mAPIList)
-            {
-                currentSyncList.Add(_animParseData.Parse_PacketApi(cowinfo, _userInfo, _conn));
-            }
-
-            if (currentSyncList.Count > 0)
-            {
-                // 이전 데이터가 없는 경우
-                if (differenceQueue == null && _isSame) //완전 처음이면서 
-                {
-                    // MainWindowViewModel 쪽으로 데이터 전달
-                    WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
-                }
-                else if (differenceQueue == null)
-                {
-                    // MainWindowViewModel 쪽으로 데이터 전달
-                    WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                    epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
+                    if (epdList != null)
+                    {
+                        beforemAPIList = _conn.JoinEpdnData(beforemAPIList, epdList);
+                        mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+                    }
                 }
                 else
                 {
-                    if (differenceQueue != null || differenceQueue.Count >0) //그 전 받아온 데이터와 현재 받아온 데이터가 다른 경우
+                    if (epdList != null)
                     {
-                        currentSyncList.Clear();
-                        while (differenceQueue.TryDequeue(out message))
-                        {
-                            currentSyncList.Add(_animParseData.Parse_PacketApi(message,_userInfo,_conn));
-                        }
-                        if (logoQueue !=null && logoQueue.Any() )
-                        {
-                            while (logoQueue.TryDequeue(out message))
-                            {
-                                gValues gValues = new gValues();
-                                gValues.SpaceIndex = message.Split('|')[34];
-                                gValues.AuctionResultStatus = "00";
+                        mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+                    }
 
-                                // 중복제거 (같은 이름의 거치대 숫자 제거)
-                                bool  isDuflicate = currentSyncList.Find(cow => cow.SpaceIndex == gValues.SpaceIndex) == null; //즉 중복된 거치대가 없을떄만 로고 추가
-                                if (isDuflicate || currentSyncList.Count==1)
-                                {
-                                    currentSyncList.Add(gValues);
-                                }
-                            }
-
-                            
+                    _isSame = beforemAPIList.SequenceEqual(mAPIList);
+                    if (_isSame)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        bool IsDataDelete = false;
+                        Debug.WriteLine("두 값이 틀림 =======");
+                        differenceQueue = new ConcurrentQueue<string>(mAPIList.Except(beforemAPIList));
+                        if (differenceQueue.IsEmpty)
+                        {
+                            differenceQueue = new ConcurrentQueue<string>(beforemAPIList.Except(mAPIList));
+                            IsDataDelete = true;
                         }
 
+                        var tempList = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5])); // 개체번호만 같은 것
 
+                        var tempList2 = beforemAPIList.Where(item => differenceQueue.Any(d => d.Split('|')[5] == item.Split('|')[5] && d.Split('|')[34] == item.Split('|')[34])); // 개체 + 계류대번호가 같은 것
 
-                        Debug.WriteLine("몇개가 틀리냐 ======={0}", currentSyncList.Count()) ;
+                        if (!tempList2.Any() || IsDataDelete)
+                        {
+                            logoQueue = new ConcurrentQueue<string>(tempList);
+                        }
 
+                        // beforemAPIList 업데이트
+                        beforemAPIList = new List<string>(mAPIList.Select(x => x));
+                    }
+                }
+
+                // Netty 접속
+                foreach (string cowinfo in mAPIList)
+                {
+                    currentSyncList.Add(_animParseData.Parse_PacketApi(cowinfo, _userInfo, _conn));
+                }
+
+                if (currentSyncList.Count > 0)
+                {
+                    // 이전 데이터가 없는 경우
+                    if (differenceQueue == null && _isSame)
+                    {
                         // MainWindowViewModel 쪽으로 데이터 전달
                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
                     }
+                    else
+                    {
+                        if (differenceQueue != null && differenceQueue.Count > 0)
+                        {
+                            currentSyncList.Clear();
+
+                            // 안전하게 큐 복사 후 처리
+                            var differenceItems = differenceQueue.ToArray();
+                            foreach (var item in differenceItems)
+                            {
+                                currentSyncList.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
+                            }
+
+                            if (logoQueue != null && logoQueue.Any())
+                            {
+                                var logoItems = logoQueue.ToArray();
+                                foreach (var logoItem in logoItems)
+                                {
+                                    gValues gValues = new gValues
+                                    {
+                                        SpaceIndex = logoItem.Split('|')[34],
+                                        AuctionResultStatus = "00"
+                                    };
+
+                                    // 중복 제거 (같은 이름의 거치대 숫자 제거)
+                                    bool isDuplicate = currentSyncList.Any(cow => cow.SpaceIndex == gValues.SpaceIndex);
+                                    if (!isDuplicate)
+                                    {
+                                        currentSyncList.Add(gValues);
+                                    }
+                                }
+                            }
+
+                            Debug.WriteLine("몇개가 틀리냐 ======={0}", currentSyncList.Count);
+
+                            // MainWindowViewModel 쪽으로 데이터 전달
+                            WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                        }
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                logger.LogError("ProcessMessageAsync 내부에서 예외 발생: " + ex.Message);
+            }
         }
-
-
         /// <summary>
         /// 경매 스페이스바 눌렀을때
         /// 경매방식, 코드(AS,SV) , 경매번호, 현재가격 , 경매상태
@@ -271,14 +419,24 @@ namespace CowAuctionSmall.Models
             string msgString = string.Join(", ", message.Data);
             Debug.WriteLine("스페이스바 땡 누름 : " + msgString);
 
-            string code= message.Data[1];
+            string code = message.Data[1];
+
+            if (message.Data[2].Equals("8007")) //회차 종료
+            {
+                runProcessMessageAsync = false;
+                logger.LogInfo("프로그램 회차 종료");
+            }
+            else
+            {
+                runProcessMessageAsync = true;
+            }
 
             if (message.Data[0].Equals("20") && beforemAPIList != null) //단일 경매
             {
                 switch (code)
                 {
                     case "AS":
-
+                        
                         var tempList = beforemAPIList.Where(item => item.Split('|')[2] == message.Data[2]); //경매번호만 같은거
 
                         // 해당 개체번호를 출력
@@ -386,6 +544,25 @@ namespace CowAuctionSmall.Models
 
                 WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
             }
+        }
+
+        private void OnStringMsg8007(object recipient, DataStringMessage8007 message)
+        {
+            /*List<gValues> currentSyncList = new List<gValues>();
+
+            if (runningSipNumber != null && runningSipNumber.Length > 0)
+            {
+                var tempList = beforemAPIList.Where(item => item.Split('|')[2] == runningSipNumber); //경매번호만 같은거
+
+                foreach (var item in tempList)
+                {
+                    currentSyncList.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
+                }
+
+                WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+            }*/
+
+            Console.WriteLine( "1111111111 "+message.ToString());
         }
 
         // 2024-07-13 추가된 Dispose 메소드

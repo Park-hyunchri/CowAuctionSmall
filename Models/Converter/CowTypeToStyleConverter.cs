@@ -15,7 +15,7 @@ namespace CowAuctionSmall.Models.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string cowType = value as string;
+            string? cowType = value as string;
 
             if (cowType != null)
             {

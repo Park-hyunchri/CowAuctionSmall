@@ -29,9 +29,9 @@ namespace CowAuctionSmall.Models.XMLParser
             BoardList? boardResult;
             UserInfo? userInfoResult;
 
-            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string boardXmlPath = Path.Combine(baseDir,"Config", "Board.XML");
-            string userXmlPath = Path.Combine(baseDir, "Config", "users.XML");
+            string? baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string? boardXmlPath = Path.Combine(baseDir,"Config", "Board.XML");
+            string? userXmlPath = Path.Combine(baseDir, "Config", "users.XML");
             try
             {
                 boardResult = _board.ParseXml(boardXmlPath);

@@ -1,4 +1,6 @@
 ﻿using CowAuctionSmall.Models.Structures;
+using Microsoft.Extensions.Logging;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +19,21 @@ namespace CowAuctionSmall.Models
     /// </summary>
     public class AnimalParseData
     {
-        public AnimalParseData() { }
+        private NLogger logger;
+        public AnimalParseData() 
+        {
+            logger = NLogger.Instance;
+        }
 
 
         public gValues Parse_PacketApi(string message , UserInfo userInfo, ServerConn conn)
         {
+            if (message == null || userInfo== null || conn ==null)
+            {
+                logger.LogError("Parse_PacketApi \nmessage : " + message + "\nuserInfo : " + userInfo.ToString() + "\nconn : " + conn.ToString()+ "");
+                
+            }
+
             gValues gv = new gValues();
             string[] data = message.Split('|');
             //0:구분자 | 1:조합구분코드 | 2:출품번호 | 3:경매회차 | 4:경매대상구분코드 | 5:축산개체관리번호 | 6:축산축종구분코드 |

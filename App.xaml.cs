@@ -35,8 +35,15 @@ namespace CowAuctionSmall
         {
             // NLog 설정 파일 로드
             string configFile = "NLog.config";
-            LogManager.Configuration = new NLog.Config.XmlLoggingConfiguration(configFile, true);
+
+            // 구식 생성자를 대체하여 NLog 설정 로드
+            LogManager.ThrowConfigExceptions = true; // 오류 발생 시 예외를 던지도록 설정 (필요에 따라 true/false로 설정)
+            var xmlLoggingConfiguration = new NLog.Config.XmlLoggingConfiguration(configFile);
+
+            // NLog의 현재 설정으로 적용
+            LogManager.Configuration = xmlLoggingConfiguration;
         }
+
 
         public new static App Current => (App)Application.Current;
 

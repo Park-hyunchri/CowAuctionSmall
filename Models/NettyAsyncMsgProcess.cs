@@ -140,15 +140,25 @@ namespace CowAuctionSmall.Models
             {
                 if (data.Length >= 7 && runningState == AS.PROGRESS) // Check if data has at least 7 elements
                 {
-                    string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
-                    // Use the msg array here
-                    WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
-
+                    if (data[6].Equals("8007")) //회차종료
+                    {
+                        WeakReferenceMessenger.Default.Send(new DataStringMessage8007("8007"));
+                    }
+                    else
+                    {
+                        string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
+                        // Use the msg array here
+                        WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
+                    }
                 }
                 else
                 {
                     // Handle the case where data has less than 7 elements
                     Console.WriteLine("data array has less than 7 elements!");
+                    if(data[6].Equals("8007")) //회차종료
+                    {
+                        WeakReferenceMessenger.Default.Send(new DataStringMessage8007("8007"));
+                    }
                 }
             }
         }

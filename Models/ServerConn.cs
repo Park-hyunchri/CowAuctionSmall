@@ -55,7 +55,7 @@ namespace CowAuctionSmall.Models
 
                         if (!string.IsNullOrEmpty(responseText))
                         {
-                            JObject jObject = JObject.Parse(responseText);
+                            JObject? jObject = JObject.Parse(responseText);
                             if ((bool)jObject.SelectToken("success"))
                             {
                                 token = (string)jObject.SelectToken("accessToken");
@@ -91,11 +91,12 @@ namespace CowAuctionSmall.Models
             {
                 JObject currentJObject = await GetCurrentInfo(userInfo, token);
 
-                if (currentJObject != null && currentJObject.Count > 0)
+                if (currentJObject != null && currentJObject.Count > 0  && userInfo != null && token !=null)
                 {
 
                     List<string> currentInfoList = currentJObject.SelectToken("entry")?.Select(s => (string)s).ToList();
-                    if (userInfo.Auction.IsGoatAuction.ToUpper().Equals("N"))// 염소 경매 옵션
+
+                    if (currentInfoList != null && userInfo.Auction.IsGoatAuction.ToUpper().Equals("N"))// 염소 경매 옵션
                     {
                         bool existGoat = currentInfoList.First().Split('|')[4] == "5";
                         if (existGoat)
@@ -151,7 +152,7 @@ namespace CowAuctionSmall.Models
 
                         if (!string.IsNullOrEmpty(responseText))
                         {
-                            JObject jObject = JObject.Parse(responseText);
+                            JObject? jObject = JObject.Parse(responseText);
                             if ((bool)jObject.SelectToken("success"))
                             {
                                 return jObject;

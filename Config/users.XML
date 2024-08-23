@@ -2,7 +2,7 @@
 <Server>
 		<Authentication>
 				<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
-				<UserID>board_163_5</UserID>
+				<UserID>board_163_3</UserID>
 				<Password>1111</Password>
 		</Authentication>
   

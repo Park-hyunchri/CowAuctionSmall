@@ -34,8 +34,8 @@ namespace CowAuctionSmall.Models
         private DispatcherTimer _timer; //왔다갔다 타이머
         private int _rotationIndex = 0; //화면 왔다갔다 인덱스
 
-        private readonly WeakReferenceMessenger _messenger;
-        private readonly WeakReferenceMessenger _messengerStringArr;
+        //private readonly WeakReferenceMessenger _messenger;
+        //private readonly WeakReferenceMessenger _messengerStringArr;
 
         public DisplaySelect(UserInfo userInfo,BoardList boardinfo)
         {
@@ -90,12 +90,17 @@ namespace CowAuctionSmall.Models
                 logoImgName ="logo.bmp";
             }
 
-            // 폴더 경로 설정
-            string folderPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Config", logoImgName);
-
-
-            // 만약 일치하는 ID가 없는 경우에 대한 처리
-            return folderPath; // 또는 다른 값을 반환하거나 예외를 throw할 수 있음
+            if (logoImgName != null)
+            {
+                // 폴더 경로 설정
+                string folderPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Config", logoImgName);
+                // 만약 일치하는 ID가 없는 경우에 대한 처리
+                return folderPath; // 또는 다른 값을 반환하거나 예외를 throw할 수 있음
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public void DisplayLogo(VirtualizingStackPanel panel)
@@ -409,7 +414,7 @@ namespace CowAuctionSmall.Models
         /// <param name="predicate"></param>
         /// <param name="panels"></param>
         /// <returns></returns>
-        private VirtualizingStackPanel FindPanel(Func<VirtualizingStackPanel, bool> predicate, System.Collections.ObjectModel.ObservableCollection<VirtualizingStackPanel> panels)
+        private VirtualizingStackPanel? FindPanel(Func<VirtualizingStackPanel, bool> predicate, System.Collections.ObjectModel.ObservableCollection<VirtualizingStackPanel> panels)
         {
             foreach (var panel in panels)
             {

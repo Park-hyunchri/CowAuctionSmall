@@ -47,6 +47,16 @@ namespace CowAuctionSmall.Models
         }
     }
 
+    public class DataStringMessage8007
+    {
+        public string Data { get; }
+
+        public DataStringMessage8007(string data)
+        {
+            Data = data;
+        }
+    }
+
     public class DataToServerGetArrMsg
     {
         public string[] Data { get; }

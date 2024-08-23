@@ -14,7 +14,7 @@ namespace CowAuctionSmall.Models.Converter
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // value를 string으로 가정하고 필요에 따라 형변환하여 사용합니다.
-            string pregnantValueString = value as string;
+            string? pregnantValueString = value as string;
             if (pregnantValueString != null && int.TryParse(pregnantValueString, out int pregnantValue))
             {
                 return pregnantValue > 0; // 0보다 크면 true를 반환하여 캔버스를 보이게 합니다.
