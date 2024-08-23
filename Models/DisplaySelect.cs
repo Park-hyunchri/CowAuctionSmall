@@ -23,28 +23,30 @@ namespace CowAuctionSmall.Models
 {
     public class DisplaySelect
     {
-        public ObservableCollection<AuctionContPanelViewModel> RunningViewModel { get; private set; } // 진행중인 뷰모델만 관리
+        // 진행 중인 뷰모델을 관리하는 ObservableCollection
+        public ObservableCollection<AuctionContPanelViewModel> RunningViewModel { get; private set; }
 
         private UserInfo _userInfo;
         private BoardList _boardinfo;
 
+        // 페이지 시간 목록
         private List<int> pageTime = new List<int>();
         private int _totalRunningPage = 0;
 
-        private DispatcherTimer _timer; //왔다갔다 타이머
-        private int _rotationIndex = 0; //화면 왔다갔다 인덱스
+        // 화면 전환을 위한 타이머
+        private DispatcherTimer _timer;
+        private int _rotationIndex = 0;
 
-        //private readonly WeakReferenceMessenger _messenger;
-        //private readonly WeakReferenceMessenger _messengerStringArr;
+        // 단일 경매 진행 시 플래그
+        private bool singleAuctionmethodFlag = true;
 
-        public DisplaySelect(UserInfo userInfo,BoardList boardinfo)
+        public DisplaySelect(UserInfo userInfo, BoardList boardinfo)
         {
-
-
             _userInfo = userInfo;
             _boardinfo = boardinfo;
 
-            if (_userInfo.Auction.BoardPage.Length <=0)
+            // 경매 페이지 수 설정
+            if (_userInfo.Auction.BoardPage.Length <= 0)
             {
                 _totalRunningPage = 1;
             }
@@ -53,23 +55,22 @@ namespace CowAuctionSmall.Models
                 _totalRunningPage = Convert.ToInt32(_userInfo.Auction.BoardPage);
             }
 
-            pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime)); //Convert.ToInt32 null일 경우 0 반환
+            // 페이지 시간 설정
+            pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime));
             pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime2));
             pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime3));
 
             RunningViewModel = new ObservableCollection<AuctionContPanelViewModel>();
 
+            // 타이머 초기화 및 시작
             _timer = new DispatcherTimer();
             _timer.Tick += Timer_Tick;
             _timer.Interval = TimeSpan.FromSeconds(2);
             _timer.Start();
-
-
         }
 
-        
-
-        private string IsMultipleLogo(string panelName) //로고를 여러개를 보여줘야 한다면 한줄마다 다르게 보여주기
+        // 로고를 여러 개 보여줘야 할 경우 한 줄마다 다르게 보여주기 위한 메서드
+        private string IsMultipleLogo(string panelName)
         {
             string logoImgName = string.Empty;
 
@@ -87,15 +88,14 @@ namespace CowAuctionSmall.Models
 
             if (logoImgName == string.Empty)
             {
-                logoImgName ="logo.bmp";
+                logoImgName = "logo.bmp";
             }
 
             if (logoImgName != null)
             {
                 // 폴더 경로 설정
                 string folderPath = System.IO.Path.Combine(Environment.CurrentDirectory, "Config", logoImgName);
-                // 만약 일치하는 ID가 없는 경우에 대한 처리
-                return folderPath; // 또는 다른 값을 반환하거나 예외를 throw할 수 있음
+                return folderPath;
             }
             else
             {
@@ -103,6 +103,7 @@ namespace CowAuctionSmall.Models
             }
         }
 
+        // 로고를 패널에 표시하는 메서드
         public void DisplayLogo(VirtualizingStackPanel panel)
         {
             string logoPath = IsMultipleLogo(panel.Name);
@@ -119,44 +120,33 @@ namespace CowAuctionSmall.Models
             }
         }
 
+        // 패널에서 뷰모델을 제거하는 메서드
         private void RemoveViewModelFromPanel(VirtualizingStackPanel panel)
         {
-            // 패널에 연결된 뷰모델 찾기
             var viewModel = RunningViewModel.FirstOrDefault(vm => vm._panel == panel);
             if (viewModel != null)
             {
                 RunningViewModel.Remove(viewModel);
                 viewModel.Dispose();
                 panel.DataContext = null;
-                
             }
         }
 
-
-
-
-        private bool singleAuctionmethodFlag = true; //단일경매 진행시 계속 새로고침을 할수는 없으니
         /// <summary>
-        /// 진행할 화면 넣기 추후 여러페이지 보여주기(고민..)
+        /// 진행할 화면 넣기 추후 여러 페이지 보여주기
         /// </summary>
         public void DisplayRunning(VirtualizingStackPanel panel, gValues cowInfo, int auctionmethod)
         {
-            
-            
-
-            // 데이터 바인딩을 통해 UI를 표시
-            var viewModel = new AuctionContPanelViewModel(cowInfo,this,panel, pageTime, _totalRunningPage);
+            var viewModel = new AuctionContPanelViewModel(cowInfo, this, panel, pageTime, _totalRunningPage);
             RunningViewModel.Add(viewModel);
-            InitializePages(panel,  viewModel);
+            InitializePages(panel, viewModel);
 
-
-            if (panel.Children.Count !=0 )  //거치대 변경시 타이머 때문에 일순간 패널의 자식이 0이됨
+            if (panel.Children.Count != 0)
             {
                 DisplayRunningPageNum(viewModel._panel, cowInfo, 1);
-                
             }
 
-            //염소 경매인경우
+            // 염소 경매인 경우
             if (cowInfo.CowDistinction.Equals("5"))
             {
                 DisplayRunningPageNum(viewModel._panel, cowInfo, 1);
@@ -165,68 +155,52 @@ namespace CowAuctionSmall.Models
 
             switch (auctionmethod)
             {
-                case 10: //일괄 경매
+                case 10: // 일괄 경매
                     break;
-                case 20: //단일 경매
-                    if (cowInfo.IsRunning == true && singleAuctionmethodFlag) //단일경매 방식이면서 경매시작을 했을경우 모든 페이지는 첫페이지로 전환되어야한다.
+                case 20: // 단일 경매
+                    if (cowInfo.IsRunning == true && singleAuctionmethodFlag)
                     {
                         Debug.WriteLine("단일경매 시작");
 
                         singleAuctionmethodFlag = false;
-                        
-                        
+
                         foreach (AuctionContPanelViewModel vm in RunningViewModel)
                         {
                             DisplayRunningPageNum(vm._panel, vm.CowInfo, 1);
                         }
                         _timer.Stop();
                     }
-
-
                     break;
-
                 default:
                     break;
             }
-
         }
 
+        // 페이지를 초기화하는 메서드
         public void InitializePages(VirtualizingStackPanel panel, AuctionContPanelViewModel viewModel)
         {
-            // 패널에 이미 추가된 컨트롤이 있는지 확인합니다.
             var existingPages = panel.Children.OfType<UserControl>().ToList();
-            UserControl page1, page2;    //, page3;
+            UserControl page1, page2;
 
-            // 128x128 크기의 패널인 경우
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
                 page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? new AuctionRunning1 { Name = "RunPage1" };
                 page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2") ?? new AuctionRunning2 { Name = "RunPage2" };
-                
-                //페이지 3을 적용한 축협x
-                //page3 = existingPages.FirstOrDefault(p => p.Name == "RunPage3") ?? new AuctionRunning3 { Name = "RunPage3" };
             }
-            // 128x64 크기의 패널인 경우
             else
             {
                 page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1_64") ?? new AuctionRunning1_64 { Name = "RunPage1_64" };
                 page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2_64") ?? new AuctionRunning2_64 { Name = "RunPage2_64" };
-
-                //페이지 3을 적용한 축협x
-                //page3 = existingPages.FirstOrDefault(p => p.Name == "RunPage3_64") ?? new AuctionRunning3_64 { Name = "RunPage3_64" };
             }
 
-            // 모든 페이지의 DataContext와 크기를 설정합니다.
             SetPageProperties(page1, viewModel, panel);
             SetPageProperties(page2, viewModel, panel);
-            //SetPageProperties(page3, viewModel, panel);
 
-            // 패널에 컨트롤이 이미 추가되지 않은 경우에만 추가합니다.
             if (!existingPages.Contains(page1)) panel.Children.Add(page1);
             if (!existingPages.Contains(page2)) panel.Children.Add(page2);
-            //if (!existingPages.Contains(page3)) panel.Children.Add(page3);
         }
 
+        // 페이지 속성을 설정하는 메서드
         private void SetPageProperties(UserControl page, AuctionContPanelViewModel viewModel, VirtualizingStackPanel panel)
         {
             page.DataContext = viewModel;
@@ -235,17 +209,14 @@ namespace CowAuctionSmall.Models
             page.Height = panel.Height;
         }
 
-
-
+        // 경매 진행 페이지 번호를 표시하는 메서드
         public void DisplayRunningPageNum(VirtualizingStackPanel panel, gValues cowinfo, int pageNum)
         {
-            // 모든 UserControl을 숨깁니다.
             foreach (UIElement child in panel.Children)
             {
                 child.Visibility = Visibility.Collapsed;
             }
 
-            // 경매가 진행 중이면 뷰모델을 새로 생성하지 않고, 기존 뷰모델을 사용합니다.
             if (cowinfo.IsRunning)
             {
                 var existingViewModel = panel.DataContext as AuctionContPanelViewModel;
@@ -258,7 +229,6 @@ namespace CowAuctionSmall.Models
                 }
             }
 
-            // 선택된 페이지를 표시합니다.
             if (pageNum >= 1 && pageNum <= 3)
             {
                 int index = 0;
@@ -270,7 +240,7 @@ namespace CowAuctionSmall.Models
                 {
                     index = (pageNum - 1) + (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128") ? 0 : 3);
                 }
-                 
+
                 if (index < panel.Children.Count)
                 {
                     panel.Children[index].Visibility = Visibility.Visible;
@@ -278,14 +248,11 @@ namespace CowAuctionSmall.Models
             }
         }
 
-
         /// <summary>
         /// 낙찰된 화면 넣기
         /// </summary>
         public void DisplaySold(VirtualizingStackPanel panel, gValues cowInfo)
         {
-            // 데이터 바인딩을 통해 UI를 표시
-
             UserControl cowPanel = null;
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
@@ -296,44 +263,34 @@ namespace CowAuctionSmall.Models
                 cowPanel = new AuctionSold_64();
             }
             cowPanel.DataContext = cowInfo;
-            cowPanel.Name = "";
-
             cowPanel.Width = panel.Width;
             cowPanel.Height = panel.Height;
 
             panel.Children.Add(cowPanel);
         }
-
-
 
         /// <summary>
         /// 유찰된 화면 넣기
         /// </summary>
         public void DisplayUnSold(VirtualizingStackPanel panel, gValues cowInfo)
         {
-
-            // 데이터 바인딩을 통해 UI를 표시
             UserControl cowPanel = null;
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
                 cowPanel = new AuctionUnSold();
             }
-            else // 무조건 128,64라고 가정하고
+            else
             {
                 cowPanel = new AuctionUnSold_64();
             }
             cowPanel.DataContext = cowInfo;
-
             cowPanel.Width = panel.Width;
             cowPanel.Height = panel.Height;
 
             panel.Children.Add(cowPanel);
-
-            
-
-
         }
 
+        // 패널의 바인딩을 해제하는 메서드
         private void ClearPanelBindings(VirtualizingStackPanel panel)
         {
             foreach (var child in panel.Children)
@@ -347,34 +304,31 @@ namespace CowAuctionSmall.Models
             panel.Children.Clear();
         }
 
-        public void FindPanel(string pName, System.Collections.ObjectModel.ObservableCollection<VirtualizingStackPanel> panels,gValues gv, int auctionmethod)
+        // 패널을 이름으로 찾는 메서드
+        public void FindPanel(string pName, ObservableCollection<VirtualizingStackPanel> panels, gValues gv, int auctionmethod)
         {
-            if(gv.Code.Equals("SV"))
+            if (gv.Code.Equals("SV"))
             {
-                if (singleAuctionmethodFlag==true && !gv.CowDistinction.Equals("5"))
+                if (singleAuctionmethodFlag == true && !gv.CowDistinction.Equals("5"))
                 {
                     _timer.Start();
                 }
 
                 singleAuctionmethodFlag = true;
-                
             }
 
-            // 이름으로 패널 찾기
             VirtualizingStackPanel panel1 = FindPanel(p => p.Name == pName, panels);
 
-            // ...
             int auctionStatus = int.Parse(gv.AuctionResultStatus);
             if (panel1 != null)
             {
-                // 뷰모델 객체 제거
                 RemoveViewModelFromPanel(panel1);
                 ClearPanelBindings(panel1);
 
                 switch (auctionStatus)
                 {
                     case 11:
-                         DisplayRunning(panel1, gv, auctionmethod);
+                        DisplayRunning(panel1, gv, auctionmethod);
                         break;
                     case 22:
                         DisplaySold(panel1, gv);
@@ -383,20 +337,16 @@ namespace CowAuctionSmall.Models
                         DisplayUnSold(panel1, gv);
                         break;
                     default:
-                        
                         DisplayLogo(panel1);
                         break;
                 }
-                
             }
             else
             {
-                 //컴퓨터가 여러개로 쪼개져 운영할경우 동기화 하기 위해 사용
-                if (gv.IsRunning == true && singleAuctionmethodFlag ==true)
+                if (gv.IsRunning == true && singleAuctionmethodFlag == true)
                 {
-                    Debug.WriteLine("단일경매단일경매단일경매단일경매단일경매 시작");
+                    Debug.WriteLine("단일경매 시작");
                     singleAuctionmethodFlag = false;
-
 
                     foreach (AuctionContPanelViewModel vm in RunningViewModel)
                     {
@@ -405,16 +355,10 @@ namespace CowAuctionSmall.Models
                     _timer.Stop();
                 }
             }
-
-
         }
-        /// <summary>
-        /// 전체 생성된 패널 cow_1~cow_n까지 중 원하는거 찾기
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <param name="panels"></param>
-        /// <returns></returns>
-        private VirtualizingStackPanel? FindPanel(Func<VirtualizingStackPanel, bool> predicate, System.Collections.ObjectModel.ObservableCollection<VirtualizingStackPanel> panels)
+
+        // 패널을 조건에 맞게 찾는 메서드
+        private VirtualizingStackPanel? FindPanel(Func<VirtualizingStackPanel, bool> predicate, ObservableCollection<VirtualizingStackPanel> panels)
         {
             foreach (var panel in panels)
             {
@@ -426,12 +370,7 @@ namespace CowAuctionSmall.Models
             return null;
         }
 
-
-        /// <summary>
-        /// 진행중일때 화면 번갈아 가면서 표출
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // 타이머 틱 이벤트 핸들러
         private void Timer_Tick(object sender, EventArgs e)
         {
             foreach (AuctionContPanelViewModel viewModel in RunningViewModel)
@@ -444,6 +383,7 @@ namespace CowAuctionSmall.Models
             _rotationIndex = (_rotationIndex + 1) % _totalRunningPage;
         }
 
+        // 타이머를 중지하는 메서드
         public void StopTimer()
         {
             if (_timer != null)

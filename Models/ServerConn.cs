@@ -34,8 +34,17 @@ namespace CowAuctionSmall.Models
         /// <summary>
         /// 초기 토큰 생성
         /// </summary>
+        /// <summary>
+        /// 초기 토큰 생성
+        /// </summary>
         public async Task<string?> IssueTocken(UserInfo userInfo)
         {
+            if (userInfo?.Authentication?.Address == null)
+            {
+                logger.LogError("IssueTocken: userInfo.Authentication.Address가 null입니다.");
+                return null;
+            }
+
             string? token = String.Empty;
             try
             {
@@ -74,10 +83,9 @@ namespace CowAuctionSmall.Models
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message + "\r\n");
-                logger.LogError("IssueTocken 발생 "+ e.Message);
+                logger.LogError("IssueTocken 발생 " + e.Message);
                 return null;
             }
-            
         }
 
 

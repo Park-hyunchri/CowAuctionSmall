@@ -76,7 +76,7 @@ namespace CowAuctionSmall.NetProto.netty
         public void OnCurrentAuctionData(String data)
         {
             //gMain.Main.mNetMessageList.Enqueue(data);
-            Debug.WriteLine("OnCurrentAuctionData 에서 호출         {0} \n ",data);
+            Debug.WriteLine("OnCurrentAuctionData 에서 호출         {0} \n ", data);
             WeakReferenceMessenger.Default.Send(new DataStringArrMessage(data.Split('|')));
         }
     }

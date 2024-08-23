@@ -3,22 +3,13 @@ using CommunityToolkit.Mvvm.Messaging;
 using CowAuctionSmall.Models;
 using CowAuctionSmall.Models.Structures;
 using CowAuctionSmall.Models.XMLParser;
-using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
-
-using static CowAuctionSmall.Models.NLogger;
 
 namespace CowAuctionSmall.ViewModels
 {
@@ -29,13 +20,11 @@ namespace CowAuctionSmall.ViewModels
 
         private XmlParserCont _xmlParserCont;
 
-
         public ObservableCollection<VirtualizingStackPanel> Panels { get; private set; } // 전체적인 패널 관리
-        
 
         private readonly ObservableCollection<gValues> _currentCowList = new ObservableCollection<gValues>();
         private readonly Dispatcher _dispatcher;
-        public VirtualizingStackPanel MainContainer { get; private set; }
+        public VirtualizingStackPanel? MainContainer { get; private set; } // null 허용으로 변경
 
         [ObservableProperty]
         private int _mainWindowWidth;
@@ -43,42 +32,31 @@ namespace CowAuctionSmall.ViewModels
         private int _mainWindowHeight;
 
         [ObservableProperty]
-        private string _mainWindowTextBox;
+        private string? _mainWindowTextBox; // null 허용으로 변경
 
         [ObservableProperty]
         private double _mainPositionX;
         [ObservableProperty]
         private double _mainPositionY;
 
-        //각각의 패널 크기
+        // 각각의 패널 크기
         private int _eachPanelWidth;
         private int _eachPanelHeight;
 
-
-        //private int test = 1;
         private bool first = true;
-
-        //패널 인덱스(생성될 패널의 이름용)
-        //private int k = 1;
 
         private DisplaySelect displaySelect;
         private ServerGetData _serverGetData;
 
         private int _auctionmethod = 0; // 단일 일괄경매방식
 
-
         public MainWindowViewModel(XmlParserCont xmlParserCont, ServerGetData serverGetData)
         {
-
-            // NLogger 초기화
             var logger = NLogger.Instance;
-
-            // 초기화 후 로그 기록
-            //logger.LogInfo("Application started.22");
 
             _dispatcher = Dispatcher.CurrentDispatcher;
 
-            _messenger = WeakReferenceMessenger.Default; 
+            _messenger = WeakReferenceMessenger.Default;
             _messenger.Register<DataChangedMessage>(this, OnDataChanged);
 
             _messengerStringMsg = WeakReferenceMessenger.Default;
@@ -86,126 +64,130 @@ namespace CowAuctionSmall.ViewModels
 
             this._serverGetData = serverGetData;
 
-            //관찰 나중에 값을 변경하려고 패널을 관찰
             Panels = new ObservableCollection<VirtualizingStackPanel>();
 
-            //xml (user, board) 파싱한 값
             _xmlParserCont = xmlParserCont;
             var r = _xmlParserCont.XmlPaserResult();
 
-            //각각의 패널의 사이즈
-            _eachPanelWidth = int.Parse(r.board.Size.Split(',')[0]);
-            _eachPanelHeight = int.Parse(r.board.Size.Split(',')[1]);
+            // null 가능성 검사 추가
+            if (r.board == null || r.userInfo == null)
+            {
+                logger.LogError("MainWindowViewModel: board 또는 userInfo가 null입니다.");
+                return;
+            }
 
-            //전체 보여주는 화면의 사이즈
-            _mainWindowWidth = r.board.MultiBoards[0].Rows[0].Length * _eachPanelWidth;
-            _mainWindowHeight = r.board.MultiBoards[0].Rows.Count * _eachPanelHeight +75;
+            if (r.board.Size != null)
+            {
+                var sizeParts = r.board.Size.Split(',');
+                if (sizeParts.Length == 2)
+                {
+                    _eachPanelWidth = int.Parse(sizeParts[0]);
+                    _eachPanelHeight = int.Parse(sizeParts[1]);
+                }
+            }
 
-            _mainPositionX = double.Parse(r.userInfo.Auction.StartPosition.Split(",")[0]);
-            _mainPositionY = double.Parse(r.userInfo.Auction.StartPosition.Split(",")[1]);
+            // null 가능성 검사 추가
+            if (r.board.MultiBoards != null && r.board.MultiBoards.Count > 0 && r.board.MultiBoards[0].Rows != null)
+            {
+                _mainWindowWidth = r.board.MultiBoards[0].Rows[0].Length * _eachPanelWidth;
+                _mainWindowHeight = r.board.MultiBoards[0].Rows.Count * _eachPanelHeight + 75;
+            }
+
+            if (r.userInfo.Auction != null && r.userInfo.Auction.StartPosition != null)
+            {
+                var startPositionParts = r.userInfo.Auction.StartPosition.Split(",");
+                if (startPositionParts.Length == 2)
+                {
+                    _mainPositionX = double.Parse(startPositionParts[0]);
+                    _mainPositionY = double.Parse(startPositionParts[1]);
+                }
+            }
 
             displaySelect = new DisplaySelect(r.userInfo, r.board);
 
             initCreateStackPanel(r.board);
-
         }
 
-
-
-        /// <summary>
-        /// 고정적으로 메시지를 받아와서 넣어주고
-        /// </summary>
         private void OnDataChanged(object recipient, DataChangedMessage message)
         {
             ObservableCollection<gValues> currentCowList = new ObservableCollection<gValues>();
             currentCowList.Clear();
 
-            // 데이터 처리
             foreach (var gValue in message.Data)
             {
                 currentCowList.Add(gValue);
             }
-            // UI 스레드에서 UpdatePanels 메서드 호출
+
             _dispatcher.Invoke(() => UpdatePanels(currentCowList));
         }
 
         public void UpdatePanels(ObservableCollection<gValues> currentCowList)
         {
             Debug.WriteLine("------------ {0}", currentCowList.Count);
-            // Panels의 내용을 업데이트
+
             foreach (gValues gValues in currentCowList)
             {
-                displaySelect.FindPanel("Cow_"+ gValues.SpaceIndex, Panels, gValues, _auctionmethod);
+                // 각 소의 정보를 기반으로 패널을 업데이트
+                displaySelect.FindPanel("Cow_" + gValues.SpaceIndex, Panels, gValues, _auctionmethod);
             }
         }
 
-
         private void initCreateStackPanel(BoardList boardInfo)
         {
-
-            // RowIdx에 접근
-            List<int[]> rowIdx = boardInfo.MultiBoards[0].Rows;
-            if (rowIdx != null)
+            // null 가능성 검사 추가
+            if (boardInfo.MultiBoards == null || boardInfo.MultiBoards.Count == 0 || boardInfo.MultiBoards[0].Rows == null)
             {
-                // 최상위 컨테이너
-                var mainContainer = new VirtualizingStackPanel();
-                mainContainer.Background = Brushes.DarkSlateBlue;
-                mainContainer.Orientation = Orientation.Vertical;
+                return;
+            }
 
-                int rowIdxNumber = 0;
+            List<int[]> rowIdx = boardInfo.MultiBoards[0].Rows;
+            var mainContainer = new VirtualizingStackPanel
+            {
+                Background = Brushes.DarkSlateBlue,
+                Orientation = Orientation.Vertical
+            };
 
-                int k = 0;// 판넬 인덱스용?
-                for (int i=0; i< rowIdx.Count; i++)
+            int k = 0;
+            foreach (var row in rowIdx)
+            {
+                var rowStackPanel = new VirtualizingStackPanel
                 {
+                    Orientation = Orientation.Horizontal
+                };
 
-                    // 각 행의 VirtualizingStackPanel
-                    var rowStackPanel = new VirtualizingStackPanel();
-                    rowStackPanel.Orientation = Orientation.Horizontal;
-
-
-                    for (int j = 0; j < rowIdx[i].Length ; j++)
+                foreach (var cell in row)
+                {
+                    k++;
+                    var panel = new VirtualizingStackPanel
                     {
-                        k++;
-                        // 패널 생성 및 레이아웃 설정
-                        var panel = new VirtualizingStackPanel(); // CowInfoPanel 사용
-                        panel.Name = "Cow_"+ rowIdx[i][j].ToString(); // 나중에 해당 패널만 조작
-                        panel.Width = _eachPanelWidth;
-                        panel.Height = _eachPanelHeight; // 패널의 세로 크기
-                        panel.Background = Brushes.Black;
+                        Name = "Cow_" + cell.ToString(),
+                        Width = _eachPanelWidth,
+                        Height = _eachPanelHeight,
+                        Background = Brushes.Black
+                    };
 
-
-                        if (_currentCowList.Count <0 || first) //데이터가 없을경우 즉, 오늘 경매날이 아닌경우
-                        {
-                            displaySelect.DisplayLogo(panel);
-                        }
-                        else // 아직... 생각중..
-                        {
-                            first = false;
-                        }
-                        Panels.Add(panel);
-                        // 생성된 패널을 현재 행의 VirtualizingStackPanel에 추가
-                        rowStackPanel.Children.Add(panel);
-                        
+                    if (_currentCowList.Count < 0 || first)
+                    {
+                        displaySelect.DisplayLogo(panel);
                     }
-
-                    rowIdxNumber++;
-                    
-                    // 현재 행의 VirtualizingStackPanel을 최상위 컨테이너에 추가
-                    mainContainer.Children.Add(rowStackPanel);
-                    //_subWindowWidth = widthPanelSize.Length;
-
-
-                    k++; //test
+                    else
+                    {
+                        first = false;
+                    }
+                    Panels.Add(panel);
+                    rowStackPanel.Children.Add(panel);
                 }
 
-                // 최종적으로 생성된 mainContainer를 MainContainer 속성에 설정
-                MainContainer = mainContainer;
+                mainContainer.Children.Add(rowStackPanel);
+                k++;
             }
+
+            MainContainer = mainContainer;
         }
 
         private void OnDataStringMsg(object recipient, DataStringMessage message)
         {
-            string msg = String.Empty;
+            string msg = string.Empty;
             switch (message.Data)
             {
                 case "10":
@@ -226,5 +208,4 @@ namespace CowAuctionSmall.ViewModels
             }
         }
     }
-
 }

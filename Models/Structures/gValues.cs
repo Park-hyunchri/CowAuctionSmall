@@ -43,7 +43,7 @@ namespace CowAuctionSmall.Models.Structures
         public string Note { get; set; } = "-";                     //비고
         //public string Sex { get, set};
         public string ModifiedPrice { get; set; } = "-";            //수정 최저가
-        public string AuctionResultStatus { get; set; } = "-";      //낙찰 결과      
+        public string AuctionResultStatus { get; set; } = "-";
 
         public string EntityNumber { get; set; } = "";              //개체 번호
         public string EntityNumberShort { get; set; } = "";              //개체 번호

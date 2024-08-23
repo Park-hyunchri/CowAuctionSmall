@@ -30,7 +30,7 @@ namespace CowAuctionSmall.Models.XMLParser
             UserInfo? userInfoResult;
 
             string? baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            string? boardXmlPath = Path.Combine(baseDir,"Config", "Board.XML");
+            string? boardXmlPath = Path.Combine(baseDir, "Config", "Board.XML");
             string? userXmlPath = Path.Combine(baseDir, "Config", "users.XML");
             try
             {
@@ -44,7 +44,7 @@ namespace CowAuctionSmall.Models.XMLParser
                 userInfoResult = null;
                 logger.LogError("XmlPaserResult : " + ex.ToString());
             }
-            
+
             return (boardResult, userInfoResult);
         }
     }

@@ -1,14 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using CowAuctionSmall.Models.Structures;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Presentation;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.Extensions.Logging;
-using NLog;
 using System;
 using System.Diagnostics;
-using System.Windows.Interop;
 using System.Windows.Threading;
 using static CowAuctionSmall.Models.Structures.AuctionStatus;
 
@@ -131,6 +123,11 @@ namespace CowAuctionSmall.Models
         {
             AS runningState = (AS)Convert.ToInt32(data[6]);
 
+            //경매 상태 메시지 만약 회차종료인경우 비동기 while문을 잠시 끄기위해 메시지 전송
+            // ServerGetData OnStringMsg8007에서 처리
+            WeakReferenceMessenger.Default.Send(new DataStringMessage8007(runningState.ToString()));
+
+
             if (_auctionmethod != 0 && (_auctionmethod == 10)) //일괄경매인경우
             {
                 string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[6] };// 경매방식, 코드, 경매상태
@@ -140,25 +137,15 @@ namespace CowAuctionSmall.Models
             {
                 if (data.Length >= 7 && runningState == AS.PROGRESS) // Check if data has at least 7 elements
                 {
-                    if (data[6].Equals("8007")) //회차종료
-                    {
-                        WeakReferenceMessenger.Default.Send(new DataStringMessage8007("8007"));
-                    }
-                    else
-                    {
-                        string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
-                        // Use the msg array here
-                        WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
-                    }
+                    string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
+                    // Use the msg array here
+                    WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
+
                 }
                 else
                 {
                     // Handle the case where data has less than 7 elements
                     Console.WriteLine("data array has less than 7 elements!");
-                    if(data[6].Equals("8007")) //회차종료
-                    {
-                        WeakReferenceMessenger.Default.Send(new DataStringMessage8007("8007"));
-                    }
                 }
             }
         }
