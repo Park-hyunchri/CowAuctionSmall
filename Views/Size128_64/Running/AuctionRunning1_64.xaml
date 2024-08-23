@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_64.Running.AuctionRunning1_64"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_64.Running"
+             xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="64" d:DesignWidth="128">
+
+
+    <UserControl.Resources>
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard RepeatBehavior="Forever">
+                                <ColorAnimation
+                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                From="Black" To="Red" Duration="0:0:0.5"/>
+                                <ColorAnimation
+                                Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                                From="Red" To="Black" Duration="0:0:0.5" BeginTime="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 목차 스타일 -->
+        <Style x:Key="IndexStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="lime"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="2,0,0,0"/>
+        </Style>
+
+        <Style x:Key="DataStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:MotherLevelConverter x:Key="MotherLevelConverter" />
+        <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
+    </UserControl.Resources>
+
+    <Border x:Name="border" Style="{StaticResource BlinkingBorderStyle2}" BorderThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid>
+            <Canvas Margin="97,0,0,38">
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" x:Name="Sex" Margin="3,-4,0,0" FontSize="24"/>
+            </Canvas>
+
+            <Canvas Margin="0,0,0,0">
+                <TextBlock Text="개체 :"  Style="{StaticResource IndexStyle}"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="35,0,0,0" Foreground="Silver" Style="{StaticResource DataStyle}" x:Name="EntityNumber"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="61,0,0,0" Foreground="red" Background="Black" Style="{StaticResource DataStyle}" FontWeight="Bold"/>
+            </Canvas>
+
+            <Canvas Margin="0,12,0,0">
+                <TextBlock Text="{Binding CowInfo.Location}"  Foreground="magenta"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.OwnerName}" Margin="32,0,0,0" Foreground="Cyan"/>
+            </Canvas>
+
+            <Canvas Margin="0,24,0,0">
+                <TextBlock Text="최저 :"  Style="{StaticResource IndexStyle}"/>
+                <TextBlock Text="{Binding CowInfo.LowestPrice}" Margin="35,0,0,0" Foreground="Yellow" Style="{StaticResource DataStyle}"/>
+            </Canvas>
+
+            <Canvas Margin="65,24,0,0">
+                <TextBlock Text="중량:"  Style="{StaticResource IndexStyle}"/>
+                <TextBlock Text="{Binding CowInfo.Weight}" Margin="32,0,0,0" Foreground="Yellow" Style="{StaticResource DataStyle}"/>
+            </Canvas>
+
+            <Canvas Margin="0,36,0,0">
+                <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Margin="2,0,0,0"/>
+            </Canvas>
+
+            <Canvas x:Name="canvas" ClipToBounds="True" Margin="0,48,0,0">
+                <TextBlock x:Name="note" Text="{Binding CowInfo.Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular"/>
+            </Canvas>
+            
+        </Grid>
+    </Border>
+
+</UserControl>

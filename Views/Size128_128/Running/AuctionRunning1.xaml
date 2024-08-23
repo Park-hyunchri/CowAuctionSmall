@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.AuctionRunning1"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views"
+             xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+
+    <UserControl.Resources>
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard RepeatBehavior="Forever">
+                                <ColorAnimation
+                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                            From="Black" To="Red" BeginTime="0:0:0.3"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 추가 -->
+        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:MotherLevelConverter x:Key="MotherLevelConverter" />
+        <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
+
+    </UserControl.Resources>
+
+
+    <Border BorderThickness="2" Style="{StaticResource BlinkingBorderStyle2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid>
+
+            <Canvas Margin="0,17,0,0">
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" x:Name="Sex"/>
+            </Canvas>
+
+            <Canvas Margin="0,5,0,0">
+                <TextBlock Text="개체 : "  Foreground="lime" Margin="2,0,0,0" />
+                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="40,0,0,0" Foreground="Silver"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="68,0,0,0" Foreground="red" Background="Black"/>
+            </Canvas>
+
+            <Canvas Margin="0,20,0,0">
+                <TextBlock Text="{Binding CowInfo.Location}"  Foreground="magenta"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
+            </Canvas>
+
+            <Canvas Margin="0,35,0,0">
+                <TextBlock Text="최저 : "  Foreground="lime"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.LowestPrice}" Margin="40,0,0,0" Foreground="Yellow"/>
+            </Canvas>
+
+            <Canvas Margin="0,50,0,0">
+                <TextBlock Text="중량 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Weight}" Margin="40,0,0,0" Foreground="Yellow"/>
+            </Canvas>
+
+            <Canvas Margin="70,50,0,0" >
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowInfo.Pregnant, Converter={StaticResource PregnancyValueConverter}}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
+                <TextBlock Text="임신 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Pregnant}" Margin="40,0,0,0" Foreground="Yellow"/>
+            </Canvas>
+
+            <Canvas Margin="0,65,0,0">
+                <!-- 생년월일 -->
+                <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Margin="2,0,0,0"/>
+            </Canvas>
+
+            <Canvas Margin="0,80,0,0">
+                <TextBlock Text="어미 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.MotherLevel, Converter={StaticResource MotherLevelConverter}}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <Canvas Margin="70,80,0,0">
+                <TextBlock Text="계대 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Blood}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <Canvas Margin="0,95,0,0">
+                <TextBlock Text="KPN : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.KPN}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <Canvas Margin="70,95,0,0">
+                <TextBlock Text="산차 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.CalvingNumber}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <!-- Note를 표시하는 TextBlock -->
+            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
+                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" FontSize="12"/>
+            </Canvas>
+        </Grid>
+    </Border>
+
+
+</UserControl>
