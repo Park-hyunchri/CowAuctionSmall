@@ -9,7 +9,7 @@
 		<CurrentInfo>
 				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry?date=</Address>
 				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
-				<Date></Date>
+				<Date>20240906</Date>
 		</CurrentInfo>
   
 		<Auction>
@@ -23,8 +23,8 @@
 							<CowBirth>Y</CowBirth>					<!--     송아지 생년월일 일자 표기 결정    ex. Y or N   사용하지않는 옵션-->
 
 							<BoardPage>2</BoardPage>						<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
-							<BoardPageTime>25</BoardPageTime>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
-							<BoardPageTime2>7</BoardPageTime2>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+							<BoardPageTime>7</BoardPageTime>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+							<BoardPageTime2>30</BoardPageTime2>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
 							<BoardPageTime3>2</BoardPageTime3>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
 	
 							<BidderName>Y</BidderName>				<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->

@@ -4,44 +4,15 @@ closedXML 라이브러리 삭제
 240805
 128*128 사이즈 첫번째 개체정보 화면 요소 중 출하자 이름이 4글자 일때 성별과 겹치는 경우가 생겨 왼쪽으로 픽셀 옮김
 
-/*
-현재 문제점
+ServerGetData의 ProcessMessageAsync 수정
+기존 : 함수안에 다 때려 박음
+변경 후 : 함수를 나눠서 각각의 기능을 수행하도록 변경 
+		  서버에서 온 데이터의 양과 직전에 받아온 양을 비교 후 데이터를 처리하도록 변경
+
+MainWindowViewModel 수정
+	
+
+--------------------- 현재 문제점 -------------------------
 응찰서버 중복접속시 중복메시지가 표출 x + 메모리 사용량 무한히 증가
 라이센스 적용 x
 
-
-<Grid Margin="2,28,2,21">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="42"/>
-                        <ColumnDefinition Width="20"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="냉도체중:"  Style="{StaticResource EpdIndexStyle}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
-
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="배최장근:"  Style="{StaticResource EpdIndexStyle}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
-
-
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방 :"  Style="{StaticResource EpdIndexStyle}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
-
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="근내지방:"  Style="{StaticResource EpdIndexStyle}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
-
-
-                </Grid>
-*/

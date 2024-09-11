@@ -6,12 +6,14 @@ using CowAuctionSmall.Views.Size128_128;
 //using CowAuctionSmall.Views.Size128_128.Running;
 using CowAuctionSmall.Views.Size128_64;
 using CowAuctionSmall.Views.Size128_64.Running;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -37,11 +39,18 @@ namespace CowAuctionSmall.Models
         private DispatcherTimer _timer;
         private int _rotationIndex = 0;
 
+        private Timer? _initTimer; // 매 정각마다 초기화 타이머
+
         // 단일 경매 진행 시 플래그
         private bool singleAuctionmethodFlag = true;
 
+
+        private NLogger logger; // 로그용
+
         public DisplaySelect(UserInfo userInfo, BoardList boardinfo)
         {
+            logger = NLogger.Instance;
+
             _userInfo = userInfo;
             _boardinfo = boardinfo;
 
@@ -55,10 +64,14 @@ namespace CowAuctionSmall.Models
                 _totalRunningPage = Convert.ToInt32(_userInfo.Auction.BoardPage);
             }
 
+           int page1 = Convert.ToInt32(_userInfo.Auction.BoardPageTime);
+           int page2 =  Convert.ToInt32(_userInfo.Auction.BoardPageTime2);
+           int page3 = Convert.ToInt32(_userInfo.Auction.BoardPageTime3);
+
             // 페이지 시간 설정
-            pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime));
-            pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime2));
-            pageTime.Add(Convert.ToInt32(_userInfo.Auction.BoardPageTime3));
+            pageTime.Add(page1 == 0 ? 25 : page1);
+            pageTime.Add(page2 == 0 ? 7 :  page2);
+            pageTime.Add(page3 == 0 ? 0 : page3);
 
             RunningViewModel = new ObservableCollection<AuctionContPanelViewModel>();
 
@@ -67,6 +80,47 @@ namespace CowAuctionSmall.Models
             _timer.Tick += Timer_Tick;
             _timer.Interval = TimeSpan.FromSeconds(2);
             _timer.Start();
+
+            _initTimer = new Timer(InitTimer_Tick, null, 0, 60000);
+        }
+
+
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // SemaphoreSlim 초기화
+
+        private async void InitTimer_Tick(object? state)
+        {
+            if (_totalRunningPage == 1)
+            {
+                return;
+            }
+
+            if (DateTime.Now.Minute == 0 ) //
+            {
+                await _semaphore.WaitAsync(); // 세마포어 락
+                try
+                {
+                    // UI 업데이트는 Dispatcher를 사용하여 UI 스레드에서 수행해야 합니다.
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // _timer 리셋
+                        _timer.Stop();
+                        _rotationIndex = 0; // 페이지 인덱스 초기화
+
+                        foreach (AuctionContPanelViewModel viewModel in RunningViewModel)
+                        {
+                            DisplayRunningPageNum(viewModel._panel, viewModel.CowInfo, _rotationIndex + 1);
+                        }
+
+                        _timer.Start();
+                        logger.LogInfo("매 시간마다 초기화 완료");
+                        Debug.WriteLine("매 시간마다 초기화 완료");
+                    });
+                }
+                finally
+                {
+                    _semaphore.Release(); // 세마포어 해제
+                }
+            }
         }
 
         // 로고를 여러 개 보여줘야 할 경우 한 줄마다 다르게 보여주기 위한 메서드
@@ -76,13 +130,13 @@ namespace CowAuctionSmall.Models
 
             panelName = panelName.Split('_')[1];
 
-            List<LogoRowIdx> logoRows = _boardinfo.LogoBoard[0].Rows;
+            List<LogoRowIdx> logoRows = _boardinfo?.LogoBoard?[0]?.Rows ?? new List<LogoRowIdx>();
 
             foreach (var logoRow in logoRows)
             {
                 if (logoRow.Rows != null && logoRow.Rows.Contains(Convert.ToInt32(panelName)))
                 {
-                    logoImgName = logoRow.ID;
+                    logoImgName = logoRow.ID ?? "logo.bmp";
                 }
             }
 
@@ -382,6 +436,8 @@ namespace CowAuctionSmall.Models
 
             _rotationIndex = (_rotationIndex + 1) % _totalRunningPage;
         }
+
+
 
         // 타이머를 중지하는 메서드
         public void StopTimer()

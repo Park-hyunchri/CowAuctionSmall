@@ -28,7 +28,7 @@ namespace CowAuctionSmall.NetProto.netty
         //private async void CreateNettyClientWait(Builder builder)
         private void CreateNettyClientWait(Builder builder)
         {
-            //KIH_1219: Netty 접속 실표시 Alert 표출되는거 수정 함.
+            //KIH_1219: Netty 접속 실표시 Alert 표출되는거 수정 함. 여기서 지연
             //await Task.Run(() => this.startClient(builder.host, builder.port, builder.controller));
             ////channel = AuctionDelegate.getInstance().mClient.getChannel();
 
@@ -88,8 +88,10 @@ namespace CowAuctionSmall.NetProto.netty
             {
                 return channel.IsActive;
             }
-
-            return false;
+            else
+            {
+                return false; 
+            }
         }
 
         public int getPort()

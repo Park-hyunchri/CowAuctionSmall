@@ -13,7 +13,7 @@ using System.Windows.Threading;
 
 namespace CowAuctionSmall.ViewModels
 {
-    public partial class MainWindowViewModel : ObservableObject
+    public partial class MainWindowViewModel : ObservableObject, IDisposable
     {
         private readonly WeakReferenceMessenger _messenger;
         private readonly WeakReferenceMessenger _messengerStringMsg;
@@ -110,27 +110,33 @@ namespace CowAuctionSmall.ViewModels
 
         private void OnDataChanged(object recipient, DataChangedMessage message)
         {
-            ObservableCollection<gValues> currentCowList = new ObservableCollection<gValues>();
-            currentCowList.Clear();
-
-            foreach (var gValue in message.Data)
+            _dispatcher.Invoke(() =>
             {
-                currentCowList.Add(gValue);
-            }
-
-            _dispatcher.Invoke(() => UpdatePanels(currentCowList));
+                _currentCowList.Clear();
+                foreach (var gValue in message.Data)
+                {
+                    _currentCowList.Add(gValue);
+                }
+                UpdatePanels(_currentCowList);
+            });
         }
+
+
 
         public void UpdatePanels(ObservableCollection<gValues> currentCowList)
         {
             Debug.WriteLine("------------ {0}", currentCowList.Count);
 
-            foreach (gValues gValues in currentCowList)
+            _dispatcher.Invoke(() =>
             {
-                // 각 소의 정보를 기반으로 패널을 업데이트
-                displaySelect.FindPanel("Cow_" + gValues.SpaceIndex, Panels, gValues, _auctionmethod);
-            }
+                foreach (gValues gValues in currentCowList)
+                {
+                    // 각 소의 정보를 기반으로 패널을 업데이트
+                    displaySelect.FindPanel("Cow_" + gValues.SpaceIndex, Panels, gValues, _auctionmethod);
+                }
+            });
         }
+
 
         private void initCreateStackPanel(BoardList boardInfo)
         {
@@ -206,6 +212,12 @@ namespace CowAuctionSmall.ViewModels
                     MainWindowTextBox += message.Data;
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            _messenger.Unregister<DataChangedMessage>(this);
+            _messengerStringMsg.Unregister<DataStringMessage>(this);
         }
     }
 }

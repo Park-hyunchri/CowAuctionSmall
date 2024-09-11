@@ -1,4 +1,5 @@
-﻿using CowAuctionSmall.NetProto.interfaces;
+﻿using CowAuctionSmall.Models;
+using CowAuctionSmall.NetProto.interfaces;
 using CowAuctionSmall.NetProto.models;
 using DotNetty.Codecs;
 using DotNetty.Transport.Channels;
@@ -17,9 +18,10 @@ namespace CowAuctionSmall.NetProto.netty.handlers
     public class AuctionClientInboundDecoder : MessageToMessageDecoder<String>
     {
         private iNettyControllable mController;
-
+        private NLogger logger;
         public AuctionClientInboundDecoder(iNettyControllable controller)
         {
+            logger = NLogger.Instance;
             mController = controller;
         }
 
@@ -57,7 +59,7 @@ namespace CowAuctionSmall.NetProto.netty.handlers
         protected override void Decode(IChannelHandlerContext ctx, String message, List<Object> _out)
         {
             Debug.WriteLine("[" + System.DateTime.Now.ToString()+ "]" + "MSG>>" + message);
-
+            logger.LogInfo("[" + System.DateTime.Now.ToString() + "]" + "MSG>>" + message);
             String[] Msgs = message.Split(GlobalDefine.NETTY_INFO.DELIMITER);
 
             string foo = message.Substring(0, 2);
