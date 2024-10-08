@@ -13,11 +13,13 @@
 
     <UserControl.Resources>
         <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
     </UserControl.Resources>
 
     <Border BorderBrush="Blue" BorderThickness="2">
 
         <Grid Background="Black">
+            <TextBlock Visibility="Collapsed" Text="{Binding CowDistinction}" />
             <!-- "낙찰"을 표시하는 TextBlock -->
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="25" Foreground="Violet" />
 
@@ -40,15 +42,23 @@
                 </Canvas>
             </Canvas>
 
-            <Canvas Margin="0,75,0,0">
+<!-- ======================================================================================================================================================================= -->
+            <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
+            <Canvas Margin="0,75,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="개체 : "  Foreground="lime" Margin="2,0,0,0" />
                 <TextBlock Text="{Binding EntityNumber}" Margin="40,0,0,0" Foreground="Silver"/>
                 <TextBlock Text="{Binding EntityNumberShort}" Margin="73,0,0,0" Foreground="red" Background="Black"/>
             </Canvas>
+            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
+            <Canvas Margin="0,75,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" />
+                <TextBlock Text="{Binding EntityNumberShort}" Margin="40,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
+            </Canvas>
+<!-- ======================================================================================================================================================================= -->
 
             <Canvas Margin="0,90,0,0">
                 <TextBlock Text="{Binding Location}"  Foreground="magenta" Margin="2,0,0,0" />
-                <TextBlock Text="{Binding OwnerName}" Margin="40,0,0,0" Foreground="Cyan"/>
+                <TextBlock Text="{Binding OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
             </Canvas>
 
             <!-- Note를 표시하는 TextBlock -->

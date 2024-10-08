@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Server>
+		<Authentication>
+				<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
+				<UserID>boardman-139-1</UserID>
+				<Password>1111</Password>
+		</Authentication>
+  
+		<CurrentInfo>
+				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990687094/entry?date=</Address>
+				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990687094/date/</AddressEPD>
+				<Date>20240822</Date>
+		</CurrentInfo>
+  
+		<Auction>
+				<Address>115.41.222.25</Address>
+				<Port>5001</Port>
+				<Channel>6006</Channel>
+				<Priority>MANAGE</Priority>
+							<AuctionHouseCode>8808990687094</AuctionHouseCode>
+							<StartPosition>0,0</StartPosition>				<!--     프로그램 시작 위치 변경   -->
+	
+							<CowBirth>Y</CowBirth>					<!--     송아지 생년월일 일자 표기 결정    ex. Y or N   사용하지않는 옵션-->
+
+							<BoardPage>2</BoardPage>						<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
+							<BoardPageTime>7</BoardPageTime>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+							<BoardPageTime2>7</BoardPageTime2>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+							<BoardPageTime3>2</BoardPageTime3>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+	
+							<BidderName>Y</BidderName>				<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
+							<IsShowOwnerName>N</IsShowOwnerName>    <!--     출하자 이름 표시 ex. Y or N   -->
+							<ChangeSexName>Y</ChangeSexName>			<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
+							<IsGoatAuction>Y</IsGoatAuction>		<!--     염소경매데이터 표출 여부 ex. Y or N  -->
+		</Auction>
+</Server>
+
+<!--   개발서버용   -->
+<!--   영주축협   -->
+<!--    
+
+8808990687094
+128*64 일때는 
+BidderName  = Y,N
+ChangeSexName = N
+
+SpaceIndex = 계류대번호
+SipNumber = 출품번호
+MotherLevel = 어미 혈통
+RegistrationCategory = 본인혈통
+CalvingNumber = 어미산차
+Pregnant = 임신개월수
+EntityNumber = 축산개체관리번호
+BirthMonth = 개월령
+Birth = 생년월일
+ -->

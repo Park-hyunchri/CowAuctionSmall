@@ -1,20 +1,12 @@
 ﻿using CowAuctionSmall.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace CowAuctionSmall
@@ -24,14 +16,18 @@ namespace CowAuctionSmall
     /// </summary>
     public partial class MainWindow : Window
     {
-        private DispatcherTimer _shutdownTimer;
+        private Timer _shutdownTimer;
+        private Timer _memoryCheckTimer;
         public MainWindow()
         {
             IsLisence();
+            CheckMemoryUsageTimer(); // 메모리 사용량 체크 타이머 추가
+            SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽2시에는 무조건 프로그램 종료)
+            
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.None;
             this.DataContext = App.Current.Services.GetService<MainWindowViewModel>();
-            SetupShutdownTimer();
+            
         }
 
         private void IsLisence()
@@ -56,21 +52,69 @@ namespace CowAuctionSmall
                 Application.Current.Shutdown();
             }
         }
+
+        // 프로그램 종료 타이머 설정, 밤11시 30분 부터 새벽 2시까지 인 경우  
         private void SetupShutdownTimer()
         {
-            _shutdownTimer = new DispatcherTimer();
-            _shutdownTimer.Tick += ShutdownTimer_Tick;
-            _shutdownTimer.Interval = TimeSpan.FromMinutes(5); // 5분마다 체크로 변경하여 CPU 사용량 감소
+            _shutdownTimer = new Timer(300000); // 30분마다 체크
+            _shutdownTimer.Elapsed += ShutdownTimer_Tick;
             _shutdownTimer.Start();
         }
 
-        private void ShutdownTimer_Tick(object sender, EventArgs e)
+        // 타이머 틱 이벤트 핸들러
+        private void ShutdownTimer_Tick(object? sender, ElapsedEventArgs e)
         {
-            if (DateTime.Now.Hour == 23 && DateTime.Now.Minute == 30)
+            DateTime now = DateTime.Now;
+            if ((now.Hour == 23) || (now.Hour == 0) || (now.Hour == 1)) // 23시부터 새벽 2시까지
             {
-                Application.Current.Shutdown();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    Application.Current.Shutdown();
+                });
             }
         }
+
+        // 메모리 사용량 체크 타이머 추가
+        private void CheckMemoryUsageTimer()
+        {
+            _memoryCheckTimer = new Timer(10000); // 10마다 체크
+            _memoryCheckTimer.Elapsed += CheckMemoryUsageTimer_Tick;
+            _memoryCheckTimer.Start();
+        }
+
+        // 메모리 사용량 체크 타이머 틱 이벤트 핸들러
+        private void CheckMemoryUsageTimer_Tick(object? sender, ElapsedEventArgs e)
+        {
+            // 현재 프로세스의 메모리 사용량을 가져옴 (바이트 단위)
+            long memoryUsage = Process.GetCurrentProcess().WorkingSet64;
+
+            // 메모리 사용량이 2GB (2 * 1024 * 1024 * 1024 바이트)보다 크면 프로그램 재시작
+            if (memoryUsage > 2L * 1024 * 1024 * 1024)
+            {
+                var fileName = Process.GetCurrentProcess().MainModule.FileName;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    try
+                    {
+                        // 새 프로세스 시작
+                        Process.Start(fileName);
+
+                        // 타이머 정지
+                        _memoryCheckTimer.Stop();
+
+                        // 현재 애플리케이션 종료
+                        Application.Current.Shutdown();
+                    }
+                    catch (Exception ex)
+                    {
+                        // 예외 처리 (필요 시 로그 작성 또는 사용자에게 알림)
+                        MessageBox.Show($"프로그램 재시작 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                });
+            }
+        }
+
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -79,17 +123,10 @@ namespace CowAuctionSmall
                 Application.Current.Shutdown();
             }
         }
-
-        protected override void OnClosed(EventArgs e)
+        private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            base.OnClosed(e);
-            // 타이머 해제하여 메모리 누수 방지
-            if (_shutdownTimer != null)
-            {
-                _shutdownTimer.Stop();
-                _shutdownTimer.Tick -= ShutdownTimer_Tick;
-                _shutdownTimer = null;
-            }
+            // 스크롤을 맨 아래로 이동
+            MsgTextBox.ScrollToEnd();
         }
     }
 }

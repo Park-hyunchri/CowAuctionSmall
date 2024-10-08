@@ -17,8 +17,10 @@
             <ContentPresenter Content="{Binding MainContainer}" Grid.Row="0"/>
 
 
-            <TextBox Grid.Row="1" x:Name="MsgTextBox" Background="Black" Text="{Binding MainWindowTextBox}" Foreground="Lime" IsReadOnly="True" Margin="0,1,0,0" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                     BorderThickness="0" BorderBrush="Transparent"/>
+            <TextBox Grid.Row="1" x:Name="MsgTextBox" Background="Black" Text="{Binding MainWindowTextBox, UpdateSourceTrigger=PropertyChanged}" Foreground="Lime" IsReadOnly="True" Margin="0,1,0,0" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible"
+         BorderThickness="0" BorderBrush="Transparent" Height="70" TextChanged="MsgTextBox_TextChanged"/>
+
+
         </Grid>
     </ScrollViewer>
 </Window>

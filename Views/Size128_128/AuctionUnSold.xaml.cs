@@ -1,5 +1,6 @@
 ﻿using CowAuctionSmall.Models;
 using DocumentFormat.OpenXml.InkML;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using Canvas = System.Windows.Controls.Canvas;
@@ -20,10 +21,16 @@ namespace CowAuctionSmall.Views.Size128_128
         private void AuctionUnSold_Loaded(object sender, RoutedEventArgs e)
         {
 
-            if (note.ActualWidth > 120)
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                StartScrollingAnimation();
-            }
+                if (note.Text.Length > 8)
+                {
+                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
+                    {
+                        StartScrollingAnimation();
+                    }
+                }
+            }), System.Windows.Threading.DispatcherPriority.Render);
         }
 
         private void StartScrollingAnimation()

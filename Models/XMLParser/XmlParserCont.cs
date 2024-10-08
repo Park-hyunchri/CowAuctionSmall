@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -39,7 +40,7 @@ namespace CowAuctionSmall.Models.XMLParser
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Debug.WriteLine(ex.ToString());
                 boardResult = null; // null 값 할당
                 userInfoResult = null;
                 logger.LogError("XmlPaserResult : " + ex.ToString());

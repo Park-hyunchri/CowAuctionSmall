@@ -24,13 +24,24 @@ namespace CowAuctionSmall.Views
         {
 
 
-            if (note.Text.Length > 8)
+            /*            if (note.Text.Length > 8)
+                        {
+                            if (note.ActualWidth > 120 || note.Text.Replace(" ","").Length > 10)
+                            {
+                                StartScrollingAnimation();
+                            }
+                        }*/
+
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                if (note.ActualWidth > 120 || note.Text.Replace(" ","").Length > 10)
+                if (note.Text.Length > 8)
                 {
-                    StartScrollingAnimation();
+                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
+                    {
+                        StartScrollingAnimation();
+                    }
                 }
-            }
+            }), System.Windows.Threading.DispatcherPriority.Render);
         }
 
         private void StartScrollingAnimation()

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Diagnostics;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using static CowAuctionSmall.Models.Structures.AuctionStatus;
 
@@ -90,9 +91,17 @@ namespace CowAuctionSmall.Models
                     Process_NettyState_SD(data);
                     break;
 
-                case "SZ": //[일괄경매] 미응찰내역 표시
+                case "SZ": //[일괄경매] 미응찰내역 표시 , 
                     //SZ | 8808990657202 | 20240422 | 0 | 1 | Y | 1 | 999
                     // 종합안내 F9~F12번 버튼 클릭시 호출 기본 영상 표시 및 미응찰 내역 표시
+                    /*
+                    기본영상  :  SZ|8808990657202|20240906|0|1|A|1|900
+                    미 응 찰  :  SZ|8808990657202|20240906|0|1|Y|1|900
+                    경매 대상 :  SZ|8808990657202|20240906|0|1|P|1|900
+                    경매 결과 :  SZ|8808990657202|20240906|0|1|N|1|900
+                     */
+                    Debug.WriteLine(data.ToString());
+                    Process_NettyState_SZ(data);
                     break;
                 case "AF"://[단일경매] 동가 경매 후 일때 
                     Process_NettyState_AF(data);
@@ -107,7 +116,9 @@ namespace CowAuctionSmall.Models
             }
         }
 
-        
+
+
+
 
         /// <summary>
         /* AS
@@ -135,17 +146,24 @@ namespace CowAuctionSmall.Models
             }
             else // 단일 경매인경우
             {
-                if (data.Length >= 7 && runningState == AS.PROGRESS) // Check if data has at least 7 elements
+                if (data.Length >= 7 && runningState == AS.PROGRESS || runningState== AS.COMPLETED) // Check if data has at least 7 elements
                 {
                     string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
                     // Use the msg array here
                     WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
 
                 }
+                else if (runningState == AS.NONE)
+                {
+                    //MSG>>AS|8808990657202|||||8001|||||||
+                    Debug.WriteLine("새로고침 시작");
+                    string[] msg = new string[] { _auctionmethod.ToString(), "AS", "8001", "refresh"};// 경매방식, 코드 , 경매상태, 새로고침
+                    WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
+                }
                 else
                 {
                     // Handle the case where data has less than 7 elements
-                    Console.WriteLine("data array has less than 7 elements!");
+                    Debug.WriteLine("data array has less than 7 elements!");
                 }
             }
         }
@@ -182,6 +200,7 @@ namespace CowAuctionSmall.Models
                     case "C": //경매 카운트
                         break;
                     case "F":// 경매도중 종료
+                        WeakReferenceMessenger.Default.Send(new DataToServerGetAF_SD(data));
                         break;
                     default:
                         break;
@@ -213,15 +232,36 @@ namespace CowAuctionSmall.Models
         /// 단일경매, 동가 입력 후 결과값 메시지
         /// 코드, 축협코드, 경매번호, 낙찰여부 , ? , 참가번호 , 낙찰가격
         /// AF|8808990657202|5|22|1636|412|500: OnCurrentAuctionData 에서 호출         {0} 
+        /// 
+        /// ESC 3번 취소: AF|8808990657202|3|24|||0
         /// </summary>
         private void Process_NettyState_AF(string[] data)
         {
             //경매 도중 ESC를 누른경우
             if (data[data.Length-1].Equals("0"))
             {
-                WeakReferenceMessenger.Default.Send(new DataToServerGetMsg("F"));
-
+                WeakReferenceMessenger.Default.Send(new DataToServerGetAF_SD(data));
             }
+        }
+
+        //일괄경매 경매대상 클릭시 표출(일괄)
+        private void Process_NettyState_SZ(string[] data)
+        {
+            //일괄경매 새로고침을 누를 시
+            //MSG>>AS|8808990657202||328|||8002||||||1|0 코드를 보냄..
+            //날짜가 없어 해당하는 날짜로 데이터 못 호출함
+
+            //경매 대상 :  SZ | 8808990657202 | 20240906 | 0 | 1 | P | 1 | 900
+            //다른 코드는 현재사용처를 모름
+
+            if (data[5].ToUpper().Equals("P")) // 경매대상 키를 누를경우  GetCurrentInfo의 date 날짜를 강제 변경..
+            {
+                WeakReferenceMessenger.Default.Send(new DataToServerConnMsg(data[2]));
+
+                string[] msg = new string[] { _auctionmethod.ToString(), data[0], "8000" };// 경매방식, 코드, 경매상태
+                WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
+            }
+
         }
     }
 }

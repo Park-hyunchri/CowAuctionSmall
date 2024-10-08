@@ -42,10 +42,10 @@
     <None Update="Config\logo2.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\users.XML">
+    <None Update="Config\개users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\실users.XML">
+    <None Update="Config\users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="NLog.config">

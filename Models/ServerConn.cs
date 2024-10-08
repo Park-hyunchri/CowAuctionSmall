@@ -1,4 +1,5 @@
-﻿using CowAuctionSmall.Models.Structures;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using CowAuctionSmall.Models.Structures;
 using CowAuctionSmall.NetProto.netty;
 using DocumentFormat.OpenXml.Drawing;
 using Newtonsoft.Json;
@@ -13,6 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using UserInfo = CowAuctionSmall.Models.Structures.UserInfo;
 
 namespace CowAuctionSmall.Models
@@ -25,10 +27,17 @@ namespace CowAuctionSmall.Models
         //private HttpWebRequest request;
 
         private NLogger logger;
+
+        private readonly WeakReferenceMessenger _messengerStringDateMsg;
+
+        private string date;
+
         public ServerConn() 
         {
             // NLogger 초기화
             logger = NLogger.Instance;
+            _messengerStringDateMsg = WeakReferenceMessenger.Default;
+            _messengerStringDateMsg.Register<DataToServerConnMsg>(this, OnChangeDeta);
         }
 
         /// <summary>
@@ -45,12 +54,13 @@ namespace CowAuctionSmall.Models
                 return null;
             }
 
-            string? token = String.Empty;
+            string? token = string.Empty;
             try
             {
                 Debug.WriteLine("인증서버 연결 시도 중... " + "\r\n");
-                string url = userInfo.Authentication.Address;
-                var content = new StringContent(JsonConvert.SerializeObject(new { usrid = userInfo.Authentication.UserID.Trim(), pw = userInfo.Authentication.Password.Trim() }), Encoding.UTF8, "application/json");
+                logger.LogInfo("IssueTocken 토큰 인증서버 연결 시도 중...: ");
+                string? url = userInfo.Authentication?.Address;
+                var content = new StringContent(JsonConvert.SerializeObject(new { usrid = userInfo.Authentication?.UserID.Trim(), pw = userInfo.Authentication?.Password.Trim() }), Encoding.UTF8, "application/json");
 
                 using (var client = new HttpClient())
                 {
@@ -119,6 +129,7 @@ namespace CowAuctionSmall.Models
                 else
                 {
                     Debug.WriteLine("API 수신데이터가 없습니다.");
+                    logger.LogError("API 수신데이터가 없습니다.");
                     return null;
                 }
             }
@@ -136,17 +147,29 @@ namespace CowAuctionSmall.Models
         public async Task<JObject> GetCurrentInfo(UserInfo userInfo, string token)
         {
             string url = userInfo.CurrentInfo.Address;
-            string date = userInfo.CurrentInfo.Date;
-            if (string.IsNullOrEmpty(date))
+
+            if (userInfo.CurrentInfo.Date.Length > 0) // user.xml에서 설정한 값이 있는지
+            {
+                date = userInfo.CurrentInfo.Date;
+            }
+            else if (string.IsNullOrEmpty(date)) // date가 비어있는지 당연히 오늘날짜로 받아옴
             {
                 date = DateTime.Now.ToString("yyyyMMdd");
+            }
+            else
+            {
+                date = date;
             }
 
             string fullUrl = url + date;
 
-            using (var client = new HttpClient())
+            // 인증서 유효성 검사 비활성화 (테스트 환경에서만 사용)
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+
+            using (var client = new HttpClient(handler))
             {
-                client.Timeout = TimeSpan.FromMinutes(10); // 예: 10분으로 Timeout 설정
+                client.Timeout = TimeSpan.FromMinutes(15); // Timeout 설정을 15분으로 증가
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -171,18 +194,27 @@ namespace CowAuctionSmall.Models
                     else
                     {
                         Debug.WriteLine("서버 응답 오류: " + response.StatusCode);
-                        logger.LogError(" GetCurrentInfo 서버 응답 오류: " + response.StatusCode);
+                        logger.LogError("GetCurrentInfo 서버 응답 오류: " + response.StatusCode);
                     }
+                }
+                catch (TaskCanceledException e)
+                {
+                    // Timeout 에러 처리
+                    Debug.WriteLine("요청이 시간 초과되었습니다: " + e.Message);
+                    logger.LogError("GetCurrentInfo 요청 시간 초과: " + e.Message);
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine(e.Message);
-                    logger.LogError("GetCurrentInfo" + e.Message);
+                    logger.LogError("GetCurrentInfo : " + e.Message + "\n NettyComm 초기화 후 시작");
+                    AuctionDelegate.getInstance().disposeClients();
+                    NettyComm(userInfo, token);
                 }
             }
 
             return null;
         }
+
 
         /// <summary>
         /// 네티 대리자 실행, 비동기적으로 데이터를 받아온다
@@ -191,11 +223,21 @@ namespace CowAuctionSmall.Models
         /// <param name="token"></param>
         public bool NettyComm(UserInfo userInfo, string token)
         {
-            string host = userInfo.Auction.Address;
+            /*string host = userInfo.Auction.Address;
             int port = Convert.ToInt32(userInfo.Auction.Port);
             string id = userInfo.Authentication.UserID;
 
-            NettyControllable nc = new NettyControllable(userInfo.Auction.AuctionHouseCode, id, token, userInfo.Auction.Channel, userInfo.Auction.Priority);
+            NettyControllable nc = new NettyControllable(userInfo.Auction.AuctionHouseCode, id, token, userInfo.Auction.Channel, userInfo.Auction.Priority);*/
+
+            string houseCode = userInfo.Auction?.AuctionHouseCode ?? throw new ArgumentNullException(nameof(userInfo.Auction.AuctionHouseCode));
+            string id = userInfo.Authentication?.UserID ?? throw new ArgumentNullException(nameof(userInfo.Authentication.UserID));
+            string channel = userInfo.Auction?.Channel ?? throw new ArgumentNullException(nameof(userInfo.Auction.Channel));
+            string priority = userInfo.Auction?.Priority ?? throw new ArgumentNullException(nameof(userInfo.Auction.Priority));
+            string host = userInfo.Auction.Address ?? throw new ArgumentNullException(nameof(userInfo.Auction.Address));
+            int port = Convert.ToInt32(userInfo.Auction.Port);
+
+            NettyControllable nc = new NettyControllable(houseCode, id, token, channel, priority);
+
 
             AuctionDelegate.getInstance().createClients(host, port, nc);
 
@@ -209,17 +251,28 @@ namespace CowAuctionSmall.Models
             List<EpdValue> responseListEpd = new List<EpdValue>();
 
             string url = userInfo.CurrentInfo.AddressEPD;
-            string date = userInfo.CurrentInfo.Date;
-            if (string.IsNullOrEmpty(date))
+            
+            if (userInfo.CurrentInfo.Date.Length > 0)
+            {
+                date = userInfo.CurrentInfo.Date;
+            }
+            else if (string.IsNullOrEmpty(date))
             {
                 date = DateTime.Now.ToString("yyyyMMdd");
+            }
+            else
+            {
+                date = date;
             }
 
             string fullUrl = url.Replace("date", date);
 
+            // TLS 1.2 강제 설정
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             using (var client = new HttpClient())
             {
-                client.Timeout = TimeSpan.FromMinutes(10); // 예: 10분으로 Timeout 설정
+                client.Timeout = TimeSpan.FromMinutes(10);
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -243,12 +296,11 @@ namespace CowAuctionSmall.Models
                                 {
                                     EpdValue epdValue = new EpdValue
                                     {
-                                        EPD_1 = item.Value<string>("EPD_1"),
-                                        EPD_2 = item.Value<string>("EPD_2"),
-                                        EPD_3 = item.Value<string>("EPD_3"),
-                                        EPD_4 = item.Value<string>("EPD_4"),
-                                        SRA_INDV_AMNNO = item.Value<string>("SRA_INDV_AMNNO"),
-                                        AUC_PRG_SQ = item.Value<int>("AUC_PRG_SQ")
+                                        EPD_1 = item.Value<string>("EPD_1") ?? string.Empty,
+                                        EPD_2 = item.Value<string>("EPD_2") ?? string.Empty,
+                                        EPD_3 = item.Value<string>("EPD_3") ?? string.Empty,
+                                        EPD_4 = item.Value<string>("EPD_4") ?? string.Empty,
+                                        SRA_INDV_AMNNO = item.Value<string>("SRA_INDV_AMNNO") ?? string.Empty
                                     };
                                     responseListEpd.Add(epdValue);
                                 }
@@ -257,18 +309,20 @@ namespace CowAuctionSmall.Models
                     }
                     else
                     {
-                        Console.WriteLine("서버 응답 오류: " + response.StatusCode);
+                        Debug.WriteLine("서버 응답 오류: " + response.StatusCode);
+                        logger.LogError("GetCurrentInfoEPD : 서버 응답 오류");
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Debug.WriteLine(e.Message);
                     logger.LogError("GetCurrentInfoEPD : " + e.Message);
                 }
             }
 
             return responseListEpd;
         }
+
 
         public List<string> JoinEpdnData(List<string> dataList, List<EpdValue> epdlist)
         {
@@ -373,6 +427,18 @@ namespace CowAuctionSmall.Models
             }
 
             return gv;
+        }
+
+        /// <summary>
+        /// 일괄 경매, 경매 대상을 클릭시 날짜 변경
+        /// </summary>
+        /// <param name="recipient"></param>
+        /// <param name="message"></param>
+        private void OnChangeDeta(object recipient, DataToServerConnMsg message)
+        {
+            string msg = message.Data;
+            date = msg;
+            logger.LogInfo($"GetCurrentInfo OnChangeDeta : 일괄경매 날짜 변경 {date}");
         }
 
 

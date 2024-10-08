@@ -29,7 +29,7 @@ namespace CowAuctionSmall.NetProto.netty.handlers
                 mController.OnCurrentAuctionData(data);                
             }
 
-            //Console.WriteLine(" ==>> called OnCurrentAuctionData");
+            //Debug.WriteLine(" ==>> called OnCurrentAuctionData");
         }
     }
 }

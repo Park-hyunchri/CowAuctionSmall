@@ -21,6 +21,8 @@ namespace CowAuctionSmall.NetProto.netty
         public string Priority = "";
         public string Channel ="";
 
+        private NLogger logger;
+
         public NettyControllable(string _HouseCode, string _Uname, string _Token, string _Channel, string _Priority)
         {
             this.HouseCode = _HouseCode;
@@ -28,6 +30,8 @@ namespace CowAuctionSmall.NetProto.netty
             this.Token = _Token;
             this.Priority = _Priority;
             this.Channel = _Channel;
+
+            logger = NLogger.Instance;
         }
 
         public void onActiveChannel(IChannelHandlerContext ctx)
@@ -43,14 +47,15 @@ namespace CowAuctionSmall.NetProto.netty
         public void onChannelInactive(int port)
         {
             //throw new NotImplementedException();
-            Console.WriteLine("## NETTY  DISCONNECT !! ");
+            Debug.WriteLine("## NETTY  DISCONNECT !! ");
+            logger.LogError("## NETTY  DISCONNECT !! ");
         }
 
         public void onCheckSession(IChannelHandlerContext ctx, AuctionCheckSession auctionCheckSession)
         {
             //throw new NotImplementedException();
             // 서버에서 요청이 오면 사용자 정보 보내줌.
-            //Console.WriteLine("[세션 정보 보냄 ] ");
+            //Debug.WriteLine("[세션 정보 보냄 ] ");
             AuctionDelegate.getInstance().sendMessage(new AuctionReponseSession(Uname, Channel, Priority).getEncodedMessage());
         }
 

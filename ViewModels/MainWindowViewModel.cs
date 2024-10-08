@@ -3,10 +3,14 @@ using CommunityToolkit.Mvvm.Messaging;
 using CowAuctionSmall.Models;
 using CowAuctionSmall.Models.Structures;
 using CowAuctionSmall.Models.XMLParser;
+using DocumentFormat.OpenXml.Bibliography;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -43,9 +47,9 @@ namespace CowAuctionSmall.ViewModels
         private int _eachPanelWidth;
         private int _eachPanelHeight;
 
-        private bool first = true;
+        private bool _first = true;
 
-        private DisplaySelect displaySelect;
+        private DisplaySelect _displaySelect;
         private ServerGetData _serverGetData;
 
         private int _auctionmethod = 0; // 단일 일괄경매방식
@@ -65,20 +69,40 @@ namespace CowAuctionSmall.ViewModels
             this._serverGetData = serverGetData;
 
             Panels = new ObservableCollection<VirtualizingStackPanel>();
-
             _xmlParserCont = xmlParserCont;
-            var r = _xmlParserCont.XmlPaserResult();
 
             // null 가능성 검사 추가
+            var r = _xmlParserCont.XmlPaserResult();
             if (r.board == null || r.userInfo == null)
             {
                 logger.LogError("MainWindowViewModel: board 또는 userInfo가 null입니다.");
                 return;
             }
 
-            if (r.board.Size != null)
+            InitializeBoardSize(r.board);
+            InitializeUserInfo(r.userInfo);
+
+            _displaySelect = new DisplaySelect(r.userInfo, r.board);
+            InitCreateStackPanel(r.board);
+        }
+        private void InitializeUserInfo(UserInfo userInfo)
+        {
+            if (userInfo.Auction?.StartPosition != null)
             {
-                var sizeParts = r.board.Size.Split(',');
+                var startPositionParts = userInfo.Auction.StartPosition.Split(",");
+                if (startPositionParts.Length == 2)
+                {
+                    _mainPositionX = double.Parse(startPositionParts[0]);
+                    _mainPositionY = double.Parse(startPositionParts[1]);
+                }
+            }
+        }
+
+        private void InitializeBoardSize(BoardList board)
+        {
+            if (board.Size != null)
+            {
+                var sizeParts = board.Size.Split(',');
                 if (sizeParts.Length == 2)
                 {
                     _eachPanelWidth = int.Parse(sizeParts[0]);
@@ -86,39 +110,28 @@ namespace CowAuctionSmall.ViewModels
                 }
             }
 
-            // null 가능성 검사 추가
-            if (r.board.MultiBoards != null && r.board.MultiBoards.Count > 0 && r.board.MultiBoards[0].Rows != null)
+            if (board.MultiBoards?.FirstOrDefault()?.Rows != null)
             {
-                _mainWindowWidth = r.board.MultiBoards[0].Rows[0].Length * _eachPanelWidth;
-                _mainWindowHeight = r.board.MultiBoards[0].Rows.Count * _eachPanelHeight + 75;
+                _mainWindowWidth = board.MultiBoards[0].Rows[0].Length * _eachPanelWidth;
+                _mainWindowHeight = board.MultiBoards[0].Rows.Count * _eachPanelHeight + 75;
             }
-
-            if (r.userInfo.Auction != null && r.userInfo.Auction.StartPosition != null)
-            {
-                var startPositionParts = r.userInfo.Auction.StartPosition.Split(",");
-                if (startPositionParts.Length == 2)
-                {
-                    _mainPositionX = double.Parse(startPositionParts[0]);
-                    _mainPositionY = double.Parse(startPositionParts[1]);
-                }
-            }
-
-            displaySelect = new DisplaySelect(r.userInfo, r.board);
-
-            initCreateStackPanel(r.board);
         }
 
         private void OnDataChanged(object recipient, DataChangedMessage message)
         {
-            _dispatcher.Invoke(() =>
+
+            if (message.Data.Count >0)
             {
-                _currentCowList.Clear();
-                foreach (var gValue in message.Data)
+                _dispatcher.Invoke(() =>
                 {
-                    _currentCowList.Add(gValue);
-                }
-                UpdatePanels(_currentCowList);
-            });
+                    _currentCowList.Clear();
+                    foreach (var gValue in message.Data)
+                    {
+                        _currentCowList.Add(gValue);
+                    }
+                    UpdatePanels(_currentCowList);
+                });
+            }
         }
 
 
@@ -131,29 +144,31 @@ namespace CowAuctionSmall.ViewModels
             {
                 foreach (gValues gValues in currentCowList)
                 {
+                    if (gValues == null)
+                    {
+                        return;
+                    }
                     // 각 소의 정보를 기반으로 패널을 업데이트
-                    displaySelect.FindPanel("Cow_" + gValues.SpaceIndex, Panels, gValues, _auctionmethod);
+                    _displaySelect.FindPanel("Cow_" + gValues.SpaceIndex, Panels, gValues, _auctionmethod);
                 }
             });
         }
 
 
-        private void initCreateStackPanel(BoardList boardInfo)
+        private void InitCreateStackPanel(BoardList boardInfo)
         {
-            // null 가능성 검사 추가
-            if (boardInfo.MultiBoards == null || boardInfo.MultiBoards.Count == 0 || boardInfo.MultiBoards[0].Rows == null)
+            if (boardInfo.MultiBoards?.FirstOrDefault()?.Rows == null)
             {
                 return;
             }
 
-            List<int[]> rowIdx = boardInfo.MultiBoards[0].Rows;
+            var rowIdx = boardInfo.MultiBoards[0].Rows;
             var mainContainer = new VirtualizingStackPanel
             {
                 Background = Brushes.DarkSlateBlue,
                 Orientation = Orientation.Vertical
             };
 
-            int k = 0;
             foreach (var row in rowIdx)
             {
                 var rowStackPanel = new VirtualizingStackPanel
@@ -163,56 +178,50 @@ namespace CowAuctionSmall.ViewModels
 
                 foreach (var cell in row)
                 {
-                    k++;
                     var panel = new VirtualizingStackPanel
                     {
-                        Name = "Cow_" + cell.ToString(),
+                        Name = "Cow_" + cell,
                         Width = _eachPanelWidth,
                         Height = _eachPanelHeight,
                         Background = Brushes.Black
                     };
 
-                    if (_currentCowList.Count < 0 || first)
+                    if (_currentCowList.Count == 0 || _first)
                     {
-                        displaySelect.DisplayLogo(panel);
+                        _displaySelect.DisplayLogo(panel);
                     }
                     else
                     {
-                        first = false;
+                        _first = false;
                     }
                     Panels.Add(panel);
                     rowStackPanel.Children.Add(panel);
                 }
 
                 mainContainer.Children.Add(rowStackPanel);
-                k++;
             }
 
             MainContainer = mainContainer;
         }
 
+
         private void OnDataStringMsg(object recipient, DataStringMessage message)
         {
-            string msg = string.Empty;
-            switch (message.Data)
+            string msg = message.Data switch
             {
-                case "10":
-                    msg = "일괄 경매 방식";
-                    MainWindowTextBox += msg;
-                    _auctionmethod = Convert.ToInt32(message.Data);
-                    break;
+                "10" => "일괄 경매 방식",
+                "20" => "단일 경매 방식",
+                _ => message.Data
+            };
 
-                case "20":
-                    msg = "단일 경매 방식";
-                    MainWindowTextBox += msg;
-                    _auctionmethod = Convert.ToInt32(message.Data);
-                    break;
-
-                default:
-                    MainWindowTextBox += message.Data;
-                    break;
+            MainWindowTextBox +=  msg+"\n";
+            if (int.TryParse(message.Data, out int method))
+            {
+                _auctionmethod = method;
             }
+
         }
+
 
         public void Dispose()
         {

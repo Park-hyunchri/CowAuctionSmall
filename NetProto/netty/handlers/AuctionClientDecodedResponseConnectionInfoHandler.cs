@@ -29,7 +29,7 @@ namespace CowAuctionSmall.NetProto.netty.handlers
             {
                 mController.OnResponseConnectionInfo(responseConnectionInfo);
             }
-            //Console.WriteLine("[" + System.DateTime.Now.ToString() + "]" + " ==>> called ResponseConnectionInfoHandler.ChannelRead0");
+            //Debug.WriteLine("[" + System.DateTime.Now.ToString() + "]" + " ==>> called ResponseConnectionInfoHandler.ChannelRead0");
         }
     }
 }

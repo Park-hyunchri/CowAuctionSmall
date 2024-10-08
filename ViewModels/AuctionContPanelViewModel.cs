@@ -58,12 +58,16 @@ namespace CowAuctionSmall.ViewModels
             }
         }
 
-        public String Note
+        public String? Note
         {
-            get { return _cowInfo.Note; }
+            get { return _cowInfo?.Note; }
             set
             {
-                OnPropertyChanged(nameof(_cowInfo.Note));
+                if (_cowInfo != null)
+                {
+                    _cowInfo.Note = value;
+                    OnPropertyChanged(nameof(_cowInfo.Note));
+                }
             }
         }
 
@@ -79,21 +83,7 @@ namespace CowAuctionSmall.ViewModels
 
             if (_isRunning ==true)
             {
-                Debug.WriteLine($"진행중 화면 {cowinfo.SpaceIndex} ");
-            }
-            //NotePosition = 300; // 초기 위치
-            //StartAnimation();
-
-            //Debug.WriteLine("진행중 화면");
-
-            if (_totalRunningPage == 1)
-            {
-                // Total running page가 1이면 로테이션을 하지 않고 첫 번째 페이지만 표시
-                _displaySelect.DisplayRunningPageNum(_panel, _cowInfo, 1);
-            }
-            else
-            {
-
+                Debug.WriteLine($"진행중 화면 {cowinfo.SpaceIndex}");
             }
         }
 

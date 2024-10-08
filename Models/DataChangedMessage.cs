@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// 메신저로 사용할 클래스 정의 
+/// 비동기로 뭔가 넘겨주고 싶을 때 사용
+/// </summary>
 namespace CowAuctionSmall.Models
 {
     public class DataChangedMessage
@@ -72,6 +76,36 @@ namespace CowAuctionSmall.Models
         public string Data { get; }
 
         public DataToServerGetMsg(string data)
+        {
+            Data = data;
+        }
+    }
+
+    public class DataToServerConnMsg
+    {
+        public string Data { get; }
+
+        public DataToServerConnMsg(string data)
+        {
+            Data = data;
+        }
+    }
+
+    public class DataToServerGetAF_SD
+    {
+        public string[] Data { get; }
+
+        public DataToServerGetAF_SD(string[] data)
+        {
+            Data = data;
+        }
+    }
+
+    public class DisplaySelectRefresh
+    {
+        public string Data { get; }
+
+        public DisplaySelectRefresh(string data)
         {
             Data = data;
         }

@@ -28,10 +28,10 @@ namespace CowAuctionSmall.Models
 
         public gValues Parse_PacketApi(string message , UserInfo userInfo, ServerConn conn)
         {
-            if (message == null || userInfo== null || conn ==null)
+            if (message == null || userInfo == null || conn == null)
             {
-                logger.LogError("Parse_PacketApi \nmessage : " + message + "\nuserInfo : " + userInfo.ToString() + "\nconn : " + conn.ToString()+ "");
-                
+                logger.LogError("Parse_PacketApi \nmessage : " + (message ?? "null") + "\nuserInfo : " + (userInfo?.ToString() ?? "null") + "\nconn : " + (conn?.ToString() ?? "null"));
+                return new gValues();
             }
 
             gValues gv = new gValues();
@@ -59,7 +59,7 @@ namespace CowAuctionSmall.Models
 
             if ((data[13] != null || data[13].Length > 0) && (data[4] != null || data[4].Length > 0))
             {
-                if (userInfo.Auction.ChangeSexName.ToUpper().Equals("N"))
+                if (userInfo.Auction?.ChangeSexName?.ToUpper().Equals("N") == true)
                 {
                     gv.Sex = data[13]; //성별 그대로 표출
                 }
@@ -67,6 +67,7 @@ namespace CowAuctionSmall.Models
                 {
                     gv.Sex = changeSex(data[13], data[4]); //성별, 송아지 비육우 번식우 구분인자
                 }
+
             }
 
             if (string.IsNullOrEmpty(data[27]) || data[27] == "0" || data[27] == "null") // 최저가
@@ -75,7 +76,7 @@ namespace CowAuctionSmall.Models
             }
             else
             {
-                gv.LowestPrice = data[27];
+                gv.LowestPrice = decimal.Parse(data[27]).ToString("N0");
             }
 
             gv.Weight = data[25];                           //중량
@@ -129,26 +130,30 @@ namespace CowAuctionSmall.Models
             }
 
 
-            if (userInfo.Auction.IsShowOwnerName.Contains("N"))
+            if (userInfo.Auction?.IsShowOwnerName?.Contains("N") == true)
             {
-                gv.OwnerName = data[9];                         //출하주 => 농가명
+                gv.OwnerName = data[9]; //출하주 => 농가명
 
-                if (!String.IsNullOrEmpty(gv.OwnerName) && gv.OwnerName.Length > 5)
+                if (!String.IsNullOrEmpty(gv.OwnerName))
                 {
-                    //농가 이름 자르기
-                    gv.OwnerName = gv.OwnerName.Substring(0, 4);
                     if (userInfo.Auction.IsShowOwnerName.Equals("N"))
                     {
-                        gv.OwnerName = gv.OwnerName.Substring(0, 1) + "*" + gv.OwnerName.Substring(2);
+                        if (gv.OwnerName.Length > 2)
+                        {
+                            gv.OwnerName = gv.OwnerName.Substring(0, 1) + "*" + gv.OwnerName.Substring(2, 1);
+                        }
+                        else
+                        {
+                            gv.OwnerName = gv.OwnerName.Substring(0, 1) + "*";
+                        }
                     }
-
                 }
-
             }
             else
             {
-                gv.OwnerName = data[9].Length > 5 ? data[9].Substring(0, 4) : data[9];                         //출하주 => 농가명
+                gv.OwnerName = data[9].Length > 4 ? data[9].Substring(0, 4) : data[9]; //출하주 => 농가명
             }
+
 
 
             gv.Location = data[22].Length > 3 ? data[22].Substring(0, 2) : data[22];                         //출하 지역
@@ -229,7 +234,7 @@ namespace CowAuctionSmall.Models
             }
 
             else
-                gv.BidPrice = data[31];                         //낙찰가격
+                gv.BidPrice = decimal.Parse(data[31]).ToString("N0"); ;                         //낙찰가격 ","표시
 
 
             if (!string.IsNullOrEmpty(data[28]))
@@ -253,8 +258,17 @@ namespace CowAuctionSmall.Models
 
             if (!string.IsNullOrEmpty(data[5]))
             {
-                string foo = data[5].Substring(10, 4);
-                gv.EntityNumberShort = foo;
+                if (!gv.CowDistinction.Equals("5"))
+                {
+                    string foo = data[5].Substring(10, 4);
+                    gv.EntityNumberShort = foo;
+                }
+                else
+                {
+                    string foo = data[5].Substring(11);
+                    gv.EntityNumberShort = foo;
+                }
+                
             }
             else
                 gv.EntityNumberShort = "";

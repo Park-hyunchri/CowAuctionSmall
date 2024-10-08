@@ -13,35 +13,50 @@ using static CowAuctionSmall.Models.Structures.AuctionStatus;
 using System.Threading;
 using System.Windows.Shell;
 using CowAuctionSmall.NetProto.netty;
+using System.Windows.Interop;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Newtonsoft.Json.Linq;
+using DocumentFormat.OpenXml.Office2016.Drawing.Command;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Office2010.PowerPoint;
+using DocumentFormat.OpenXml.Office2016.Excel;
 
 namespace CowAuctionSmall.Models
 {
     /// <summary>
-    /// 서버에서 받아온 데이터를 처리
+    /// 서버에서 받아온 데이터를 처리 
+    /// 고정적으로 데이터를 받아오고 처리 , 화면에 뿌려줄 객체 선별 후 전달 (메인뷰로 전달)
     /// </summary>
     public class ServerGetData : IDisposable
     {
         private ServerConn _conn;
         private XmlParserCont _xmlParserCont;
         private NettyAsyncMsgProcess _nettyAsync;
-        private UserInfo _userInfo;
-        private String _token;
+        private UserInfo? _userInfo;
+        private string? _token;
 
-        private bool _isRunning;
 
-        private List<string> mAPIList = new List<string>(); //고정적으로 데이터 온 메시지
-        private List<string> beforemAPIList;
-        private bool _isSame = true; //mAPIList 와 beforemAPIList 큐 비교용
+        // 여기 구간은 시험용으로
+        private List<string> mAPIList = new List<string>(); //고정적으로 데이터 온 메시지, 가공되지 않은 String []
+        private bool _isSame = true; //_latestAuctionDataList 와 _beforeAuctionDataList 큐 비교용
+        private List<EpdValue> epdList = new List<EpdValue>(); // EPD 데이터 처음 한번만 받아옴, 이유는 수정될경우가 없다고 판단
+        private bool _isRunning; // 서버 데이터 처리가 실행 중인지 여부, 에러가 생길시 동작 정지
 
-        private List<EpdValue> epdList = new List<EpdValue>();
+        private Stopwatch stopwatch = new Stopwatch();  // Stopwatch 객체 생성
+        private readonly object _lockObj = new object(); // 락 오브젝트 선언
 
-        public ConcurrentQueue<string> mNetMessageList = new ConcurrentQueue<string>();// 비동기적 메시지
+        private List<gValues>? _latestAuctionDataList; //최신 경매 데이터 리스트
+        private List<gValues>? _beforeAuctionDataList; //과거 경매 데이터 리스트
+        private int _runRunSipNumber = -1 ; // 현재 진행중인 경매 번호 (경매진행중일때 는 다른화면으로 전환 x 하려고) -1을 초기값으로 한 이유는 개발서버에서 0번 경매도 생성가능해서
+
+        private AnimalParseData _animParseData; //데이터 파싱용, 여러군데 써서 따로 빼둠
+        //
 
         private readonly WeakReferenceMessenger _messenger;
-        private readonly WeakReferenceMessenger _messenger8007;
-        private readonly WeakReferenceMessenger _messengerStringArr;
+        private readonly WeakReferenceMessenger _messenger8007;         //경매 종료시 , 메시지를 보내는 곳(NettyAsyncMsgProcess)
+        private readonly WeakReferenceMessenger _messengerStringArr;    //스페이스바 누를때, 메시지를 보내는 곳(NettyAsyncMsgProcess)
+        private readonly WeakReferenceMessenger _messengerStArrAF_SD;   //단일 유찰시, 메시지를 보내는 곳(NettyAsyncMsgProcess)
 
-        private AnimalParseData _animParseData;
 
         private NLogger logger;
         /// <summary>
@@ -67,8 +82,14 @@ namespace CowAuctionSmall.Models
 
             _messenger8007 = WeakReferenceMessenger.Default;
             _messenger8007.Register<DataStringMessage8007>(this, OnStringMsg8007);
-            
 
+            _messengerStArrAF_SD = WeakReferenceMessenger.Default;
+            _messengerStArrAF_SD.Register<DataToServerGetAF_SD>(this, OnStringArrAF_SD);
+
+            //시험용
+            _latestAuctionDataList = new List<gValues>();//최신 경매 데이터 리스트
+
+            //
             Task.Run(()=> init()) ;
         }
 
@@ -95,7 +116,7 @@ namespace CowAuctionSmall.Models
         }
 
         private bool runProcessMessageAsync = true;
-        private bool firstSetup = true;
+        private bool firstSetup = true; // 주기적으로 네티 서버와 연결을 시도후 상태에 따라 메인화면 하단에 메시지 전달
         public async Task StartAsync()
         {
             _isRunning = true;
@@ -126,7 +147,10 @@ namespace CowAuctionSmall.Models
                                 if (!isActiveNetty)
                                 {
                                     // 네티 연결이 활성화되지 않았을 경우, 즉시 재연결 시도
-                                    _conn.NettyComm(_userInfo, _token);
+                                    if (_userInfo != null && _token != null)
+                                    {
+                                        _conn.NettyComm(_userInfo, _token);
+                                    }
                                     logger.LogInfo("네티 연결 시도 중...");
                                 }
                                 else
@@ -137,6 +161,10 @@ namespace CowAuctionSmall.Models
                                 }
 
                                 logger.LogInfo("네티 연결상태 : " + isActiveNetty);
+                                if (isActiveNetty ==false)
+                                {
+                                    WeakReferenceMessenger.Default.Send(new DataStringMessage("서버 연결 실패"));
+                                }
                             }
                         }
                     }
@@ -164,77 +192,99 @@ namespace CowAuctionSmall.Models
         }
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // SemaphoreSlim 초기화
-        private bool _IsDataDelete = false;
         private async Task ProcessMessageAsync()
         {
             await _semaphore.WaitAsync(); // 세마포어 진입
             try
             {
                 List<gValues> currentSyncList = new List<gValues>();
-                ConcurrentQueue<string>? differenceQueue = null; // 변경할 데이터 목록
-                ConcurrentQueue<string>? logoQueue = null; // 기존 표출 항목에서 변경 후 로고 화면을 띄워야 하는 경우
 
                 try
                 {
                     //시작 전 싹 지우고 시작
-                    string message = "";
-                    if (mAPIList != null)
+                    if (mAPIList != null && _latestAuctionDataList !=null)
                     {
                         mAPIList.Clear();
+                        epdList.Clear(); 
+                        _latestAuctionDataList.Clear();
                     }
 
                     // 매초마다 서버에서 받아오는 목록들 List<string> 
-                    mAPIList = await _conn.SvInfoRequest(_userInfo, _token);
-
-                    if (epdList != null || epdList.Count > 0) //서버에서 온 데이터와 EPD 데이터 합치기
+                    if (_userInfo != null && _token != null)
                     {
+                        mAPIList = await _conn.SvInfoRequest(_userInfo, _token);
+                    }
+
+                    if (mAPIList != null && mAPIList.Count > 0) //서버에서 온 데이터와 EPD 데이터 합치기
+                    {
+                        if (epdList.Count ==0)
+                        {
+                            epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
+                        }
+                        
                         mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
+
+                        Parallel.ForEach(mAPIList, message =>
+                        {
+                            var gv = _animParseData.Parse_PacketApi(message, _userInfo, _conn);
+                            // 추가 처리
+                            lock (_lockObj)
+                            {
+                                _latestAuctionDataList.Add(gv);
+                            }
+                        });
+                        _latestAuctionDataList = _latestAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
                     }
 
                     //============================== 시 작 =================================================
-                    if (beforemAPIList == null || beforemAPIList.Count <= 0) //처음 시작
+                    if (_beforeAuctionDataList==null) //처음 시작
                     {
-                        // 새 ConcurrentQueue 생성
-                        beforemAPIList = new List<string>(mAPIList.Select(x => x));
-                        epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
-                        if (epdList != null)
-                        {
-                            beforemAPIList = _conn.JoinEpdnData(beforemAPIList, epdList);
-                            mAPIList = _conn.JoinEpdnData(mAPIList, epdList);
-                        }
-                        InsertDatas(new ConcurrentQueue<string>(mAPIList));
+                        // 새 복사 생성
+                        _beforeAuctionDataList = new List<gValues>(_latestAuctionDataList.Count);
+                        _beforeAuctionDataList.AddRange(_latestAuctionDataList);
+                        InsertDatas(_beforeAuctionDataList);
+                        _beforeAuctionDataList = _beforeAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
                         return;
                     }
-                    else if (mAPIList.Count < beforemAPIList.Count) //서버에서 온 데이터가 줄어들었을때 즉, 데이터 삭제됨
+
+                    if (_latestAuctionDataList.Count < _beforeAuctionDataList.Count) //서버에서 온 데이터가 줄어들었을때 즉, 데이터 삭제됨
                     {
-                        differenceQueue = new ConcurrentQueue<string>(beforemAPIList.Except(mAPIList)); //삭제할 데이터
-                        DataDeletes(differenceQueue);
-                        return;
+                        // HashSet을 사용한 예시
+                        var latestAuctionDataSet = new HashSet<gValues>(_latestAuctionDataList, new EntityNumberComparer());
+                        var removedItems = _beforeAuctionDataList
+                                            .Where(item => !latestAuctionDataSet.Contains(item))
+                                            .ToList();
+
+                        DataDeletes(removedItems);
+
                     }
-                    else if (mAPIList.Count > beforemAPIList.Count) // 서버에서 온 데이터가 늘어났을 때
+                    else if (_latestAuctionDataList.Count > _beforeAuctionDataList.Count) // 서버에서 온 데이터가 늘어났을 때
                     {
-                        differenceQueue = new ConcurrentQueue<string>(mAPIList.Except(beforemAPIList)); //추가된 데이터
-                        InsertDatas(differenceQueue);
-                        return;
+                        var addedItems = _latestAuctionDataList
+                                            .Where(item => !_beforeAuctionDataList.Contains(item))
+                                            .ToList();
+                        InsertDatas(addedItems);//추가된 데이터
                     }
                     else //서버에서 온 데이터가 정보가 그대로 유지되었거나 또는 개체의 데이터가 변경되었을때
                     {
 
-                        _isSame = beforemAPIList.SequenceEqual(mAPIList);
+                        _isSame = _beforeAuctionDataList.SequenceEqual(_latestAuctionDataList);
                         if (_isSame)
                         {
+                            //Debug.WriteLine("두 값이 같음 =======");
                             return;
                         }
                         else
                         {
                             Debug.WriteLine("두 값이 틀림 =======");
-
-                            ModifiedData(new ConcurrentQueue<string>(mAPIList), new ConcurrentQueue<string>(beforemAPIList)); // 변경된 데이터 처리
-
+                            ModifiedData(_latestAuctionDataList, _beforeAuctionDataList); // 값이 변경된 데이터 처리
                         }
                     }
-                    // beforemAPIList 업데이트
-                    beforemAPIList = new List<string>(mAPIList.Select(x => x));
+
+                    // _beforeAuctionDataList 업데이트
+                    _beforeAuctionDataList = new List<gValues>(_latestAuctionDataList.Count);
+                    _beforeAuctionDataList.AddRange(_latestAuctionDataList);
+                    _beforeAuctionDataList = _beforeAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
                 }
                 catch (Exception ex)
                 {
@@ -248,115 +298,96 @@ namespace CowAuctionSmall.Models
         }
 
 
-        private void DataDeletes(ConcurrentQueue<string> logoQueue)
+        private void DataDeletes(List<gValues> deleteDatas)
         {
-            List<gValues> deleteDatas = new List<gValues>();
-            if (logoQueue != null && logoQueue.Any())
+            //DisplaySelect 11(대기),22(낙찰),23(유찰)이 아니면 로고로 대체
+            foreach (var item in deleteDatas)
             {
-                var logoItems = logoQueue.ToArray();
-                foreach (var logoItem in logoItems)
-                {
-                    gValues gValues = new gValues
-                    {
-                        SpaceIndex = logoItem.Split('|')[34],
-                        AuctionResultStatus = "00"
-                    };
-                    deleteDatas.Add(gValues);
-                }
+                item.AuctionResultStatus = "00";
             }
+
+            Debug.WriteLine("삭제된 데이터 갯수 : " + deleteDatas.Count);
             // MainWindowViewModel 쪽으로 데이터 전달
             WeakReferenceMessenger.Default.Send(new DataChangedMessage(deleteDatas));
         }
 
-        private void InsertDatas(ConcurrentQueue<string> differenceQueue)
+        private void InsertDatas(List<gValues> insertDatas)
         {
-            List<gValues> insertDatas = new List<gValues>();
-            // 안전하게 큐 복사 후 처리
-            var differenceItems = differenceQueue.ToArray();
-            foreach (var item in differenceItems)
-            {
-                insertDatas.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
-            }
+            Debug.WriteLine("추가된 데이터 갯수 : " + insertDatas.Count);
             // MainWindowViewModel 쪽으로 데이터 전달
             WeakReferenceMessenger.Default.Send(new DataChangedMessage(insertDatas));
         }
 
-        private void ModifiedData(ConcurrentQueue<string> newAPIList, ConcurrentQueue<string> oldAPIList)
+        //값이 변경된 데이터 처리
+        private void ModifiedData(List<gValues> newAPIList, List<gValues> oldAPIList)
         {
-            List<gValues> syncList = new List<gValues>();
 
-            // 계류대 번호가 같은 항목을 Dictionary로 변환
-            var oldItemDict = oldAPIList.ToDictionary(item => item.Split('|')[5], item => item);
-            var newItemDict = newAPIList.ToDictionary(item => item.Split('|')[5], item => item);
+            // 1. 개체번호,계류대 위치는 동일한데, 다른 정보가 변경된 경우
+            // 2. 개체번호 동일,계류대 위치가 다른 경우
 
-            // new와 old의 계류대 번호가 동일하지만 다른 데이터를 가진 항목을 찾음
-            var changedItems = newItemDict
-                .Where(newItem => oldItemDict.ContainsKey(newItem.Key) && oldItemDict[newItem.Key] != newItem.Value)
-                .Select(newItem => newItem.Value);
+            // 개체번호,계류대 위치는 동일한데, 다른 정보가 변경된 경우
+            var o1 = newAPIList
+                                .Where(latest =>
+                                    oldAPIList.Any(before =>
+                                        before.EntityNumber == latest.EntityNumber && before.SpaceIndex == latest.SpaceIndex &&
+                                        !before.Equals(latest)))
+                                .ToList();
 
-            // ConcurrentQueue에 변경된 항목 추가
-            var changedItemsQueue = new ConcurrentQueue<string>(changedItems);
+            //개체번호 동일,계류대 위치가 다른 경우
+            var o2 = newAPIList
+                                .Where(latest =>
+                                    oldAPIList.Any(before =>
+                                        before.EntityNumber == latest.EntityNumber && before.SpaceIndex != latest.SpaceIndex))
+                                .ToList();
 
-            // 여기서 계류대 위치가 바뀐 항목을 찾음 (식별자는 동일하지만, 위치[34]가 다른 경우)
-            var changedItemsSpace = newItemDict
-                .Where(newItem => oldItemDict.ContainsKey(newItem.Key)
-                                && newItem.Value.Split('|')[34] != oldItemDict[newItem.Key].Split('|')[34])
-                .Select(newItem => newItem.Value);
+            Debug.WriteLine($"수정된 데이터 갯수 o1 : {o1.Count}    ,    o2 : {o2.Count}");
 
-            // 여기서 계류대 위치가 바뀐 항목을 찾음 logoQueue 기존데이터 기준 즉, 로고가 띄워질 데이터
-            var logoQueue = oldItemDict
-                .Where(oldItem => newItemDict.ContainsKey(oldItem.Key)
-                                && oldItem.Value.Split('|')[34] != newItemDict[oldItem.Key].Split('|')[34])
-                .Select(oldItem => oldItem.Value);
-
-            if (changedItems.Count() > 0 && changedItemsSpace.Count() == 0) //순번이 안 바뀐경우 비고 , 산차, 어미 등 정보만 바뀌었을 경우
+            //수정된 데이터가 있는데 그 번호가 현재 경매진행 중이라면 수정된 데이터는 무시
+            //어쩌피 경매가 끝나고 다시 데이터를 받게 될때는 그 번호가 경매진행이 아니니 수정할거임
+            if (o1.Count==1 && o1[0].SipNumber.Equals(_runRunSipNumber.ToString()))
             {
-                // 안전하게 큐 복사 후 처리
-                var copyItems = changedItems.ToArray();
-                foreach (var item in copyItems)
-                {
-                    syncList.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
-                }
-                // MainWindowViewModel 쪽으로 데이터 전달
-                WeakReferenceMessenger.Default.Send(new DataChangedMessage(syncList));
-                syncList.Clear();
+                Debug.WriteLine($"경매번호 : {o1[0].SipNumber} 경매 진행중");
                 return;
             }
-            else if (changedItemsSpace.Count() > 0) //순번이 바뀐경우
+
+            // 개체번호,계류대 위치는 동일한데, 다른 정보가 변경된 경우, 어미, 산차, 비고 등
+            if (o1.Count > 0)
             {
-                // 안전하게 큐 복사 후 처리
-                var copyItems = changedItemsSpace.ToArray();
-                foreach (var item in copyItems)
-                {
-                    syncList.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
-                }
-
-                var logoItems = logoQueue.ToArray();
-                foreach (var logoItem in logoItems)
-                {
-                    gValues gValues = new gValues
-                    {
-                        SpaceIndex = logoItem.Split('|')[34],
-                        AuctionResultStatus = "00"
-                    };
-
-                    // 중복 제거 (같은 이름의 거치대 숫자 제거)
-                    bool isDuplicate = syncList.Any(cow => cow.SpaceIndex == gValues.SpaceIndex);
-                    if (!isDuplicate)
-                    {
-                        syncList.Add(gValues);
-                    }
-                    else if (syncList.Count == 1)
-                    {
-                        syncList.Add(gValues);
-                    }
-                }
-
-                // MainWindowViewModel 쪽으로 데이터 전달
-                WeakReferenceMessenger.Default.Send(new DataChangedMessage(syncList));
-                syncList.Clear();
-                return;
+                WeakReferenceMessenger.Default.Send(new DataChangedMessage(o1));
             }
+
+            //개체번호 동일,계류대 위치가 다른 경우
+            if (o2.Count > 0)
+            {
+                //계류대 위치가 바뀌었음으로 , 기존 구역은 로고로 대체, 새로운 구역은 새로운 데이터로 대체, *2배를 해야함, 중복제거도 포함
+
+                //기존 계류대 위치
+                var beforeSpaceIndex = oldAPIList
+                                    .Where(before =>
+                                        o2.Any(newSpaceInx =>
+                                        newSpaceInx.EntityNumber == before.EntityNumber))
+                                    .ToList();
+                Debug.WriteLine("\n계류대 위치가 바뀐 데이터 갯수 : " + beforeSpaceIndex.Count);
+                for(int i=0; i<o2.Count; i++)
+                {
+                    Debug.WriteLine($"원래 계류대 위치 : {beforeSpaceIndex[i].SpaceIndex}\n바뀐 계류대 위치 :  {o2[i].SpaceIndex}");
+                }
+
+                // 로고 데이터 추가
+                var logoItems = beforeSpaceIndex.Select(item => new gValues
+                {
+                    EntityNumber = item.EntityNumber,
+                    SpaceIndex = item.SpaceIndex,
+                    AuctionResultStatus = "00" // 로고로 대체
+                }).ToList();
+
+                // 로고 데이터와 새로 바뀐 데이터 추가 및 중복제거
+                var combinedList = logoItems.Concat(o2).Distinct().ToList();
+
+                Debug.WriteLine("최종 갯수 : " + combinedList.Count);
+                WeakReferenceMessenger.Default.Send(new DataChangedMessage(combinedList));
+            }
+
         }
 
 
@@ -365,81 +396,123 @@ namespace CowAuctionSmall.Models
         /// 경매 스페이스바 눌렀을때
         /// 경매방식, 코드(AS,SV) , 경매번호, 현재가격 , 경매상태
         /// </summary>
+
+        //유찰 : AS|8808990657202|2|329|260|0|8006||||1|-1|0|0
+        //       AS|8808990657202|2|329|260|0|8006||||4|-4|0|0
+        //       AS|8808990657202|2|329|260|0|8006||||5|-5|0|0
+        // 낙찰 :AS|8808990657202|2|329|260|0|8006||||6|-6|0|0
+
+        //단일 일때 찐유찰, 낙찰신호
+        //AF|8808990657202|2|23|||0
+        //AF|8808990657202|2|22|1636|444|272
+
         private void OnStringArrMsg(object recipient, DataToServerGetArrMsg message)
         {
             List<gValues> currentSyncList = new List<gValues>();
-            gValues cow = null;
             string msgString = string.Join(", ", message.Data);
             Debug.WriteLine("스페이스바 땡 누름 : " + msgString);
 
-            string code = message.Data[1];
+            string code = message.Data[1]; //AS,SV [1]
 
-            if (message.Data[0].Equals("20") && beforemAPIList != null) //단일 경매
+            if (message.Data[0].Equals("20") && _beforeAuctionDataList != null) //단일 경매
             {
                 switch (code)
                 {
                     case "AS":
-                        
-                        var tempList = beforemAPIList.Where(item => item.Split('|')[2] == message.Data[2]); //경매번호만 같은거
-
-                        // 해당 개체번호를 출력
-                        foreach (var item in tempList)
+                        string autctionState = null;
+                        if (message.Data.Length ==5)
                         {
-                            cow = _animParseData.Parse_PacketApi(item, _userInfo, _conn);
-                            if (cow.LowestPrice.Equals(message.Data[3]))
-                            {
-                                cow.AuctionResultStatus = !cow.AuctionResultStatus.Equals("11") ? "11" : cow.AuctionResultStatus;
-                                cow.IsRunning = true;
-                            }
-                            else
-                            {
-                                Debug.WriteLine("가격이 다름\n" + item + "\n" + message.Data[3]);
-                                cow.IsRunning = false;
-                            }
-
-                            runningSipNumber = cow.SipNumber;
-                            currentSyncList.Add(cow);
+                            autctionState = message.Data[4]; //20 AS 7 240 8004 (단일/일괄 , 코드 , 경매번호 , 8001~8006)
+                        }
+                        else // Length == 4
+                        {
+                            //새고로침 20 AS 8001 refresh
+                            autctionState = message.Data[2]; //20 AS 7 8004 (단일/일괄 , 코드 , 경매번호 , 8001~8006)
                         }
 
-                        WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                        lock (_lockObj)
+                        {
+                            switch (autctionState)
+                            {
+                                case "8006":// 경매 종료
+                                    Debug.WriteLine($"==================================== 경매 종료 {message.Data.ToString()}");
+                                    var resultCow = _beforeAuctionDataList.FirstOrDefault(cow => cow.SipNumber == _runRunSipNumber.ToString());
+                                    _runRunSipNumber = -1; // 진행중인 경매번호 초기화.
+                                    break;
+                                case "8004": //경매 진행
 
-                        break;
+                                    if (message.Data[3].Equals("refresh") == false)
+                                    {
+                                        var tempList = _beforeAuctionDataList.Where(item => item.SipNumber == message.Data[2]); //경매번호만 같은거
 
-                    case "SV":
+                                        // 해당 개체번호를 출력
+                                        foreach (var cowAS in tempList)
+                                        {
+                                            if (cowAS.LowestPrice.Equals(message.Data[3]))
+                                            {
+                                                cowAS.AuctionResultStatus = !cowAS.AuctionResultStatus.Equals("11") ? "11" : cowAS.AuctionResultStatus;
+                                                _runRunSipNumber = int.Parse(cowAS.SipNumber);
+                                                cowAS.IsRunning = true;
+                                            }
+                                            else
+                                            {
+                                                Debug.WriteLine("가격이 다름\n" + cowAS.toString() + "\n" + message.Data[3]);
+                                                cowAS.IsRunning = false;
+                                            }
+
+                                            _runRunSipNumber = int.Parse(cowAS.SipNumber);
+                                            currentSyncList.Add(cowAS);
+                                        }
+
+                                        WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                                    }
+                                    break;
+
+                                case "8001":
+                                    if (message.Data[3].Equals("refresh"))
+                                    {
+                                        Debug.WriteLine("***************************************************새로고침 시작 신호***************************************************");
+                                        WeakReferenceMessenger.Default.Send(new DataStringMessage("새로고침 시작 신호"));
+                                        _startRefesh = true;
+                                    }
+                                        
+                                    break;
+                            }
+                            break;
+                        }
+
+                    case "SV": // 새로고침할 출품 , 단발 건으로 경매프로그램에서 지정한 날짜에 갯수 만큼 호출되어짐
 
                         if(_userInfo.Auction.IsGoatAuction.ToUpper().Equals("N"))
                         {
                             return;
                         }
-
+                        gValues cowSV = new gValues();
                         string msgString2 = string.Join("|", message.Data.Skip(1));
                         msgString2 = _conn.JoinEpdnDataSV(msgString2,epdList);
-                        cow = _animParseData.Parse_PacketApi(msgString2, _userInfo, _conn);
-                        cow.Code = code;
-                        currentSyncList.Add(cow);
+
+                        cowSV = _animParseData.Parse_PacketApi(msgString2, _userInfo, _conn);
                         Debug.WriteLine("SV : " + msgString2);
-                        int index = beforemAPIList.FindIndex(item => item.Contains(cow.EntityNumber.Replace(" ","")));
 
-                        if (index != -1) //변경된 최저가 값이 있을경우
+                        // 기존 목록에서 EntityNumber가 같은 항목을 찾습니다.
+                        var existingItem = _beforeAuctionDataList.FirstOrDefault(item => item.SpaceIndex == cowSV.SpaceIndex);
+
+                        if (existingItem != null)
                         {
-                            string changePriceCow = beforemAPIList[index];
-
-                            // 구분자로 문자열 분할
-                            string[] parts = changePriceCow.Split('|');
-
-                            // 특정 위치의 값을 변경
-                            int targetIndex = 27; // 최저값 위치
-                            parts[targetIndex] = cow.LowestPrice;
-
-                            // 변경된 문자열 생성
-                            string modifiedString = string.Join("|", parts);
-
-                            beforemAPIList.RemoveAt(index);
-                            beforemAPIList.Insert(index, modifiedString);
+                            //예정가 낮추기로 인한 최저가 변경
+                            existingItem.LowestPrice = cowSV.LowestPrice;
                         }
-                        // MainWindowViewModel 쪽으로 데이터 전달
-                        WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
 
+                        // 새로고침 신호가 왔을때 (대량 새로고침)
+                        if (_startRefesh == true)
+                        {
+                            AddRefrechList(cowSV);
+                        }
+                        else
+                        {
+                            // 1개만 새로고침 , 주로 예정가 낮추기를 눌렀을때 발생
+                            WeakReferenceMessenger.Default.Send(new DataChangedMessage(new List<gValues>() { existingItem }));
+                        }
                         break;
                     default:
                         Debug.WriteLine("OnStringArrMsg 에서 code값이 AS,SV 이외의 {0} 값이 나옴 {1}", code, message.Data.ToString());
@@ -452,17 +525,28 @@ namespace CowAuctionSmall.Models
                 switch (code)
                 {
                     case "AS":
-                        if (message.Data[2].Equals("8004") && beforemAPIList != null) //경매 진행상태라면
+                        if (message.Data[2].Equals("8004") && _beforeAuctionDataList != null) //경매 진행상태라면
                         {
-                            var tempList = beforemAPIList.Where(item => item.Split('|')[29].Equals("11")); //경매 진행중인것만
-                            foreach (string item in tempList)
+                            var tempList = _beforeAuctionDataList.Where(item => item.AuctionResultStatus.Equals("11")); //경매 진행중인것만
+                            foreach (gValues cow in tempList)
                             {
-                                cow = _animParseData.Parse_PacketApi(item, _userInfo, _conn);
                                 currentSyncList.Add(cow);
                             }
 
                             WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
                         }
+                        break;
+                    case "SZ":
+                            //`SZ|8808990657202|20240906|0|1|P|1|900`
+                            //서버에서 보내주는 데이터에는 날짜가 있어, 경매 전날에 데이터를 확인하려면 이 방법으로 확인 할수 밖에 없다...?
+                            Debug.WriteLine("일괄경매 경매대상 표시 표시"); 
+                            foreach (var item in _beforeAuctionDataList)
+                            {
+                                item.AuctionResultStatus = "00";
+                            }
+                            WeakReferenceMessenger.Default.Send(new DisplaySelectRefresh("Refresh"));
+                            WeakReferenceMessenger.Default.Send(new DataChangedMessage(_beforeAuctionDataList)); //로고로 대체
+                            _beforeAuctionDataList.Clear();
                         break;
                     default:
                         Debug.WriteLine("OnStringArrMsg 에서 code값이 AS,SV 이외의 {0} 값이 나옴 {1}", code, message.Data.ToString());
@@ -470,22 +554,75 @@ namespace CowAuctionSmall.Models
                 }
             }
         }
-        private string runningSipNumber = null;
+
+
+        private List<gValues> _refreshAuchList = new List<gValues>();
+        private Timer? _refreshTimer;
+        private bool _refreshTRunning = false;  // 타이머가 실행 중인지 확인하는 플래그
+        private bool _startRefesh = false;
+        //새로고침 신호가 오면 호출될 함수 (단일경매 대량의 SV)
+        private void AddRefrechList(gValues item)
+        {
+            // 항목을 리스트에 추가
+            lock (_lockObj)
+            {
+                _refreshAuchList.Add(item);
+
+                // 타이머가 실행 중이면 더 이상 타이머를 추가하지 않음
+                if (!_refreshTRunning)
+                {
+                    _refreshTRunning = true; // 타이머 시작을 표시
+                    Debug.WriteLine("타이머 시작됨: 10초 후 실행");
+
+                    // 타이머 시작 (10초 후 단발성 실행)
+                    _refreshTimer = new Timer(OnTimerElapsed, null, 10000, Timeout.Infinite);
+
+                    
+                }
+                else
+                {
+                    Debug.WriteLine("타이머가 이미 실행 중입니다. 추가된 항목은 현재 타이머 완료 후 처리됩니다.");
+                }
+            }
+
+                
+            //10초 뒤 실행됨
+        }
+
+        // 타이머가 10초 후 실행할 작업
+        private void OnTimerElapsed(object state)
+        {
+            lock (_lockObj)
+            {
+                if (_refreshAuchList.Count > 0)
+                {
+                    // 데이터 전달 및 리스트 초기화
+                    Debug.WriteLine("새로고침 할 총 갯수 : "+ _refreshAuchList.Count);
+                    WeakReferenceMessenger.Default.Send(new DataChangedMessage(_refreshAuchList));
+                    _refreshAuchList.Clear();
+                    Debug.WriteLine("새로고침 실행 완료 및 리스트 초기화");
+                }
+            }
+
+            // 타이머를 종료하고, 실행 중 플래그를 리셋
+            _refreshTimer?.Dispose();
+            _refreshTimer = null;
+            _refreshTRunning = false; // 타이머가 종료되었으므로 플래그 리셋
+            _startRefesh = false;
+            Debug.WriteLine("***************************************************새로고침 완료***************************************************");
+            //메인뷰로 날림 메인뷰 맨밑의 TextBox 
+            WeakReferenceMessenger.Default.Send(new DataStringMessage("새로고침 완료"));
+            //
+            WeakReferenceMessenger.Default.Send(new DisplaySelectRefresh("Refresh"));
+        }
+
 
         private void OnStringMsg(object recipient, DataToServerGetMsg message)
         {
-            List<gValues> currentSyncList = new List<gValues>();
-
-            if (runningSipNumber != null && runningSipNumber.Length > 0)
+            if (message.Data.Equals("F"))
             {
-                var tempList = beforemAPIList.Where(item => item.Split('|')[2] == runningSipNumber); //경매번호만 같은거
-
-                foreach (var item in tempList)
-                {
-                    currentSyncList.Add(_animParseData.Parse_PacketApi(item, _userInfo, _conn));
-                }
-
-                WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                _runRunSipNumber = -1;
+                return;
             }
         }
 
@@ -503,6 +640,47 @@ namespace CowAuctionSmall.Models
 
         }
 
+        //단일 유찰일 경우 (3번취소) AF|8808990657202|3|24|||0:
+        private void OnStringArrAF_SD(object recipient, DataToServerGetAF_SD message)
+        {
+            string[] msg = message.Data;
+            string code = msg[0];
+
+            switch(code)
+            {
+                case "AF":
+                    Debug.WriteLine("AF 온 값 : "+msg.ToString);
+                    if (msg[3].Equals("24") || msg[3].Equals("23"))
+                    {
+                        lock(_lockObj) // 경매 시작후 바로 Esc를 누르면 화면이 안바뀌는 현상 씹히는 현상이 있음 그래서 lock을 걸어줌 근데 개선은 됬지만 완벽한 해결은 아님
+                        {
+                            if(_beforeAuctionDataList.Count > 0) //경매 날짜가 오늘인경우에만 _beforeAuctionDataList가 존재함
+                            {
+                                //ESC 취소 버튼 누름
+                                var caceledCow = _beforeAuctionDataList.FirstOrDefault(item => item.SipNumber == msg[2]);
+                                caceledCow.IsRunning = false;
+                                logger.Equals("취소된 경매번호 : " + caceledCow.SipNumber);
+                                WeakReferenceMessenger.Default.Send(new DataChangedMessage(new List<gValues>() { caceledCow }));
+                            }
+                            else //경매 날짜가 오늘이 아닌경우 즉, 다른날짜의 경매 데이터를 보고 싶은 경우
+                            {
+                                return;
+                            }
+                            
+                        }
+                        
+                    }
+                    break;
+                case "SD":
+                    Debug.WriteLine("SD 온 값 : " + msg.ToString);
+                    break;
+
+                default:
+                    break;
+
+            }
+        }
+
         // 2024-07-13 추가된 Dispose 메소드
         public void Dispose()
         {
@@ -517,5 +695,54 @@ namespace CowAuctionSmall.Models
         {
             Dispose();
         }
+
+        /*
+         두 값이 같음 =======
+[2024-09-25 오전 10:40:53] 88개의 API 경매 정보가 수신되었습니다.
+
+두 값이 같음 =======
+[2024-09-25 오전 10:40:53]MSG>>AS|8808990657202|3|329|70|0|8002||||29|-29|0|0
+AS|8808990657202|3|329|70|0|8002||||29|-29|0|0: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+data array has less than 7 elements!
+[2024-09-25 오전 10:40:53]MSG>>AS|8808990657202|3|329|70|0|8003||||29|-29|0|0
+AS|8808990657202|3|329|70|0|8003||||29|-29|0|0: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+data array has less than 7 elements!
+[2024-09-25 오전 10:40:53]MSG>>AS|8808990657202|3|329|70|0|8004||||29|-29|0|0
+AS|8808990657202|3|329|70|0|8004||||29|-29|0|0: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+스페이스바 땡 누름 : 20, AS, 3, 70, 8004
+------------ 1
+진행중 화면 3
+진행중 화면 3
+[2024-09-25 오전 10:40:54] 88개의 API 경매 정보가 수신되었습니다.
+
+두 값이 틀림 =======
+수정된 데이터 갯수 o1 : 1    ,    o2 : 0
+경매번호 : 3 경매 진행중
+[2024-09-25 오전 10:40:55] 88개의 API 경매 정보가 수신되었습니다.
+
+두 값이 같음 =======
+[2024-09-25 오전 10:40:55]MSG>>SD|8808990657202|F|-1
+SD|8808990657202|F|-1: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+[2024-09-25 오전 10:40:55]MSG>>AF|8808990657202|3|24|||0
+AF|8808990657202|3|24|||0: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+[2024-09-25 오전 10:40:55]MSG>>AS|8808990657202|3|329|70|0|8002||||30|-30|0|0
+AS|8808990657202|3|329|70|0|8002||||30|-30|0|0: OnCurrentAuctionData 에서 호출         {0} 
+ 
+OnStringArrMsg OnStringArrMsg OnStringArrMsg
+data array has less than 7 elements!
+[2024-09-25 오전 10:40:56] 88개의 API 경매 정보가 수신되었습니다.
+
+두 값이 같음 =======
+         */
     }
 }

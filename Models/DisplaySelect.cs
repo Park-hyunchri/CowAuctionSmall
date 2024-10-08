@@ -6,6 +6,7 @@ using CowAuctionSmall.Views.Size128_128;
 //using CowAuctionSmall.Views.Size128_128.Running;
 using CowAuctionSmall.Views.Size128_64;
 using CowAuctionSmall.Views.Size128_64.Running;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using UserInfo = CowAuctionSmall.Models.Structures.UserInfo;
+using Stretch = System.Windows.Media.Stretch;
+using CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1;
 
 namespace CowAuctionSmall.Models
 {
@@ -30,6 +33,7 @@ namespace CowAuctionSmall.Models
 
         private UserInfo _userInfo;
         private BoardList _boardinfo;
+        private string _nhCode = string.Empty; // 축협 사업장 코드
 
         // 페이지 시간 목록
         private List<int> pageTime = new List<int>();
@@ -44,6 +48,8 @@ namespace CowAuctionSmall.Models
         // 단일 경매 진행 시 플래그
         private bool singleAuctionmethodFlag = true;
 
+        private readonly WeakReferenceMessenger _msgRefreshString;
+
 
         private NLogger logger; // 로그용
 
@@ -51,8 +57,13 @@ namespace CowAuctionSmall.Models
         {
             logger = NLogger.Instance;
 
+            _msgRefreshString = WeakReferenceMessenger.Default;
+            _msgRefreshString.Register<DisplaySelectRefresh>(this, OnRefreshMsg);
+
             _userInfo = userInfo;
             _boardinfo = boardinfo;
+
+            _nhCode = _userInfo.Auction.AuctionHouseCode;
 
             // 경매 페이지 수 설정
             if (_userInfo.Auction.BoardPage.Length <= 0)
@@ -81,20 +92,24 @@ namespace CowAuctionSmall.Models
             _timer.Interval = TimeSpan.FromSeconds(2);
             _timer.Start();
 
-            _initTimer = new Timer(InitTimer_Tick, null, 0, 60000);
+            _initTimer = new Timer(InitTimer_Tick, null, 0, 1000);
         }
 
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // SemaphoreSlim 초기화
-
+        /// <summary>
+        /// 페이지 싱크를 위한 타이머 PC1,2가 최대한 동일한 페이지를 보여주기 위함
+        /// </summary>
+        /// <param name="state"></param>
         private async void InitTimer_Tick(object? state)
         {
-            if (_totalRunningPage == 1)
+            if (_totalRunningPage == 1 || singleAuctionmethodFlag == false) //총 보여줄 페이지가 1개이거나 단일경매 진행했다면
             {
+                StopInitTimer();
                 return;
             }
 
-            if (DateTime.Now.Minute == 0 ) //
+            if (DateTime.Now.Minute % 25 == 0 && DateTime.Now.Second <= 3) // 매 25분,50분 0초부터 3초까지 초기화
             {
                 await _semaphore.WaitAsync(); // 세마포어 락
                 try
@@ -111,9 +126,9 @@ namespace CowAuctionSmall.Models
                             DisplayRunningPageNum(viewModel._panel, viewModel.CowInfo, _rotationIndex + 1);
                         }
 
-                        _timer.Start();
-                        logger.LogInfo("매 시간마다 초기화 완료");
-                        Debug.WriteLine("매 시간마다 초기화 완료");
+                        _timer.Start(); // 타이머 재시작
+                        logger.LogInfo("매 25분,50분 마다 초기화 완료");
+                        Debug.WriteLine("매 25분,50분 마다 초기화 완료");
                     });
                 }
                 finally
@@ -168,11 +183,25 @@ namespace CowAuctionSmall.Models
             if (File.Exists(logoPath))
             {
                 var image = new Image();
-                image.Source = new BitmapImage(new Uri(logoPath, UriKind.Absolute));
+
+                // 기존 이미지가 있을 경우 해제
+                if (image.Source != null)
+                {
+                    image.Source = null; // 이전 이미지 리소스 해제
+                }
+
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.UriSource = new Uri(logoPath, UriKind.Absolute);
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // 캐시 옵션을 설정하여 파일을 메모리에 로드
+                bitmapImage.EndInit();
+
+                image.Source = bitmapImage;
                 image.Stretch = Stretch.Fill;
                 panel.Children.Add(image);
             }
         }
+
 
         // 패널에서 뷰모델을 제거하는 메서드
         private void RemoveViewModelFromPanel(VirtualizingStackPanel panel)
@@ -205,6 +234,7 @@ namespace CowAuctionSmall.Models
             {
                 DisplayRunningPageNum(viewModel._panel, cowInfo, 1);
                 _timer.Stop();
+                StopInitTimer();
             }
 
             switch (auctionmethod)
@@ -234,25 +264,35 @@ namespace CowAuctionSmall.Models
         public void InitializePages(VirtualizingStackPanel panel, AuctionContPanelViewModel viewModel)
         {
             var existingPages = panel.Children.OfType<UserControl>().ToList();
-            UserControl page1, page2;
+            UserControl page1, page2;   //, page3;
 
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
-                page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? new AuctionRunning1 { Name = "RunPage1" };
+                //page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? new AuctionRunning1 { Name = "RunPage1" };
+
+                page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? CustomAuctionRunning1_128();
+                page1.Name = "RunPage1"; // 함수 반환 후에도 이름 설정 필요
+
                 page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2") ?? new AuctionRunning2 { Name = "RunPage2" };
+                //page3 = existingPages.FirstOrDefault(p => p.Name == "RunPage3") ?? new AuctionRunning3 { Name = "RunPage3" };
             }
             else
             {
                 page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1_64") ?? new AuctionRunning1_64 { Name = "RunPage1_64" };
                 page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2_64") ?? new AuctionRunning2_64 { Name = "RunPage2_64" };
+                //page3 = existingPages.FirstOrDefault(p => p.Name == "RunPage3_64") ?? new AuctionRunning3_64 { Name = "RunPage3_64" };
             }
 
             SetPageProperties(page1, viewModel, panel);
             SetPageProperties(page2, viewModel, panel);
+            //SetPageProperties(page3, viewModel, panel);
 
             if (!existingPages.Contains(page1)) panel.Children.Add(page1);
             if (!existingPages.Contains(page2)) panel.Children.Add(page2);
+            //if (!existingPages.Contains(page2)) panel.Children.Add(page3);
         }
+
+
 
         // 페이지 속성을 설정하는 메서드
         private void SetPageProperties(UserControl page, AuctionContPanelViewModel viewModel, VirtualizingStackPanel panel)
@@ -277,6 +317,9 @@ namespace CowAuctionSmall.Models
 
                 if (existingViewModel == null || !existingViewModel.CowInfo.Equals(cowinfo))
                 {
+                    // 기존 ViewModel이 있을 경우 메모리에서 해제
+                    panel.DataContext = null;
+
                     existingViewModel = new AuctionContPanelViewModel(cowinfo, this, panel, pageTime, _totalRunningPage);
                     panel.DataContext = existingViewModel;
                     InitializePages(panel, existingViewModel);
@@ -301,6 +344,7 @@ namespace CowAuctionSmall.Models
                 }
             }
         }
+
 
         /// <summary>
         /// 낙찰된 화면 넣기
@@ -361,15 +405,6 @@ namespace CowAuctionSmall.Models
         // 패널을 이름으로 찾는 메서드
         public void FindPanel(string pName, ObservableCollection<VirtualizingStackPanel> panels, gValues gv, int auctionmethod)
         {
-            if (gv.Code.Equals("SV"))
-            {
-                if (singleAuctionmethodFlag == true && !gv.CowDistinction.Equals("5"))
-                {
-                    _timer.Start();
-                }
-
-                singleAuctionmethodFlag = true;
-            }
 
             VirtualizingStackPanel panel1 = FindPanel(p => p.Name == pName, panels);
 
@@ -424,6 +459,27 @@ namespace CowAuctionSmall.Models
             return null;
         }
 
+        //ServerGetData에서 Refresh라는 메시지를 받았을 때 실행되는 메서드
+        private void OnRefreshMsg(object recipient, DisplaySelectRefresh message)
+        {
+            if (RunningViewModel.Any(cow => cow.CowInfo.CowDistinction != "5"))
+            {
+                var AnimalType = RunningViewModel.First(cow => cow.CowInfo.CowDistinction != "5");
+                if (message.Data.Equals("Refresh") && AnimalType != null)
+                {
+                    Debug.WriteLine("Refresh \t\t\t\t\tRefresh \t\t\t\t\tRefresh \t\t\t\t\tRefresh \t\t\t\t\tRefresh \t\t\t\t\t");
+                    _timer.Start();
+                    StartInitTimer();
+                    singleAuctionmethodFlag = true;
+                }
+            }
+            else // 염소 경매인 경우, 진행 페이지가 1개라 따로 타이머 돌 필요 없음 하지만 혹시 모르니 타이머는 정지  
+            {
+                _timer.Stop();
+                StopInitTimer();
+            }
+        }
+
         // 타이머 틱 이벤트 핸들러
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -438,16 +494,36 @@ namespace CowAuctionSmall.Models
         }
 
 
-
-        // 타이머를 중지하는 메서드
-        public void StopTimer()
+        // _initTimer 중지
+        public void StopInitTimer()
         {
-            if (_timer != null)
+            if (_initTimer != null)
             {
-                _timer.Stop();
-                _timer.Tick -= Timer_Tick;
-                _timer = null;
+                _initTimer.Dispose();
+                _initTimer = null;
             }
         }
+
+        // _initTimer 시작
+        public void StartInitTimer()
+        {
+            if (_initTimer == null)
+            {
+                _initTimer = new Timer(InitTimer_Tick, null, 0, 1000);
+            }
+        }
+
+        private UserControl CustomAuctionRunning1_128()
+        {
+            switch (_nhCode)
+            {
+
+                case "8808990656953": // 정읍 8808990656953 중량란 대신에 유전능력 알파벳으로 표시
+                    return new Jeongeup();
+                default:
+                    return new AuctionRunning1();
+            }
+        }
+    
     }
 }

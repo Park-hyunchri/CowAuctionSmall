@@ -1,4 +1,5 @@
 ﻿using CowAuctionSmall.Models;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -20,16 +21,26 @@ namespace CowAuctionSmall.Views
 
         private void AuctionRunning2_Loaded(object sender, RoutedEventArgs e)
         {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (note.Text.Length > 8)
+                {
+                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
+                    {
+                        StartScrollingAnimation();
+                    }
+                }
+            }), System.Windows.Threading.DispatcherPriority.Render);
 
 
-            if (note.Text.Length>8)
+            /*if (note.Text.Length>8)
             {
                 if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 10)
                 {
                     StartScrollingAnimation();
                 }
-            }
-            
+            }*/
+
         }
 
         private void StartScrollingAnimation()
