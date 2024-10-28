@@ -50,6 +50,8 @@
         <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
     </UserControl.Resources>
 
     <Border x:Name="border" Style="{StaticResource BlinkingBorderStyle2}" BorderThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
@@ -57,13 +59,18 @@
             <Canvas Margin="97,0,0,38">
                 <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" x:Name="Sex" Margin="3,-4,0,0" FontSize="24"/>
             </Canvas>
-
-            <Canvas Margin="0,0,0,0">
+            <!-- ============================================================================================================================================================================================ -->
+            <Canvas Margin="0,0,0,0" Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="개체 :"  Style="{StaticResource IndexStyle}"/>
                 <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="35,0,0,0" Foreground="Silver" Style="{StaticResource DataStyle}" x:Name="EntityNumber"/>
                 <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="61,0,0,0" Foreground="red" Background="Black" Style="{StaticResource DataStyle}" FontWeight="Bold"/>
             </Canvas>
-
+            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
+            <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 :"  Style="{StaticResource IndexStyle}"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="35,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
+            </Canvas>
+            <!-- ============================================================================================================================================================================================ -->
             <Canvas Margin="0,12,0,0">
                 <TextBlock Text="{Binding CowInfo.Location}"  Foreground="magenta"  Margin="2,0,0,0"/>
                 <TextBlock Text="{Binding CowInfo.OwnerName}" Margin="32,0,0,0" Foreground="Cyan"/>
@@ -71,7 +78,7 @@
 
             <Canvas Margin="0,24,0,0">
                 <TextBlock Text="최저 :"  Style="{StaticResource IndexStyle}"/>
-                <TextBlock Text="{Binding CowInfo.LowestPrice}" Margin="35,0,0,0" Foreground="Yellow" Style="{StaticResource DataStyle}"/>
+                <TextBlock Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Margin="35,0,0,0" Foreground="Yellow" Style="{StaticResource DataStyle}"/>
             </Canvas>
 
             <Canvas Margin="65,24,0,0">

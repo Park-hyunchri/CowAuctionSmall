@@ -76,7 +76,7 @@ namespace CowAuctionSmall.Models
             }
             else
             {
-                gv.LowestPrice = decimal.Parse(data[27]).ToString("N0");
+                gv.LowestPrice = data[27];
             }
 
             gv.Weight = data[25];                           //중량
@@ -196,11 +196,15 @@ namespace CowAuctionSmall.Models
                         if (data[0].Equals("SV"))
                         {
                             gv.Bidder = data[36] + "(" + data[30] + ")";        // 낙찰자 참가번호
+                            gv.BidderNum = data[30];
+                            gv.BidderString = data[36];
 
                         }
                         else
                         {
                             gv.Bidder = data[38] + "(" + data[30] + ")";        // 낙찰자 참가번호
+                            gv.BidderNum = data[30];
+                            gv.BidderString = data[38];
                         }
                     }
                 }
@@ -234,7 +238,7 @@ namespace CowAuctionSmall.Models
             }
 
             else
-                gv.BidPrice = decimal.Parse(data[31]).ToString("N0"); ;                         //낙찰가격 ","표시
+                gv.BidPrice = data[31];                         //낙찰가격 ","표시
 
 
             if (!string.IsNullOrEmpty(data[28]))

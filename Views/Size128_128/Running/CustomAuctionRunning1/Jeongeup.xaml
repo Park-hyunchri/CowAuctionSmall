@@ -47,6 +47,7 @@
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
     </UserControl.Resources>
 
 
@@ -77,7 +78,7 @@
 
             <Canvas Margin="0,32,0,0">
                 <TextBlock Text="최저 : "  Foreground="lime"  Margin="2,0,0,0"/>
-                <TextBlock Text="{Binding CowInfo.LowestPrice}" Margin="40,0,0,0" Foreground="Yellow"/>
+                <TextBlock Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Margin="40,0,0,0" Foreground="Yellow"/>
             </Canvas>
 
             <Canvas Margin="0,47,0,0">

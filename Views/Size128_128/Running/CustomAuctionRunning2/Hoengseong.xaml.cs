@@ -14,20 +14,20 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1
+namespace CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2
 {
     /// <summary>
-    /// Sangju.xaml에 대한 상호 작용 논리
+    /// Hoengseong.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Sangju : UserControl
+    public partial class Hoengseong : UserControl
     {
-        public Sangju()
+        public Hoengseong()
         {
             InitializeComponent();
-            Loaded += Sangju_Loaded;
+            Loaded += Hoengseong_Loaded;
         }
 
-        private void Sangju_Loaded(object sender, RoutedEventArgs e)
+        private void Hoengseong_Loaded(object sender, RoutedEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {

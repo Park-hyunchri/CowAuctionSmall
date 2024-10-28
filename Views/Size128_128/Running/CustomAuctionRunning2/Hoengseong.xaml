@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2.Hoengseong"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2"
+                          FontFamily="굴림"
+             FontWeight="Bold"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+
+    <UserControl.Resources>
+
+        <!-- 유전능력 목차 스타일 -->
+        <Style x:Key="EpdIndexStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="lime"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdNumStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="Orange"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdStringStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="Silver"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdBoarder" TargetType="Border">
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Margin" Value="0,0,-1,0"/>
+        </Style>
+
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard RepeatBehavior="Forever">
+                                <ColorAnimation
+                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                        From="Black" To="Red" Duration="0:0:0.5"/>
+                                <ColorAnimation
+                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
+                        From="Red" To="Black" Duration="0:0:0.5" BeginTime="0:0:0.5"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+    <Border x:Name="border" Style="{StaticResource BlinkingBorderStyle2}" BorderThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid>
+
+            <!-- "유전능력 EPD"을 표시하는 TextBlock -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유 전 능 력" FontSize="20" Foreground="Violet" FontWeight="Bold"/>
+
+            <Grid Margin="2,28,2,21">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="도 체 중 :"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
+
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="등심면적:"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
+
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방 :"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="육질등급:"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
+
+
+            </Grid>
+            <!-- Note를 표시하는 TextBlock -->
+            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
+                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" FontSize="12"/>
+            </Canvas>
+        </Grid>
+    </Border>
+</UserControl>
+

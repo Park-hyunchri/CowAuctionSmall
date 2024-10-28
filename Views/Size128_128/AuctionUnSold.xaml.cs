@@ -18,17 +18,32 @@ namespace CowAuctionSmall.Views.Size128_128
             Loaded += AuctionUnSold_Loaded;
         }
 
-        private void AuctionUnSold_Loaded(object sender, RoutedEventArgs e)
+/*        private void AuctionUnSold_Loaded(object sender, RoutedEventArgs e)
         {
 
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (note.Text.Length > 8)
                 {
-                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
+                    if (note.ActualWidth > 120)// || note.Text.Replace(" ", "").Length > 8)
                     {
                         StartScrollingAnimation();
                     }
+                }
+            }), System.Windows.Threading.DispatcherPriority.Render);
+        }
+*/
+        private void AuctionUnSold_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                note.Arrange(new Rect(note.DesiredSize));
+
+                // 강제 렌더링 후 너비 확인
+                if (note.ActualWidth > 0 && note.Text.Length > 8 && note.ActualWidth > 120)
+                {
+                    StartScrollingAnimation();
                 }
             }), System.Windows.Threading.DispatcherPriority.Render);
         }

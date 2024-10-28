@@ -2,21 +2,21 @@
 <Server>
 		<Authentication>
 			<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auth/login</Address>
-			<UserID>boardman-160-4</UserID>
-			<Password>1111</Password>
+			<UserID>boardman-177-5</UserID>
+			<Password>nacf1234</Password>
 		</Authentication>
 
 		<CurrentInfo>
-			<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auction/8808990656953/entry?date=</Address>
-			<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656953/date/</AddressEPD>
-			<Date></Date>
+			<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auction/8808990656502/entry?date=</Address>
+			<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656502/date/</AddressEPD>
+			<Date>20241023</Date>
 		</CurrentInfo>
 		<Auction>
 				<Address>1.201.161.58</Address>
 				<Port>5001</Port>
 				<Channel>6006</Channel>
 				<Priority>MANAGE</Priority>
-							<AuctionHouseCode>8808990656953</AuctionHouseCode>
+							<AuctionHouseCode>8808990656502</AuctionHouseCode>
 							<StartPosition>0,0</StartPosition>				<!--     프로그램 시작 위치 변경   -->
 	
 							<CowBirth>Y</CowBirth>							<!--     송아지 생년월일 일자 표기 결정    ex. Y or N   사용하지않는 옵션-->

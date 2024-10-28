@@ -1,4 +1,5 @@
 ﻿using CowAuctionSmall.Models;
+using DocumentFormat.OpenXml.InkML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,30 +15,30 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1
+namespace CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold
 {
     /// <summary>
-    /// Sangju.xaml에 대한 상호 작용 논리
+    /// SanjuUnSold.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Sangju : UserControl
+    public partial class SanjuUnSold : UserControl
     {
-        public Sangju()
+        public SanjuUnSold()
         {
             InitializeComponent();
-            Loaded += Sangju_Loaded;
+            Loaded += SanjuUnSold_Loaded;
         }
 
-        private void Sangju_Loaded(object sender, RoutedEventArgs e)
+        private void SanjuUnSold_Loaded(object sender, RoutedEventArgs e)
         {
+
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                note.Arrange(new Rect(note.DesiredSize));
-
-                // 강제 렌더링 후 너비 확인
-                if (note.ActualWidth > 0 && note.Text.Length > 8 && note.ActualWidth > 120)
+                if (note.Text.Length > 8)
                 {
-                    StartScrollingAnimation();
+                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
+                    {
+                        StartScrollingAnimation();
+                    }
                 }
             }), System.Windows.Threading.DispatcherPriority.Render);
         }

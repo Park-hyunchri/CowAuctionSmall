@@ -38,10 +38,11 @@ namespace CowAuctionSmall.Models.Structures
         public string Location { get; set; } = "-";                 //출하 지역
         public int ProcessStatus { get; set; } = 8001;              //경매 진행 상태
         public string Bidder { get; set; } = "-";                   //낙찰자 번호
-        //public string BidNumber { get; set; } = "None";           //낙찰번호
+        public string BidderNum { get; set; } = "";           //낙찰번호
+        public string BidderString { get; set; } = "";           //낙찰번호
+
         public string BidPrice { get; set; } = "-";                 //낙찰가격
         public string Note { get; set; } = "-";                     //비고
-        //public string Sex { get, set};
         public string ModifiedPrice { get; set; } = "-";            //수정 최저가
         public string AuctionResultStatus { get; set; } = "-";
 
@@ -143,6 +144,8 @@ namespace CowAuctionSmall.Models.Structures
                 Location = Location,
                 ProcessStatus = ProcessStatus,
                 Bidder = Bidder,
+                BidderNum = BidderNum,
+                BidderString = BidderString,
                 BidPrice = BidPrice,
                 Note = Note,
                 ModifiedPrice = ModifiedPrice,
@@ -194,6 +197,8 @@ namespace CowAuctionSmall.Models.Structures
                    Location == other.Location &&
                    ProcessStatus == other.ProcessStatus &&
                    Bidder == other.Bidder &&
+                   BidderNum == other.BidderNum &&
+                   BidderString == other.BidderString &&
                    BidPrice == other.BidPrice &&
                    Note == other.Note &&
                    ModifiedPrice == other.ModifiedPrice &&

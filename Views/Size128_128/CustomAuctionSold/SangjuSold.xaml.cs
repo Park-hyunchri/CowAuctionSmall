@@ -14,38 +14,50 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1
+namespace CowAuctionSmall.Views.Size128_128.CustomAuctionSold
 {
     /// <summary>
-    /// Sangju.xaml에 대한 상호 작용 논리
+    /// SangjuSold.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Sangju : UserControl
+    public partial class SangjuSold : UserControl
     {
-        public Sangju()
+        public SangjuSold()
         {
             InitializeComponent();
-            Loaded += Sangju_Loaded;
+            Loaded += SangjuSold_Loaded;
         }
-
-        private void Sangju_Loaded(object sender, RoutedEventArgs e)
+        private void SangjuSold_Loaded(object sender, RoutedEventArgs e)
         {
+
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                note.Arrange(new Rect(note.DesiredSize));
-
-                // 강제 렌더링 후 너비 확인
-                if (note.ActualWidth > 0 && note.Text.Length > 8 && note.ActualWidth > 120)
+                if (note.Text.Length > 8)
                 {
-                    StartScrollingAnimation();
+                    if (note.ActualWidth > 120)
+                    {
+                        StartScrollingAnimation();
+                    }
+                }
+
+                if (bidder.Text.Length > 6)
+                {
+                    StartScrollingAnimation2();
                 }
             }), System.Windows.Threading.DispatcherPriority.Render);
+
+
         }
 
         private void StartScrollingAnimation()
         {
             FlowTextAnimation scrollingText = new FlowTextAnimation(note, canvas); // note는 TextBlock, canvas는 애니메이션할 패널
             scrollingText.Start(); // 속도 설정 (속도 값이 클수록 빠름)
+        }
+
+        private void StartScrollingAnimation2()
+        {
+            FlowTextAnimation scrollingText2 = new FlowTextAnimation(bidder, canvasBidder); // note는 TextBlock, canvas는 애니메이션할 패널
+            scrollingText2.Start2(); // 속도 설정 (속도 값이 클수록 빠름)
         }
     }
 }

@@ -17,7 +17,7 @@ namespace CowAuctionSmall.Views.Size128_128
             InitializeComponent();
             Loaded += AuctionSold_Loaded;
         }
-        private void AuctionSold_Loaded(object sender, RoutedEventArgs e)
+        /*private void AuctionSold_Loaded(object sender, RoutedEventArgs e)
         {
 
             Dispatcher.BeginInvoke(new Action(() =>
@@ -36,7 +36,21 @@ namespace CowAuctionSmall.Views.Size128_128
                 }
             }), System.Windows.Threading.DispatcherPriority.Render);
 
+        }*/
 
+        private void AuctionSold_Loaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                note.Arrange(new Rect(note.DesiredSize));
+
+                // 강제 렌더링 후 너비 확인
+                if (note.ActualWidth > 0 && note.Text.Length > 8 && note.ActualWidth > 120)
+                {
+                    StartScrollingAnimation();
+                }
+            }), System.Windows.Threading.DispatcherPriority.Render);
         }
 
         private void StartScrollingAnimation()

@@ -122,6 +122,7 @@ namespace CowAuctionSmall.NetProto.netty.handlers
                 else
                 {
                     Debug.WriteLine("네티 연결성 체크 (SS) 확인 중..  15초만 기다려 주세요");
+                    logger.LogInfo("네티 연결성 체크 (SS) 확인 중..  15초만 기다려 주세요");
                 }
             }
 
@@ -136,11 +137,13 @@ namespace CowAuctionSmall.NetProto.netty.handlers
                 if (_stateSS ==true)
                 {
                     Debug.WriteLine("SS 상태 확인 완료 Good");
+                    logger.LogInfo("SS 상태 확인 완료 Good");
                     _refreshTRunning = true; // 타이머 시작을 표시
                 }
                 else
                 {
                     Debug.WriteLine("SS 상태 확인 완료 Bad");
+                    logger.LogInfo("SS 상태 확인 완료 Bad");
 
                     // 현재 실행 중인 애플리케이션 경로 가져오기
                     var fileName = Process.GetCurrentProcess().MainModule.FileName;

@@ -20,6 +20,7 @@ using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Office2010.PowerPoint;
 using DocumentFormat.OpenXml.Office2016.Excel;
+using System.Net.NetworkInformation;
 
 namespace CowAuctionSmall.Models
 {
@@ -102,7 +103,7 @@ namespace CowAuctionSmall.Models
                 logger.LogError("init: _userInfo가 null입니다.");
                 return;
             }
-
+            await WaitForNetwork();
             string tempToken = await _conn.IssueTocken(_userInfo);
             if (tempToken != null)
             {
@@ -112,6 +113,16 @@ namespace CowAuctionSmall.Models
             else
             {
                 logger.LogError("init: await _conn.IssueTocken(_userInfo); 부분 null 반환");
+            }
+        }
+
+        private async Task WaitForNetwork()
+        {
+            while (!NetworkInterface.GetIsNetworkAvailable())
+            {
+                Debug.WriteLine("네트워크 연결 대기 중...(인터넷 연결이 되어 있는지 확인)");
+                logger.LogInfo("네트워크 연결 대기 중...(인터넷 연결이 되어 있는지 확인)");
+                await Task.Delay(5000); // 5초 대기 후 다시 확인
             }
         }
 
@@ -133,7 +144,7 @@ namespace CowAuctionSmall.Models
                         if (runProcessMessageAsync)
                         {
                             await ProcessMessageAsync();
-                            await Task.Delay(1000); // 1초 대기
+                            await Task.Delay(800); // 0.8초 대기
                         }
 
                         if (firstSetup)
@@ -192,6 +203,7 @@ namespace CowAuctionSmall.Models
         }
 
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1); // SemaphoreSlim 초기화
+        private DateTime _now = DateTime.Now;
         private async Task ProcessMessageAsync()
         {
             await _semaphore.WaitAsync(); // 세마포어 진입
@@ -205,7 +217,11 @@ namespace CowAuctionSmall.Models
                     if (mAPIList != null && _latestAuctionDataList !=null)
                     {
                         mAPIList.Clear();
-                        epdList.Clear(); 
+                        if (DateTime.Now.Minute % 10 == 0)
+                        {
+                            epdList.Clear();
+                        }
+                        
                         _latestAuctionDataList.Clear();
                     }
 
@@ -217,7 +233,7 @@ namespace CowAuctionSmall.Models
 
                     if (mAPIList != null && mAPIList.Count > 0) //서버에서 온 데이터와 EPD 데이터 합치기
                     {
-                        if (epdList.Count ==0)
+                        if (epdList.Count==0)
                         {
                             epdList = await _conn.GetCurrentInfoEPD(_userInfo, _token);
                         }

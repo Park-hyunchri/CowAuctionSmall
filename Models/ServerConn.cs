@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using UserInfo = CowAuctionSmall.Models.Structures.UserInfo;
 
@@ -46,7 +47,7 @@ namespace CowAuctionSmall.Models
         /// <summary>
         /// 초기 토큰 생성
         /// </summary>
-        public async Task<string?> IssueTocken(UserInfo userInfo)
+/*        public async Task<string?> IssueTocken(UserInfo userInfo)
         {
             if (userInfo?.Authentication?.Address == null)
             {
@@ -96,7 +97,69 @@ namespace CowAuctionSmall.Models
                 logger.LogError("IssueTocken 발생 " + e.Message);
                 return null;
             }
+        }*/
+
+        public async Task<string?> IssueTocken(UserInfo userInfo)
+        {
+            if (userInfo?.Authentication?.Address == null)
+            {
+                logger.LogError("IssueTocken: userInfo.Authentication.Address가 null입니다.");
+                return null;
+            }
+
+            string? token = string.Empty;
+            string? url = userInfo.Authentication?.Address;
+            var content = new StringContent(JsonConvert.SerializeObject(new { usrid = userInfo.Authentication?.UserID.Trim(), pw = userInfo.Authentication?.Password.Trim() }), Encoding.UTF8, "application/json");
+
+            using (var client = new HttpClient())
+            {
+                client.Timeout = TimeSpan.FromMinutes(10);
+                for (int retry = 0; retry < 3; retry++) // 3번까지 재시도
+                {
+                    try
+                    {
+                        Debug.WriteLine("인증서버 연결 시도 중... " + "\r\n");
+                        logger.LogInfo("IssueTocken 토큰 인증서버 연결 시도 중...: ");
+                        HttpResponseMessage response = await client.PostAsync(url, content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            string responseText = await response.Content.ReadAsStringAsync();
+                            if (!string.IsNullOrEmpty(responseText))
+                            {
+                                JObject? jObject = JObject.Parse(responseText);
+                                if ((bool)jObject.SelectToken("success"))
+                                {
+                                    token = (string)jObject.SelectToken("accessToken");
+                                    return token;
+                                }
+                            }
+                            return null;
+                        }
+                        else
+                        {
+                            Debug.WriteLine("IssueTocken 서버 응답 오류: " + response.StatusCode + "\r\n");
+                            logger.LogError("IssueTocken 서버 응답 오류: " + response.StatusCode);
+                            return null;
+                        }
+                    }
+                    catch (HttpRequestException e) when (retry < 2) // 네트워크 예외 발생 시 재시도
+                    {
+                        logger.LogError($"IssueTocken 재시도 {retry + 1}/3: {e.Message}");
+                        await Task.Delay(1000); // 1초 대기 후 재시도
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e.Message + "\r\n");
+                        logger.LogError("IssueTocken 발생 " + e.Message);
+                        return null;
+                    }
+                }
+            }
+
+            return null;
         }
+
 
 
 
@@ -205,10 +268,37 @@ namespace CowAuctionSmall.Models
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine(e.Message);
-                    logger.LogError("GetCurrentInfo : " + e.Message + "\n NettyComm 초기화 후 시작");
-                    AuctionDelegate.getInstance().disposeClients();
-                    NettyComm(userInfo, token);
+                    try
+                    {
+                        Debug.WriteLine(e.Message);
+                        logger.LogError("GetCurrentInfo : " + e.Message);
+
+/*                        logger.LogError("GetCurrentInfo : " + e.Message + "\n NettyComm 초기화 후 시작 2초 대기후 진행");
+                        AuctionDelegate.getInstance().disposeClients();
+                        await Task.Delay(2000); // 1초 대기
+                        NettyComm(userInfo, token);*/
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError("GetCurrentInfo 2.... : " + e.Message + "\n 재 실행");
+                        var fileName = Process.GetCurrentProcess().MainModule.FileName;
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            try
+                            {
+                                // 새 프로세스 시작
+                                Process.Start(fileName);
+                                // 현재 애플리케이션 종료
+                                Application.Current.Shutdown();
+                            }
+                            catch (Exception ex)
+                            {
+                                // 예외 처리 (필요 시 로그 작성 또는 사용자에게 알림)
+                                MessageBox.Show($"프로그램 재시작 중 오류가 발생했습니다: {ex.Message}", "오류", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                        });
+                    }
                 }
             }
 

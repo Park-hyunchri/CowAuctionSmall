@@ -2,14 +2,14 @@
 <Server>
 		<Authentication>
 				<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
-				<UserID>boardman-139-1</UserID>
+				<UserID>board_163_7</UserID>
 				<Password>1111</Password>
 		</Authentication>
   
 		<CurrentInfo>
-				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990687094/entry?date=</Address>
-				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990687094/date/</AddressEPD>
-				<Date>20240822</Date>
+				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry?date=</Address>
+				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
+				<Date>2024102</Date>
 		</CurrentInfo>
   
 		<Auction>
@@ -17,17 +17,17 @@
 				<Port>5001</Port>
 				<Channel>6006</Channel>
 				<Priority>MANAGE</Priority>
-							<AuctionHouseCode>8808990687094</AuctionHouseCode>
+							<AuctionHouseCode>8808990657202</AuctionHouseCode>
 							<StartPosition>0,0</StartPosition>				<!--     프로그램 시작 위치 변경   -->
 	
 							<CowBirth>Y</CowBirth>					<!--     송아지 생년월일 일자 표기 결정    ex. Y or N   사용하지않는 옵션-->
 
-							<BoardPage>2</BoardPage>						<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
+							<BoardPage>3</BoardPage>						<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
 							<BoardPageTime>7</BoardPageTime>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
 							<BoardPageTime2>7</BoardPageTime2>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
 							<BoardPageTime3>2</BoardPageTime3>				<!--     판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
 	
-							<BidderName>Y</BidderName>				<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
+							<BidderName>B</BidderName>				<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
 							<IsShowOwnerName>N</IsShowOwnerName>    <!--     출하자 이름 표시 ex. Y or N   -->
 							<ChangeSexName>Y</ChangeSexName>			<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
 							<IsGoatAuction>Y</IsGoatAuction>		<!--     염소경매데이터 표출 여부 ex. Y or N  -->

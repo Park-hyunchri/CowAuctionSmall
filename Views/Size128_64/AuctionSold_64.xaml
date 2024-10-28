@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_64"
+             xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
              d:DesignHeight="64" d:DesignWidth="128"
              mc:Ignorable="d" 
              FontFamily="굴림"
@@ -19,6 +20,8 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
+
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
     </UserControl.Resources>
 
     <Border BorderBrush="Blue" BorderThickness="2">
@@ -50,13 +53,13 @@
             </Canvas>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="최저가" Style="{StaticResource BasicStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding LowestPrice}" Style="{StaticResource BasicStyle}" Foreground="Orange" FontWeight="Bold"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Style="{StaticResource BasicStyle}" Foreground="Orange" FontWeight="Bold"/>
 
             <TextBlock Grid.Row="2" Grid.Column="1" Text="낙찰자" Foreground="Violet" Style="{StaticResource BasicStyle}" />
             <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Bidder}" Style="{StaticResource BasicStyle}" Foreground="Silver" FontWeight="Bold" x:Name="bidder"/> 
 
             <TextBlock Grid.Row="2" Grid.Column="2" Text="낙찰가" Style="{StaticResource BasicStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding BidPrice}" Style="{StaticResource BasicStyle}" Foreground="Yellow" FontWeight="Bold"/>
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Style="{StaticResource BasicStyle}" Foreground="Yellow" FontWeight="Bold"/>
 
         </Grid>
     </Border>

@@ -49,7 +49,7 @@ namespace CowAuctionSmall.Models
         private bool singleAuctionmethodFlag = true;
 
         private readonly WeakReferenceMessenger _msgRefreshString;
-
+        private SetCustomDisplay _setCustomDisplay;
 
         private NLogger logger; // 로그용
 
@@ -64,6 +64,8 @@ namespace CowAuctionSmall.Models
             _boardinfo = boardinfo;
 
             _nhCode = _userInfo.Auction.AuctionHouseCode;
+
+            _setCustomDisplay = new SetCustomDisplay();
 
             // 경매 페이지 수 설정
             if (_userInfo.Auction.BoardPage.Length <= 0)
@@ -264,16 +266,18 @@ namespace CowAuctionSmall.Models
         public void InitializePages(VirtualizingStackPanel panel, AuctionContPanelViewModel viewModel)
         {
             var existingPages = panel.Children.OfType<UserControl>().ToList();
-            UserControl page1, page2;   //, page3;
+            UserControl page1, page2;//, page3;
 
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
                 //page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? new AuctionRunning1 { Name = "RunPage1" };
 
-                page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? CustomAuctionRunning1_128();
+                page1 = existingPages.FirstOrDefault(p => p.Name == "RunPage1") ?? _setCustomDisplay.CustomAuctionRunning1_128(_nhCode);
                 page1.Name = "RunPage1"; // 함수 반환 후에도 이름 설정 필요
 
-                page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2") ?? new AuctionRunning2 { Name = "RunPage2" };
+                page2 = existingPages.FirstOrDefault(p => p.Name == "RunPage2") ?? _setCustomDisplay.CustomAuctionRunning2_128(_nhCode);
+                page2.Name = "RunPage2"; // 함수 반환 후에도 이름 설정 필요
+
                 //page3 = existingPages.FirstOrDefault(p => p.Name == "RunPage3") ?? new AuctionRunning3 { Name = "RunPage3" };
             }
             else
@@ -290,6 +294,7 @@ namespace CowAuctionSmall.Models
             if (!existingPages.Contains(page1)) panel.Children.Add(page1);
             if (!existingPages.Contains(page2)) panel.Children.Add(page2);
             //if (!existingPages.Contains(page2)) panel.Children.Add(page3);
+
         }
 
 
@@ -354,7 +359,7 @@ namespace CowAuctionSmall.Models
             UserControl cowPanel = null;
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
-                cowPanel = new AuctionSold();
+                cowPanel = _setCustomDisplay.CustomAuctionSold_128(_nhCode);
             }
             else
             {
@@ -375,7 +380,8 @@ namespace CowAuctionSmall.Models
             UserControl cowPanel = null;
             if (_boardinfo.Size.Equals("128,128") || _boardinfo.Size.Equals("128*128"))
             {
-                cowPanel = new AuctionUnSold();
+                //cowPanel = new AuctionUnSold();
+                cowPanel = _setCustomDisplay.CustomAuctionUnSold_128(_nhCode);
             }
             else
             {
@@ -510,18 +516,6 @@ namespace CowAuctionSmall.Models
             if (_initTimer == null)
             {
                 _initTimer = new Timer(InitTimer_Tick, null, 0, 1000);
-            }
-        }
-
-        private UserControl CustomAuctionRunning1_128()
-        {
-            switch (_nhCode)
-            {
-
-                case "8808990656953": // 정읍 8808990656953 중량란 대신에 유전능력 알파벳으로 표시
-                    return new Jeongeup();
-                default:
-                    return new AuctionRunning1();
             }
         }
     
