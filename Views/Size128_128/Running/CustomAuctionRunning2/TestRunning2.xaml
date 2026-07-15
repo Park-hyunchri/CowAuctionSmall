@@ -1,0 +1,158 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2.TestRunning2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2"
+                          FontFamily="굴림"
+             FontWeight="Bold"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+    <!-- 횡성 -->
+    <UserControl.Resources>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+
+        <!-- 유전능력 목차 스타일 -->
+        <Style x:Key="EpdIndexStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="lime"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdNumStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="Orange"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdStringStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="Silver"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 유전능력 Num 스타일 -->
+        <Style x:Key="EpdBoarder" TargetType="Border">
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Margin" Value="0,0,-1,0"/>
+        </Style>
+
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="BlinkStoryboard">
+                            <Storyboard RepeatBehavior="Forever">
+                                <ObjectAnimationUsingKeyFrames
+                                    Storyboard.TargetProperty="(Border.BorderBrush)"
+                                    Duration="0:0:1">
+                                    <!-- 검정색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="Black"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+
+                                    <!-- 빨간색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.6">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="#FD3A4A"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+                                </ObjectAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+    <Border x:Name="border" Style="{StaticResource BlinkingBorderStyle2}" BorderThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid>
+
+            <!-- "유전능력 EPD"을 표시하는 TextBlock -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유 전 능 력" FontSize="20" Foreground="Violet" FontWeight="Bold"/>
+
+            <Grid Margin="2,25,2,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="냉도체중"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="배최장근"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방 "  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="근내지방"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="구 제 역"  Style="{StaticResource EpdIndexStyle}" Foreground="#dc143c"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding CowInfo.footAndMouthDiseaseTestDate}"  Style="{StaticResource EpdNumStyle}" Foreground="#dc143c"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="브루셀라"  Style="{StaticResource EpdIndexStyle}" Foreground="#f29886">
+                    <TextBlock.LayoutTransform>
+                        <ScaleTransform ScaleX="0.8" ScaleY="1.0"/>
+                        <!-- X: 가로 압축, Y: 세로 유지 -->
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+                <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4"
+                                   Margin="45,0,0,0"
+                                   Text="{Binding CowInfo.brucellosisTestDate}"
+                                   Style="{StaticResource EpdNumStyle}"
+                                   HorizontalAlignment="Left"
+                                   Foreground="#f29886">
+                    <TextBlock.LayoutTransform>
+                        <ScaleTransform ScaleX="0.8" ScaleY="1.0"/>
+                        <!-- X: 가로 압축, Y: 세로 유지 -->
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+
+                
+            </Grid>
+
+            <!-- Note를 표시하는 TextBlock -->
+</Grid>
+    </Border>
+</UserControl>

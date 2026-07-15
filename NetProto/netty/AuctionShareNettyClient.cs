@@ -9,72 +9,95 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Security;
+using System.Threading;
 using System.Threading.Tasks;
 using IChannel = DotNetty.Transport.Channels.IChannel;
 
 namespace CowAuctionSmall.NetProto.netty
 {
+    /// <summary>
+    /// Netty 클라이언트: 경매 서버와 연결 및 데이터 송수신을 담당.
+    /// </summary>
     class AuctionShareNettyClient
     {
         private int port = 0;
-        private IEventLoopGroup? group = null;
-        private IChannel? channel = null;
+        private IEventLoopGroup? group;
+        private IChannel? channel;
+        private Timer? pingTimer;
+        private bool isReconnecting = false;
+        private const int MAX_RETRY_COUNT = 5;
+        private int retryCount = 0;
+        private static readonly TimeSpan ChannelCloseTimeout = TimeSpan.FromMilliseconds(800);
+        private static readonly TimeSpan GroupShutdownTimeout = TimeSpan.FromSeconds(2);
 
-        /*        private AuctionShareNettyClient(Builder builder)
-                {
-                    this.port = builder.port;
-                    CreateNettyClientWait(builder);
-                }*/
-
+        /// <summary>
+        /// 생성자: Netty 클라이언트 설정을 초기화하고 실행.
+        /// </summary>
         private AuctionShareNettyClient(Builder builder)
         {
             this.port = builder.port;
-            InitializeClientAsync(builder).Wait(); // 또는 .GetAwaiter().GetResult() 사용
+            StartPingService();
+            _ = CreateNettyClientWait(builder); // 비동기 실행
         }
 
-        private async Task InitializeClientAsync(Builder builder)
+        /// <summary>
+        /// Netty 서버에 Ping을 보내 연결 상태 확인
+        /// </summary>
+        private void StartPingService()
         {
-            await CreateNettyClientWait(builder);
+            pingTimer = new Timer(async (e) =>
+            {
+                if (channel != null && channel.Active)
+                {
+                    try
+                    {
+                        await channel.WriteAndFlushAsync("PING\r\n");
+                        Console.WriteLine("📡 서버에 Ping 전송");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"⚠️ Ping 실패: {ex.Message}");
+                        //HandleDisconnect();
+                    }
+                }
+                else
+                {
+                    //HandleDisconnect();
+                }
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(10)); // 10초마다 Ping 전송
         }
 
-        //private async void CreateNettyClientWait(Builder builder)
-        //private void CreateNettyClientWait(Builder builder)
+        /// <summary>
+        /// Netty 클라이언트를 비동기적으로 실행하는 메서드
+        /// </summary>
         private async Task CreateNettyClientWait(Builder builder)
         {
-            //KIH_1219: Netty 접속 실표시 Alert 표출되는거 수정 함. 여기서 지연
-            //await Task.Run(() => this.startClient(builder.host, builder.port, builder.controller));
-            ////channel = AuctionDelegate.getInstance().mClient.getChannel();
-
-            /* var task1 = Task.Run(() => this.startClient(builder.host, builder.port, builder.controller));
-
-             while (!task1.IsCompleted) { }
-
-             if (task1.Status == TaskStatus.Faulted)
-             {
-                 //throw new DotNetty.Transport.Channels.ConnectException("", task1.Exception.InnerExceptions[0]);
-                 foreach (var e in task1.Exception.InnerExceptions)
-                 {
-                     Debug.WriteLine(e.Message);
-                 }
-             }*/
-
             try
             {
-                await this.startClient(builder.host, builder.port, builder.controller);
+                var controller = builder.controller;
+                if (controller == null)
+                {
+                    Debug.WriteLine("⚠️ Netty controller가 설정되지 않았습니다.");
+                    return;
+                }
+                await startClient(builder.host, builder.port, controller);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Console.WriteLine($"❌ Netty 연결 실패: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Netty 클라이언트 설정을 위한 Builder 패턴
+        /// </summary>
         public class Builder
         {
-            public String host;
+            public string host;
             public int port;
-            public iNettyControllable controller;
+            public iNettyControllable? controller;
 
-            public Builder(String host, int port)
+            public Builder(string host, int port)
             {
                 this.host = host;
                 this.port = port;
@@ -92,28 +115,67 @@ namespace CowAuctionSmall.NetProto.netty
             }
         }
 
+        /// <summary>
+        /// Netty 서버로 메시지를 전송하는 메서드
+        /// </summary>
         public void sendMessage(String message)
         {
+            if (channel == null || !channel.Active)
+            {
+                return;
+            }
             channel.WriteAndFlushAsync(message + "\r\n");
         }
 
-        public void stopClient()
+        /// <summary>
+        /// Netty 클라이언트를 종료하는 메서드
+        /// </summary>
+        public async Task stopClient()
         {
-            if(this.group != null)
-                this.group.ShutdownGracefullyAsync();
-            this.group = null;
+            var currentPingTimer = Interlocked.Exchange(ref pingTimer, null);
+            currentPingTimer?.Dispose();
+
+            var currentChannel = Interlocked.Exchange(ref channel, null);
+            if (currentChannel != null)
+            {
+                try
+                {
+                    var closeTask = currentChannel.CloseAsync();
+                    if (await Task.WhenAny(closeTask, Task.Delay(ChannelCloseTimeout)).ConfigureAwait(false) != closeTask)
+                    {
+                        Debug.WriteLine($"⚠️ Netty channel close timeout ({ChannelCloseTimeout.TotalMilliseconds}ms)");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"⚠️ Netty channel close error: {ex.Message}");
+                }
+            }
+
+            var currentGroup = Interlocked.Exchange(ref group, null);
+            if (currentGroup != null)
+            {
+                try
+                {
+                    var shutdownTask = currentGroup.ShutdownGracefullyAsync(TimeSpan.Zero, GroupShutdownTimeout);
+                    if (await Task.WhenAny(shutdownTask, Task.Delay(GroupShutdownTimeout + TimeSpan.FromMilliseconds(500))).ConfigureAwait(false) != shutdownTask)
+                    {
+                        Debug.WriteLine($"⚠️ Netty group shutdown timeout ({GroupShutdownTimeout.TotalSeconds:0.0}s)");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"⚠️ Netty group shutdown error: {ex.Message}");
+                }
+            }
         }
 
+        /// <summary>
+        /// Netty 클라이언트가 활성 상태인지 확인하는 메서드
+        /// </summary>
         public bool isActive()
         {
-            if (channel != null)
-            {
-                return channel.IsActive;
-            }
-            else
-            {
-                return false; 
-            }
+            return channel != null && channel.Active;
         }
 
         public int getPort()
@@ -126,7 +188,73 @@ namespace CowAuctionSmall.NetProto.netty
             return channel;
         }
 
-        public async Task<IChannel> startClient(String host, int port, iNettyControllable nc)
+        /// <summary>
+        /// Netty 클라이언트를 시작하는 메서드
+        /// </summary>
+        public async Task<IChannel> startClient(string host, int port, iNettyControllable nc)
+        {
+            group = new MultithreadEventLoopGroup();
+            IChannel bch = null;
+
+            try
+            {
+                var bootstrap = new Bootstrap();
+                bootstrap
+                    .Group(group)
+                    .Channel<TcpSocketChannel>()
+                    .Option(ChannelOption.TcpNodelay, true)
+                    .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
+                    {
+                        IChannelPipeline pipeline = channel.Pipeline;
+
+                        // TLS(SSL) 보안 처리
+                        pipeline.AddLast("tls", new TlsHandler(
+                            stream => new SslStream(stream, true, (sender, certificate, chain, errors) => true),
+                            new ClientTlsSettings("xn--e20bw05b.kr")
+                        ));
+
+                        // 패킷 데이터 처리 (구분자 기반)
+                        pipeline.AddLast(new DelimiterBasedFrameDecoder(1024, Delimiters.LineDelimiter()));
+                        pipeline.AddLast(new StringDecoder(System.Text.Encoding.UTF8));
+
+                        // Netty 클라이언트 핸들러 등록
+                        pipeline.AddLast(new AuctionClientInboundDecoder(nc));
+                        pipeline.AddLast(new AuctionClientDecodedResponseConnectionInfoHandler(nc));
+                        pipeline.AddLast(new AuctionClientDecodedCheckSessionHandler(nc));
+                        pipeline.AddLast(new AuctionClientDecodedCurrentEntityInfoHandler(nc));
+                        pipeline.AddLast(new StringEncoder(System.Text.Encoding.UTF8));
+                    }));
+
+                // Netty 서버에 접속 시도
+                bch = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(host), port));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"❌ Netty 클라이언트 시작 오류: {e.Message}");
+                try
+                {
+                    nc.onConnectionException();
+                }
+                catch (Exception callbackEx)
+                {
+                    Debug.WriteLine($"onConnectionException 처리 중 예외: {callbackEx.Message}");
+                }
+
+                try
+                {
+                    await stopClient();
+                }
+                catch (Exception stopEx)
+                {
+                    Debug.WriteLine($"stopClient 처리 중 예외: {stopEx.Message}");
+                }
+            }
+
+            channel = bch;
+            return bch;
+        }
+
+        /*public async Task<IChannel> startClient(String host, int port, iNettyControllable nc)
         {
             string BaseDir = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -171,7 +299,6 @@ namespace CowAuctionSmall.NetProto.netty
                         pipeline.AddLast(new AuctionClientDecodedCurrentEntityInfoHandler(nc));         // 경매 정보 결과 수신
                         pipeline.AddLast(new StringEncoder(System.Text.Encoding.UTF8));
                     }));
-
                 bch = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(host), port));
             }
             catch (Exception e)
@@ -183,6 +310,6 @@ namespace CowAuctionSmall.NetProto.netty
             }
             this.channel = bch;
             return bch;
-        }
+        }*/
     }
 }

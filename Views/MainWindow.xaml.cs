@@ -1,8 +1,12 @@
-﻿using CowAuctionSmall.ViewModels;
+﻿using CowAuctionSmall.Models;
+using CowAuctionSmall.NetProto.netty;
+using CowAuctionSmall.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,18 +20,21 @@ namespace CowAuctionSmall
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Timer _shutdownTimer;
-        private Timer _memoryCheckTimer;
+        private Timer? _shutdownTimer;
+        private Timer? _memoryCheckTimer;
+        private int _shutdownRequested;
+        private NLogger logger;
         public MainWindow()
         {
-            IsLisence();
+            logger = NLogger.Instance;
+            //IsLisence();
             CheckMemoryUsageTimer(); // 메모리 사용량 체크 타이머 추가
-            SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽2시에는 무조건 프로그램 종료)
+            SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽1시에는 무조건 프로그램 종료)
             
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.None;
             this.DataContext = App.Current.Services.GetService<MainWindowViewModel>();
-            
+
         }
 
         private void IsLisence()
@@ -42,21 +49,25 @@ namespace CowAuctionSmall
                 }
                 else
                 {
-                    MessageBox.Show("라이센스가 만료되었습니다. 관리자에게 문의하세요.");
-                    Application.Current.Shutdown();
+                    ShowLicenseError("라이센스가 만료되었습니다. 관리자에게 문의하세요.");
                 }
             }
             else
             {
-                MessageBox.Show("라이센스가 존재하지 않습니다. 관리자에게 문의하세요.");
-                Application.Current.Shutdown();
+                ShowLicenseError("라이센스가 존재하지 않습니다. 관리자에게 문의하세요.");
             }
+        }
+
+        private void ShowLicenseError(string message)
+        {
+            MessageBox.Show(message);
+            Application.Current.Shutdown();
         }
 
         // 프로그램 종료 타이머 설정, 밤11시 30분 부터 새벽 2시까지 인 경우  
         private void SetupShutdownTimer()
         {
-            _shutdownTimer = new Timer(300000); // 30분마다 체크
+            _shutdownTimer = new Timer(200000); // 20분마다 체크
             _shutdownTimer.Elapsed += ShutdownTimer_Tick;
             _shutdownTimer.Start();
         }
@@ -65,12 +76,10 @@ namespace CowAuctionSmall
         private void ShutdownTimer_Tick(object? sender, ElapsedEventArgs e)
         {
             DateTime now = DateTime.Now;
-            if ((now.Hour == 23) || (now.Hour == 0) || (now.Hour == 1)) // 23시부터 새벽 2시까지
+            if (now.Hour >= 23 || now.Hour < 1) // 밤 11시부터 새벽 1시까지 
             {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    Application.Current.Shutdown();
-                });
+                logger.Equals("프로그램 종료 : 될때 되서");
+                Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
             }
         }
 
@@ -88,8 +97,8 @@ namespace CowAuctionSmall
             // 현재 프로세스의 메모리 사용량을 가져옴 (바이트 단위)
             long memoryUsage = Process.GetCurrentProcess().WorkingSet64;
 
-            // 메모리 사용량이 2GB (2 * 1024 * 1024 * 1024 바이트)보다 크면 프로그램 재시작
-            if (memoryUsage > 2L * 1024 * 1024 * 1024)
+            // 메모리 사용량이 6GB (2 * 1024 * 1024 * 1024 바이트)보다 크면 프로그램 재시작
+            if (memoryUsage > 6L * 1024 * 1024 * 1024)
             {
                 var fileName = Process.GetCurrentProcess().MainModule.FileName;
 
@@ -97,6 +106,7 @@ namespace CowAuctionSmall
                 {
                     try
                     {
+                        logger.LogError("메모리 사용량 오버로 인한 재 시작 3GB 초과");
                         // 새 프로세스 시작
                         Process.Start(fileName);
 
@@ -104,6 +114,7 @@ namespace CowAuctionSmall
                         _memoryCheckTimer.Stop();
 
                         // 현재 애플리케이션 종료
+                        logger.LogError("프로그램 종료 : 메모리 사용량 초과");
                         Application.Current.Shutdown();
                     }
                     catch (Exception ex)
@@ -116,10 +127,31 @@ namespace CowAuctionSmall
         }
 
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        private async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
+                if (System.Threading.Interlocked.Exchange(ref _shutdownRequested, 1) == 1)
+                {
+                    return;
+                }
+
+                e.Handled = true;
+                logger.LogInfo("프로그램 종료 : ESC 키 입력");
+
+                try
+                {
+                    var nettyDisposeTask = AuctionDelegate.getInstance().disposeClients();
+                    if (await Task.WhenAny(nettyDisposeTask, Task.Delay(1500)) != nettyDisposeTask)
+                    {
+                        logger.LogWarn("ESC 종료: Netty 종료 제한시간 초과");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"ESC 종료: Netty 종료 실패 - {ex.Message}");
+                }
+
                 Application.Current.Shutdown();
             }
         }

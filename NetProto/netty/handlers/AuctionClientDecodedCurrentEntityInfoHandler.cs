@@ -14,11 +14,11 @@ namespace CowAuctionSmall.NetProto.netty.handlers
  */
     public class AuctionClientDecodedCurrentEntityInfoHandler : SimpleChannelInboundHandler<String>
     {
-        private iNettyControllable mController;
+        private readonly iNettyControllable mController;
 
         public AuctionClientDecodedCurrentEntityInfoHandler(iNettyControllable controller)
         {
-            this.mController = controller;
+            mController = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
         //@Override
@@ -28,8 +28,6 @@ namespace CowAuctionSmall.NetProto.netty.handlers
             {
                 mController.OnCurrentAuctionData(data);                
             }
-
-            //Debug.WriteLine(" ==>> called OnCurrentAuctionData");
         }
     }
 }

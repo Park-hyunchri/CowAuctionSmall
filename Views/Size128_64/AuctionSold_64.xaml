@@ -8,11 +8,19 @@
              d:DesignHeight="64" d:DesignWidth="128"
              mc:Ignorable="d" 
              FontFamily="굴림"
-             TextOptions.TextFormattingMode="Display">
+             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="Aliased" >
              
 
     <UserControl.Resources>
 
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+        
         <!-- 목차 스타일 -->
         <Style x:Key="BasicStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
@@ -21,7 +29,9 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
     </UserControl.Resources>
 
     <Border BorderBrush="Blue" BorderThickness="2">
@@ -42,10 +52,18 @@
             <TextBlock Grid.Row="0" Grid.Column="0"  Grid.ColumnSpan="2" Grid.RowSpan="2"  
                 Text="낙찰" Foreground="Violet" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="27" FontWeight="Bold"/>
 
-            <Canvas Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="18,0,0,0" VerticalAlignment="Top">
-                <TextBlock  Text="{Binding EntityNumber}" Foreground="Silver"/>
-                <TextBlock Text="{Binding EntityNumberShort}"  Margin="28,0,0,0" Foreground="red" Background="Black" FontWeight="Bold"/>
+            <!-- ======================================================================================================================================================================= -->
+            <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
+            <Canvas Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="18,0,0,0">
+                <TextBlock  Text="{Binding EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}"/>
+                <TextBlock Text="{Binding EntityNumberShort}"  Margin="26,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Bold"/>
             </Canvas>
+            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
+            <Canvas Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="18,0,0,0">
+                <TextBlock Text="개체" Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding SipNumber}" Margin="30,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
 
             <Canvas Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="13,0,0,0" VerticalAlignment="Top">
                 <TextBlock Text="{Binding Location}"  Foreground="magenta"  Margin="2,0,0,0"/>

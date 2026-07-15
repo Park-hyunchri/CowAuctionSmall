@@ -5,26 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_64.Running"
              xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
-             TextOptions.TextFormattingMode="Display"
              FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="64" d:DesignWidth="128">
 
     <UserControl.Resources>
-
+        
+        
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            
+        </Style>
 
         <!-- 목차 스타일 -->
         <Style x:Key="IndexStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="lime"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontWeight" Value="Regular"/>
         </Style>
 
         <!-- 유전능력 Num 스타일 -->
         <Style x:Key="EpdNumStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="Orange"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -32,7 +40,7 @@
 
         <!-- 유전능력 Num 스타일 -->
         <Style x:Key="EpdStringStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="Silver"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -44,40 +52,55 @@
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
     </UserControl.Resources>
 
-    <Border BorderBrush="Black" BorderThickness="2">
-        <Grid Background="Black">
+    <Border BorderBrush="Black" BorderThickness="0">
+        <Grid Background="Black" CacheMode="BitmapCache">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="42"/>
-                <ColumnDefinition Width="20"/>
-            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="냉도체중 :" Style="{StaticResource IndexStyle}"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
-            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="배최장근 :" Style="{StaticResource IndexStyle}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
 
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방 :" Style="{StaticResource IndexStyle}"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
-            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
+            <Grid Background="Black" CacheMode="BitmapCache" Grid.Row="0">
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="근내지방 :" Style="{StaticResource IndexStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
-            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="20"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="냉도체중" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text=":" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="배최장근" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text=":" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
 
 
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text=":" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="근내지방" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" Text=":" Style="{StaticResource IndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
+
+
+            </Grid>
         </Grid>
+        
+        
     </Border>
 </UserControl>

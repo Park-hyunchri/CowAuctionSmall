@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using CowAuctionSmall.Models.Structures;
 
 namespace CowAuctionSmall.Models.Converter
 {
@@ -15,6 +16,7 @@ namespace CowAuctionSmall.Models.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+
             string? cowType = value as string;
 
             if (cowType != null)

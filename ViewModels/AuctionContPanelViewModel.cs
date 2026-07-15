@@ -1,19 +1,14 @@
-﻿using CowAuctionSmall.Models;
-using CowAuctionSmall.Models.Structures;
+﻿using CowAuctionSmall.Models.Structures;
+using CowAuctionSmall.Services;
 using CowAuctionSmall.Views;
-using DocumentFormat.OpenXml.InkML;
-using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 using Canvas = System.Windows.Controls.Canvas;
 
 
@@ -24,6 +19,7 @@ namespace CowAuctionSmall.ViewModels
     /// </summary>
     public partial class AuctionContPanelViewModel : IDisposable, INotifyPropertyChanged
     {
+
         private DisplaySelect _displaySelect;
         private gValues _cowInfo;
 
@@ -37,16 +33,25 @@ namespace CowAuctionSmall.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public bool HasPaternityMatch => !string.IsNullOrWhiteSpace(CowInfo.PaternityMatch) && CowInfo.PaternityMatch != "-";
+
+        public Thickness NoteMargin => HasPaternityMatch ? new Thickness(32, 110, 0, 1) : new Thickness(2, 110, 0, 1);
+
 
         public gValues CowInfo
         {
-            get { return _cowInfo; }
+            get => _cowInfo;
             set
             {
                 _cowInfo = value;
                 OnPropertyChanged(nameof(CowInfo));
+
+                // ★ 추가
+                OnPropertyChanged(nameof(HasPaternityMatch));
+                OnPropertyChanged(nameof(NoteMargin));
             }
         }
+
 
         public bool IsRunning
         {
@@ -54,7 +59,7 @@ namespace CowAuctionSmall.ViewModels
             set
             {
                 _isRunning = value;
-                OnPropertyChanged(nameof(_isRunning));
+                OnPropertyChanged(nameof(IsRunning));
             }
         }
 
@@ -66,29 +71,143 @@ namespace CowAuctionSmall.ViewModels
                 if (_cowInfo != null)
                 {
                     _cowInfo.Note = value;
+                    if (value.Length < 9 )
+                    {
+
+                    }
                     OnPropertyChanged(nameof(_cowInfo.Note));
                 }
             }
         }
 
-
-        public AuctionContPanelViewModel(gValues cowinfo, DisplaySelect display, VirtualizingStackPanel panel, List<int> pageTime, int totalRunningPage)
+        /// <summary>
+        /// 새로운 개체 정보로 뷰모델 상태를 갱신한다.
+        /// </summary>
+        public void UpdateCowInfo(gValues cowinfo)
         {
-            _displaySelect = display;
+            var previousNote = _cowInfo?.Note;
+
             _cowInfo = cowinfo;
-            _panel = panel;
-            _totalRunningPage = totalRunningPage; //보여줄 진행 정보패널
+            IsRunning = cowinfo.IsRunning;
+            UpdateSexDisc(cowinfo);
 
-            _isRunning = cowinfo.IsRunning;
+            OnPropertyChanged(nameof(CowInfo));
 
-            if (_isRunning ==true)
+            // ★ 추가: PaternityMatch 기반 파생 속성도 갱신 알림
+            OnPropertyChanged(nameof(HasPaternityMatch));
+            OnPropertyChanged(nameof(NoteMargin));
+
+            if (!string.Equals(previousNote, cowinfo.Note, StringComparison.Ordinal))
             {
-                Debug.WriteLine($"진행중 화면 {cowinfo.SpaceIndex}");
+                OnPropertyChanged(nameof(Note));
+                ResetNotePositions();
             }
         }
 
 
+        private double _notePosition;
+        public double NotePosition
+        {
+            get { return _notePosition; }
+            set
+            {
+                _notePosition = value;
+            }
+        }
+
+        // Note 위치 업데이트 로직 추가
+        /// <summary>
+        /// 노트 스크롤 위치를 갱신한다.
+        /// </summary>
+        public void UpdateNotePosition(double newPosition)
+        {
+            NotePosition = newPosition;
+        }
+
+        private string _sexDisc =string.Empty;
+        public string SexDisc // 성별에 구분자가지 포함
+        {
+            get { return _sexDisc; }
+            set
+            {
+                _sexDisc = value;
+                OnPropertyChanged(nameof(SexDisc));
+            }
+        }
+
+        private readonly Dictionary<string, double> _notePositions = new Dictionary<string, double>(StringComparer.Ordinal);
+        private readonly Dictionary<string, string> _noteTextSnapshot = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        public double? GetNotePosition(string pageKey)
+        {
+            return _notePositions.TryGetValue(pageKey, out var pos) ? pos : (double?)null;
+        }
+
+        public void SetNotePosition(string pageKey, double position)
+        {
+            _notePositions[pageKey] = position;
+        }
+
+        public bool IsSameNoteText(string pageKey, string? noteText)
+        {
+            noteText ??= string.Empty;
+            return _noteTextSnapshot.TryGetValue(pageKey, out var stored) && stored == noteText;
+        }
+
+        public void UpdateNoteTextSnapshot(string pageKey, string? noteText)
+        {
+            _noteTextSnapshot[pageKey] = noteText ?? string.Empty;
+        }
+
+        public void ResetNotePositions()
+        {
+            _notePositions.Clear();
+            _noteTextSnapshot.Clear();
+        }
+        /// <summary>
+        /// 패널별 진행 화면 뷰모델을 구성한다.
+        /// </summary>
+        public AuctionContPanelViewModel( gValues cowinfo, DisplaySelect display, VirtualizingStackPanel panel, List<int> pageTime, int totalRunningPage)
+        {
+            _displaySelect = display;
+            _cowInfo = cowinfo;
+            _panel = panel;
+            _totalRunningPage = totalRunningPage;
+
+            _isRunning = cowinfo.IsRunning;
+
+            UpdateSexDisc(cowinfo);
+
+            if (_isRunning)
+            {
+                Debug.WriteLine($"진행중 화면 {cowinfo.SpaceIndex}");
+            }
+
+        }
+
+        /// <summary>
+        /// 성별/구분 문자열을 계산해 노출용 값을 갱신한다.
+        /// </summary>
+        private void UpdateSexDisc(gValues cowinfo)
+        {
+            if (cowinfo.Sex.Length < 2)
+            {
+                _sexDisc = cowinfo.Sex + " " + cowinfo.StrCowDistinction;
+            }
+            else
+            {
+                _sexDisc = cowinfo.StrCowDistinction;
+            }
+            OnPropertyChanged(nameof(SexDisc));
+        }
+
+
+
+
         // IDisposable 인터페이스 구현
+        /// <summary>
+        /// 리소스를 정리한다.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -96,39 +215,30 @@ namespace CowAuctionSmall.ViewModels
         }
 
         // 종료자 정의
+        /// <summary>
+        /// 정리 루틴을 실행한다.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {
                 if (disposing)
                 {
-                    // 관리되는 리소스 해제
-                    _displaySelect = null;
-                    _cowInfo = null;
-                    _panel = null;
-                    PropertyChanged = null; // 이벤트 핸들러 참조 해제
+                    // 원래 있던 정리 코드
+                    PropertyChanged = null;
                 }
-
-                // 비관리 리소스를 여기에서 해제
 
                 _disposed = true;
             }
         }
+
         // PropertyChanged 이벤트 발생 메서드
+        /// <summary>
+        /// 속성 변경 알림을 전달한다.
+        /// </summary>
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private double _notePosition;
-        public double NotePosition
-        {
-            get => _notePosition;
-            set
-            {
-                _notePosition = value;
-                OnPropertyChanged(nameof(_notePosition));
-            }
         }
 
     }

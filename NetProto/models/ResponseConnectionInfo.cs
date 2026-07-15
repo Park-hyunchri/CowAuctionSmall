@@ -14,64 +14,41 @@ namespace CowAuctionSmall.NetProto.models
         public const char ORIGIN = 'A';
         public const char TYPE = 'R';
 
-        private String mAuctionHouseCode; // 거점코드
-        private String mUserMemNum; // 거래인관리번호
-        private String mResult; // 결과코드
-        private String mAuctionJoinNum; // 경매참가번호
+        public string mAuctionHouseCode { get; private set; } //축협코드
+        public string mUserMemNum { get; private set; } //사용자 회원번호
+        public string mResult { get; private set; } //결과
+        public string mAuctionJoinNum { get; private set; } //경매 참여 번호
 
-        public ResponseConnectionInfo(String auctionHouseCode, String result, String userMemNum, String auctionJoinNum)
+        public ResponseConnectionInfo(string auctionHouseCode, string result, string userMemNum, string auctionJoinNum)
         {
-            mAuctionHouseCode = auctionHouseCode;
-            mUserMemNum = userMemNum;
-            mResult = result;
-            mAuctionJoinNum = auctionJoinNum;
+            mAuctionHouseCode = auctionHouseCode ?? "UNKNOWN";
+            mResult = result ?? "FAIL";
+            mUserMemNum = userMemNum ?? "UNKNOWN";
+            mAuctionJoinNum = auctionJoinNum ?? "0";
         }
 
-        public String getAuctionHouseCode()
+        /// <summary>
+        /// 문자열로 인코딩된 메시지 반환
+        /// </summary>
+        public string getEncodedMessage()
         {
-            return mAuctionHouseCode;
+            return new StringBuilder()
+                .Append(ORIGIN).Append(TYPE).Append(GlobalDefine.DELIMITER)
+                .Append(mAuctionHouseCode).Append(GlobalDefine.DELIMITER)
+                .Append(mResult).Append(GlobalDefine.DELIMITER)
+                .Append(mUserMemNum).Append(GlobalDefine.DELIMITER)
+                .Append(mAuctionJoinNum)
+                .ToString();
         }
 
-        public void setAuctionHouseCode(String auctionHouseCode)
+        public override string ToString()
         {
-            this.mAuctionHouseCode = auctionHouseCode;
-        }
-
-        public String getUserMemNum()
-        {
-            return mUserMemNum;
-        }
-
-        public void setUserMemNum(String userMemNum)
-        {
-            this.mUserMemNum = userMemNum;
+            return $"[ResponseConnectionInfo] AuctionHouseCode={mAuctionHouseCode}, Result={mResult}, UserMemNum={mUserMemNum}, AuctionJoinNum={mAuctionJoinNum}";
         }
 
         public String getResult()
         {
             return mResult;
-        }
-
-        public void setResult(String result)
-        {
-            this.mResult = result;
-        }
-
-        public String getAuctionJoinNum()
-        {
-            return mAuctionJoinNum;
-        }
-
-        public void setAuctionJoinNum(String auctionJoinNum)
-        {
-            this.mAuctionJoinNum = auctionJoinNum;
-        }
-
-        public String getEncodedMessage()
-        {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}", ORIGIN, TYPE, GlobalDefine.NETTY_INFO.DELIMITER, mAuctionHouseCode,
-                    GlobalDefine.NETTY_INFO.DELIMITER, mResult, GlobalDefine.NETTY_INFO.DELIMITER, mUserMemNum,
-                    GlobalDefine.NETTY_INFO.DELIMITER, mAuctionJoinNum);
         }
 
     }

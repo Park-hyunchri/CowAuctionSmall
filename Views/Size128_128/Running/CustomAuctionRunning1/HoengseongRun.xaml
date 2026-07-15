@@ -1,0 +1,168 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.HoengseongRun"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1"
+                          xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+
+    <UserControl.Resources>
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="black"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard x:Name="BlinkStoryboard">
+                            <Storyboard RepeatBehavior="Forever">
+                                <ObjectAnimationUsingKeyFrames
+                                    Storyboard.TargetProperty="(Border.BorderBrush)"
+                                    Duration="0:0:1">
+                                    <!-- 검정색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="Black"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+
+                                    <!-- 빨간색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.6">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="#FD3A4A"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+                                </ObjectAnimationUsingKeyFrames>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 추가 -->
+        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:MotherLevelConverter x:Key="MotherLevelConverter" />
+        <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:WeightKGConverter x:Key="WeightKGConverter"/>
+        <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
+        <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
+        <models:SelectShowWeight_EPDString x:Key="SelectShowWeight_EPDString" />
+        <models:BorderOutlineConverter x:Key="BorderOutlineConverter"/>
+        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Border BorderThickness="3" Style="{StaticResource BlinkingBorderStyle2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid>
+
+            <Canvas Margin="0,17,0,0">
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex" ></TextBlock>
+            </Canvas>
+
+            <!-- ======================================================================================================================================================================= -->
+            <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
+            <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
+                <TextBlock Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="44,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="72,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/>
+            </Canvas>
+            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
+            <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.SipNumber}" Margin="40,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
+            <Canvas Margin="0,16,0,0">
+                <TextBlock Text="{Binding CowInfo.Location}"  Foreground="magenta"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
+            </Canvas>
+
+            <Canvas Margin="0,32,0,0">
+                <TextBlock Text="최저 : "  Foreground="lime"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Margin="40,0,0,0" Foreground="Yellow"/>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
+            <Canvas Visibility="{Binding CowInfo.SelectShowWeight_EPD, Converter={StaticResource SelectShowWeight_EPDString}, ConverterParameter=ShowWeight}">
+                <Canvas Margin="0,47,0,0">
+                    <TextBlock Text="중량 : "  Foreground="lime" Margin="2,0,0,0"/>
+                    <TextBlock Text="{Binding CowInfo.Weight, Converter={StaticResource WeightKGConverter}}" Margin="40,0,0,0" Foreground="Yellow"/>
+                </Canvas>
+            </Canvas>
+
+            <Canvas Visibility="{Binding CowInfo.SelectShowWeight_EPD, Converter={StaticResource SelectShowWeight_EPDString}, ConverterParameter=ShowEPD}">
+                <Canvas Margin="0,47,0,0">
+                    <TextBlock Text="육종:"  Foreground="lime" Margin="2,0,0,0"/>
+                    <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Margin="30,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Margin="60,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                </Canvas>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
+            <Canvas Margin="70,47,0,0" >
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowInfo.Pregnant, Converter={StaticResource PregnancyValueConverter}}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
+                <TextBlock Text="임신 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Pregnant}" Margin="40,0,0,0" Foreground="Yellow"/>
+            </Canvas>
+
+            <Canvas Margin="0,62,0,0">
+                <!-- 생년월일 -->
+                <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Margin="2,0,0,0"/>
+            </Canvas>
+
+            <!-- ======================================================================================================================================================================= -->
+            <!--  2026.07.07  jsr 
+            <Canvas Visibility="{Binding CowInfo.RegistrationCategory, Converter={StaticResource ShowMatherBloodConverter}, ConverterParameter=MyBlood}">
+            
+            -->
+            <Canvas>            
+                <Canvas Margin="0,77,0,0">
+                    <TextBlock Text="등록 : "  Foreground="lime" Margin="2,0,0,0"/> 
+                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}"  Margin="40,0,0,0" />
+                </Canvas>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
+            <Canvas Margin="70,77,0,0">
+                <TextBlock Text="계대 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Blood}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <Canvas Margin="0,92,0,0">
+                <TextBlock Text="KPN : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.KPN}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <Canvas Margin="70,92,0,0">
+                <TextBlock Text="산차 : "  Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.CalvingNumber}" Margin="40,0,0,0" Foreground="Orange"/>
+            </Canvas>
+
+            <!-- Note를 표시하는 TextBlock -->
+</Grid>
+    </Border>
+
+</UserControl>

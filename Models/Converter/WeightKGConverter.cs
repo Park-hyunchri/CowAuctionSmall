@@ -12,9 +12,16 @@ namespace CowAuctionSmall.Models.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string? weight = value as string;
-
-            return weight + " Kg";
+            string weight = value as string ?? "-";
+            if (weight.Equals("0") || weight.Equals("-"))
+            {
+                return "-";
+            }
+            else
+            {
+                return weight + "kg";
+            }
+            
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

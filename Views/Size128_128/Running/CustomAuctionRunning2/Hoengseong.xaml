@@ -12,6 +12,13 @@
 
     <UserControl.Resources>
 
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+
         <!-- 유전능력 목차 스타일 -->
         <Style x:Key="EpdIndexStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
@@ -44,21 +51,35 @@
         </Style>
 
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderBrush" Value="black"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsRunning}" Value="True">
                     <DataTrigger.EnterActions>
-                        <BeginStoryboard>
+                        <BeginStoryboard x:Name="BlinkStoryboard">
                             <Storyboard RepeatBehavior="Forever">
-                                <ColorAnimation
-                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                        From="Black" To="Red" Duration="0:0:0.5"/>
-                                <ColorAnimation
-                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"
-                        From="Red" To="Black" Duration="0:0:0.5" BeginTime="0:0:0.5"/>
+                                <ObjectAnimationUsingKeyFrames
+                                    Storyboard.TargetProperty="(Border.BorderBrush)"
+                                    Duration="0:0:1">
+                                    <!-- 검정색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="Black"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+
+                                    <!-- 빨간색 상태 -->
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.6">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="#FD3A4A"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+                                </ObjectAnimationUsingKeyFrames>
                             </Storyboard>
                         </BeginStoryboard>
                     </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                    </DataTrigger.ExitActions>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -83,16 +104,13 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="도 체 중 :"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
 
-
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="등심면적:"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
-
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="등 지 방 :"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
@@ -102,13 +120,9 @@
                 <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
 
-
             </Grid>
             <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" FontSize="12"/>
-            </Canvas>
-        </Grid>
+</Grid>
     </Border>
 </UserControl>
 

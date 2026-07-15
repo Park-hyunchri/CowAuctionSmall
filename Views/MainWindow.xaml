@@ -4,10 +4,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="{Binding MainWindowWidth}" Height="{Binding MainWindowHeight, Mode=TwoWay}" Width="{Binding MainWindowWidth , Mode=TwoWay}" WindowStartupLocation="Manual" WindowStyle="None" Top="{Binding MainPositionX ,Mode=TwoWay}" Left="{Binding MainPositionY , Mode=TwoWay}" ResizeMode="NoResize" KeyDown="Window_KeyDown" >
-    <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" >
-        <Grid>
+        Title="{Binding MainWindowWidth}" Height="{Binding MainWindowHeight, Mode=TwoWay}" Width="{Binding MainWindowWidth , Mode=TwoWay}" WindowStartupLocation="Manual" Top="{Binding MainPositionX ,Mode=TwoWay}" WindowStyle="None" Left="{Binding MainPositionY , Mode=TwoWay}" ResizeMode="NoResize" KeyDown="Window_KeyDown" Background="Black" >
+    <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled" Background="Black" >
+        <Grid Background="Black">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -20,6 +21,25 @@
             <TextBox Grid.Row="1" x:Name="MsgTextBox" Background="Black" Text="{Binding MainWindowTextBox, UpdateSourceTrigger=PropertyChanged}" Foreground="Lime" IsReadOnly="True" Margin="0,1,0,0" TextWrapping="Wrap" VerticalScrollBarVisibility="Visible"
          BorderThickness="0" BorderBrush="Transparent" Height="70" TextChanged="MsgTextBox_TextChanged"/>
 
+            <Border Grid.Row="2" Background="#111111" Height="24" Margin="0,1,0,0" Visibility="{Binding PageIndicatorVisibility}">
+                <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                    <TextBlock Foreground="#DADADA" FontSize="12" VerticalAlignment="Center" Text="{Binding PageIndicatorRoleText}"/>
+                    <TextBlock Foreground="#DADADA" FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0" Width="130" Text="{Binding PageIndicatorSyncText}"/>
+
+                    <ItemsControl Margin="4,0,0,0" ItemsSource="{Binding PageIndicatorDots}" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Ellipse Width="9" Height="9" Fill="{Binding}" Margin="3,0,0,0" Stroke="#55000000" StrokeThickness="1"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
 
         </Grid>
     </ScrollViewer>

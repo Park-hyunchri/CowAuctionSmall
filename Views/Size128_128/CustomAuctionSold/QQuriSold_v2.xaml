@@ -1,0 +1,240 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAuctionSold.QQuriSold_v2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAuctionSold"
+                          xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+
+    <UserControl.Resources>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+
+        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Border BorderBrush="#1E90FF" BorderThickness="2">
+
+        <Grid Background="Black">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="23"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="1.1*"/>
+                <RowDefinition Height="1.1*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="1.2*"/>
+                <RowDefinition Height="17"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="1.1*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center"  Text="낙  찰" FontSize="22" Foreground="Violet" FontWeight="Bold"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"  Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="15" FontWeight="Bold"/>
+           
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Center" VerticalAlignment="Top"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="22,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Bold" />
+
+            <TextBlock  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex">
+            </TextBlock>
+
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+            <TextBlock  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <!-- 기본: 중량 안 보일 때(2,3,5 이외) => 크게 -->
+                        <Setter Property="FontSize" Value="17"/>
+
+                        <Style.Triggers>
+                            <!-- CowDistinction 이 2일 때 (중량 보임) => 작게 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="2">
+                                <Setter Property="FontSize" Value="12"/>
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 3일 때 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="3">
+                                <Setter Property="FontSize" Value="12"/>
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 5일 때 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="5">
+                                <Setter Property="FontSize" Value="12"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- 낙찰가 : 라벨 -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+
+            <!-- 낙찰가 : 값 -->
+            <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" Margin="3,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <!-- 기본: 중량 안 보일 때(2,3,5 이외) => 크게 -->
+                        <Setter Property="FontSize" Value="17"/>
+
+                        <Style.Triggers>
+                            <!-- CowDistinction 이 2일 때 (중량 보임) => 작게 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="2">
+                                <Setter Property="FontSize" Value="13"/>
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 3일 때 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="3">
+                                <Setter Property="FontSize" Value="13"/>
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 5일 때 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="5">
+                                <Setter Property="FontSize" Value="13"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" Orientation="Horizontal"  VerticalAlignment="Center" Margin="0,3,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <!-- 기본은 안 보이게 -->
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <!-- CowDistinction 이 2일 때 보이게 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="2">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 3일 때 보이게 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="3">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+
+                            <!-- CowDistinction 이 5일 때 보이게 -->
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="5">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="중량" Foreground="lime" FontSize="12" Margin="6,0,0,0"/>
+                <TextBlock Text=":" Foreground="lime" FontSize="12" Margin="11,0,0,0"/>
+                <TextBlock Foreground="Cyan" FontSize="12" Margin="7,0,0,0">
+                    <Run Text="{Binding Weight, Converter={StaticResource NumberFormatConverter}}" Foreground="Orange"/>
+                    <Run Text=" kg" Foreground="Orange"/>
+                </TextBlock>
+            </StackPanel>
+
+
+
+
+
+            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text="낙찰자" Foreground="Violet" FontSize="13" VerticalAlignment="Center"/>
+            <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text=":" Foreground="Violet" FontSize="12" Margin="41,0,0,0" VerticalAlignment="Center"/>
+
+            <Grid Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="2" VerticalAlignment="Center" Height="32">
+
+                <!-- N : 숫자만 (현재와 동일한 형태) -->
+                <TextBlock x:Name="tbBidderNumberOnly" Text="{Binding Bidder}" Foreground="Yellow" FontSize="30" FontWeight="Bold"  VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BidderName}" Value="N">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Y : 사람 이름만 (2줄/줄바꿈) -->
+                <TextBlock x:Name="tbBidderNameOnly" Text="{Binding Bidder}" Foreground="Yellow" TextWrapping="Wrap" TextAlignment="Center"  VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="FontSize" Value="18"/>
+                            <Style.Triggers>
+                                <!-- 1) Y일 때만 보이게 -->
+                                <DataTrigger Binding="{Binding BidderName}" Value="Y">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+
+                                <!-- 2) 2줄짜리 이름이면 폰트 14 -->
+                                <DataTrigger Binding="{Binding IsTwoLineName}" Value="True">
+                                    <Setter Property="FontSize" Value="14"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+
+                <!-- B : 윗줄 숫자, 아랫줄 이름 -->
+                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BidderName}" Value="B">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <!-- 윗줄 : 숫자 -->
+                    <TextBlock  Foreground="Yellow" FontSize="20"  TextAlignment="Center" FontWeight="Bold" >
+                        <Run Text="{Binding BidderNum}" />
+                    </TextBlock>
+
+                    <!-- 아랫줄 : 이름 (2줄 허용) -->
+                    <TextBlock Text="{Binding BidderString}" Foreground="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="80" TextWrapping="NoWrap" FontSize="11.5" />
+
+                </StackPanel>
+            </Grid>
+
+            <Border x:Name="borderPaternityMatch" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Yellow" BorderThickness="1" CornerRadius="3" Padding="1" Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}" Width="28" HorizontalAlignment="Left">
+                <TextBlock Foreground="Yellow" Text="{Binding PaternityMatch}"/>
+            </Border>
+
+            <!-- Note를 표시하는 TextBlock -->
+            <Canvas Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="5" x:Name="canvas" ClipToBounds="True">
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Margin" Value="2,3,2,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
+                                <Setter Property="Margin" Value="32,3,2,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
+                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#f61c2d" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
+            </Canvas>
+        </Grid>
+    </Border>
+</UserControl>

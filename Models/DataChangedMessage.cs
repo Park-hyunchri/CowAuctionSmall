@@ -64,10 +64,13 @@ namespace CowAuctionSmall.Models
     public class DataToServerGetArrMsg
     {
         public string[] Data { get; }
+        public string? Refresh { get; }
 
-        public DataToServerGetArrMsg(string[] data)
+
+        public DataToServerGetArrMsg(string[] data, string? refresh=null)
         {
             Data = data;
+            Refresh = refresh;
         }
     }
 
@@ -110,4 +113,47 @@ namespace CowAuctionSmall.Models
             Data = data;
         }
     }
+
+    public class NettyConnectionResultMessage
+    {
+        public string ResultCode { get; }
+
+        public NettyConnectionResultMessage(string resultCode)
+        {
+            ResultCode = resultCode;
+        }
+    }
+
+    public class RefreshAuctionSV_Message
+    {
+        public string Data { get; }
+        public RefreshAuctionSV_Message(string data)
+        {
+            Data = data;
+        }
+    }
+
+    public class PageIndicatorStateMessage
+    {
+        public int CurrentPage { get; }
+        public int TotalPages { get; }
+        public bool IsMaster { get; }
+        public bool IsFrozen { get; }
+        public bool IsSubFallbackActive { get; }
+
+        public PageIndicatorStateMessage(
+            int currentPage,
+            int totalPages,
+            bool isMaster,
+            bool isFrozen,
+            bool isSubFallbackActive)
+        {
+            CurrentPage = currentPage;
+            TotalPages = totalPages;
+            IsMaster = isMaster;
+            IsFrozen = isFrozen;
+            IsSubFallbackActive = isSubFallbackActive;
+        }
+    }
+
 }

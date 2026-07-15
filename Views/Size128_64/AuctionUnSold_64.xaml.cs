@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CowAuctionSmall.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,12 +24,7 @@ namespace CowAuctionSmall.Views.Size128_64
         public AuctionUnSold_64()
         {
             InitializeComponent();
-            Loaded += AuctionUnSold_64_Loaded;
-        }
-        private void AuctionUnSold_64_Loaded(object sender, RoutedEventArgs e)
-        { 
-                Sex.Text = Sex.Text.Length > 0 ? Sex.Text.Substring(0) : "";
-
+            //Loaded += AuctionUnSold_64_Loaded;
         }
     }
 }

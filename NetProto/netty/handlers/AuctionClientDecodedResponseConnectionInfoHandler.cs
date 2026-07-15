@@ -15,11 +15,11 @@ namespace CowAuctionSmall.NetProto.netty.handlers
  */
     public class AuctionClientDecodedResponseConnectionInfoHandler : SimpleChannelInboundHandler<ResponseConnectionInfo>
     {
-        private iNettyControllable mController;
+        private readonly iNettyControllable mController;
 
         public AuctionClientDecodedResponseConnectionInfoHandler(iNettyControllable controller)
         {
-            this.mController = controller;
+            mController = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
         //@Override
@@ -29,7 +29,7 @@ namespace CowAuctionSmall.NetProto.netty.handlers
             {
                 mController.OnResponseConnectionInfo(responseConnectionInfo);
             }
-            //Debug.WriteLine("[" + System.DateTime.Now.ToString() + "]" + " ==>> called ResponseConnectionInfoHandler.ChannelRead0");
+            
         }
     }
 }

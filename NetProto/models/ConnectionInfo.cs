@@ -18,93 +18,43 @@ namespace CowAuctionSmall.NetProto.models
 
         public static char TYPE = 'I';
 
-        private String mAuctionHouseCode; // 조합구분코드
-        private String mUserMemNum; // 거래인관리번호
-        private String mAuthToken; // 인증토큰
-        private String mChannel; // 접속 요청 채널
-        private String mOS; // 사용 채널
-        private String mAuctionJoinNum; // 경매참가번호(패킷데이터에서 제외)
+
+        public string mAuctionHouseCode { get; private set; } //축협코드 
+        public string mUserMemNum { get; private set; } // 거래인관리번호
+        public string mAuthToken { get; private set; } //인증토큰
+        public string mChannel { get; private set; } //접속 요청 채널
+        public String mOS { get; private set; } // 사용 채널
+        public String mAuctionJoinNum { get; private set; } = string.Empty; // 경매참가번호(패킷데이터에서 제외)
 
 
         public ConnectionInfo(String auctionHouseCode, String userMemNum, String authToken, String channel, String os)
         {
-            mAuctionHouseCode = auctionHouseCode;
-            mUserMemNum = userMemNum;
-            mAuthToken = authToken;
-            mChannel = channel;
-            mOS = os;
+            mAuctionHouseCode = auctionHouseCode ?? "UNKNOWN";
+            mUserMemNum = userMemNum ?? "UNKNOWN";
+            mAuthToken = authToken ?? "INVALID";
+            mChannel = channel ?? "DEFAULT";
+            mOS = os ?? "UNKNOWN";
         }
 
-        public Boolean equals(Object obj)
+        /// <summary>
+        /// 문자열로 인코딩된 메시지 반환
+        /// </summary>
+        public string getEncodedMessage()
         {
-            return ((ConnectionInfo)obj).mUserMemNum.Equals(mUserMemNum);
+            return new StringBuilder()
+                .Append(ORIGIN).Append(TYPE).Append(GlobalDefine.DELIMITER)
+                .Append(mAuctionHouseCode).Append(GlobalDefine.DELIMITER)
+                .Append(mUserMemNum).Append(GlobalDefine.DELIMITER)
+                .Append(mAuthToken).Append(GlobalDefine.DELIMITER)
+                .Append(mChannel).Append(GlobalDefine.DELIMITER)
+                .Append(mOS)
+                .ToString();
         }
 
-        public String getAuctionHouseCode()
+        public override string ToString()
         {
-            return mAuctionHouseCode;
+            return $"[ConnectionInfo] AuctionHouseCode={mAuctionHouseCode}, UserMemNum={mUserMemNum}, Channel={mChannel}, OS={mOS}";
         }
 
-        public void setAuctionHouseCode(String auctionHouseCode)
-        {
-            this.mAuctionHouseCode = auctionHouseCode;
-        }
-
-        public String getUserMemNum()
-        {
-            return mUserMemNum;
-        }
-
-        public void setUserMemNum(String userMemNum)
-        {
-            this.mUserMemNum = userMemNum;
-        }
-
-        public String getAuthToken()
-        {
-            return mAuthToken;
-        }
-
-        public void setAuthToken(String authToken)
-        {
-            this.mAuthToken = authToken;
-        }
-
-        public String getChannel()
-        {
-            return mChannel;
-        }
-
-        public void setChannel(String channel)
-        {
-            this.mChannel = channel;
-        }
-
-        public String getOS()
-        {
-            return mOS;
-        }
-
-        public void setOS(String os)
-        {
-            this.mOS = os;
-        }
-
-        public String getAuctionJoinNum()
-        {
-            return this.mAuctionJoinNum;
-        }
-
-        public void setAuctionJoinNum(String auctionJoinNum)
-        {
-            mAuctionJoinNum = auctionJoinNum;
-        }
-
-        public String getEncodedMessage()
-        {
-            return String.Format("{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}", ORIGIN, TYPE, GlobalDefine.NETTY_INFO.DELIMITER, mAuctionHouseCode,
-                    GlobalDefine.NETTY_INFO.DELIMITER, mUserMemNum, GlobalDefine.NETTY_INFO.DELIMITER, mAuthToken,
-                    GlobalDefine.NETTY_INFO.DELIMITER, mChannel, GlobalDefine.NETTY_INFO.DELIMITER, mOS);
-        }
     }
 }

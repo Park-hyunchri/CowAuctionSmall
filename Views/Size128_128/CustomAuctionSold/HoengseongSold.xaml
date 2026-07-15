@@ -12,6 +12,14 @@
              d:DesignHeight="128" d:DesignWidth="128">
 
     <UserControl.Resources>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+        
         <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
@@ -48,19 +56,19 @@
             <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
             <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="개체 : "  Foreground="lime" Margin="2,0,0,0" />
-                <TextBlock Text="{Binding EntityNumber}" Margin="40,0,0,0" Foreground="Silver"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="73,0,0,0" Foreground="red" Background="Black"/>
+                <TextBlock Text="{Binding EntityNumber}" Margin="40,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
+                <TextBlock Text="{Binding EntityNumberShort}" Margin="73,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/>
             </Canvas>
             <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
             <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
                 <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" />
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="40,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
+                <TextBlock Text="{Binding EntityNumberShort}" Margin="40,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Bold"/>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
 
             <!-- Note를 표시하는 TextBlock -->
             <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular"/>
+                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
             </Canvas>
         </Grid>
     </Border>

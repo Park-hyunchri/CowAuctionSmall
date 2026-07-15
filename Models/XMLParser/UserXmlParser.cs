@@ -15,8 +15,13 @@ namespace CowAuctionSmall.Models.XMLParser
             UserInfo userInfo = new UserInfo();
 
             XDocument xmlDoc = XDocument.Load(xmlFilePath);
+            var root = xmlDoc.Root;
+            if (root == null)
+            {
+                return userInfo;
+            }
 
-            var authElement = xmlDoc.Root.Element("Authentication");
+            var authElement = root.Element("Authentication");
             if (authElement != null)
             {
                 userInfo.Authentication = new Authentication
@@ -27,21 +32,22 @@ namespace CowAuctionSmall.Models.XMLParser
                 };
             }
 
-            var currentInfoElement = xmlDoc.Root.Element("CurrentInfo");
+            var currentInfoElement = root.Element("CurrentInfo");
             if (currentInfoElement != null)
             {
                 userInfo.CurrentInfo = new CurrentInfo
                 {
                     Address = currentInfoElement.Element("Address")?.Value,
                     AddressEPD = currentInfoElement.Element("AddressEPD")?.Value,
+                    AddressQcn = currentInfoElement.Element("AddressQcn")?.Value,
                     Date = currentInfoElement.Element("Date")?.Value
                 };
             }
 
-            var auctionElement = xmlDoc.Root.Element("Auction");
+            var auctionElement = root.Element("Auction");
             if (auctionElement != null)
             {
-                userInfo.Auction = new Auction
+                var auction = new Auction
                 {
                     Address = auctionElement.Element("Address")?.Value,
                     Port = auctionElement.Element("Port")?.Value,
@@ -54,12 +60,34 @@ namespace CowAuctionSmall.Models.XMLParser
                     BoardPageTime = auctionElement.Element("BoardPageTime")?.Value,
                     BoardPageTime2 = auctionElement.Element("BoardPageTime2")?.Value,
                     BoardPageTime3 = auctionElement.Element("BoardPageTime3")?.Value,
+                    BoardPageTime4 = auctionElement.Element("BoardPageTime4")?.Value,
                     BidderName = auctionElement.Element("BidderName")?.Value,
                     IsShowOwnerName = auctionElement.Element("IsShowOwnerName")?.Value,
                     ChangeSexName = auctionElement.Element("ChangeSexName")?.Value,
-                    IsGoatAuction = auctionElement.Element("IsGoatAuction")?.Value
-                    
+                    SelectShowWeight_EPD = auctionElement.Element("SelectShowWeight_EPD")?.Value,
+                    IsShowQQuri = auctionElement.Element("IsShowQQuri")?.Value,
+                    PageTimerPort = auctionElement.Element("PageTimerPort")?.Value,
+                    EnableSubFallback = auctionElement.Element("EnableSubFallback")?.Value,
+                    SubFallbackTimeoutMs = auctionElement.Element("SubFallbackTimeoutMs")?.Value
                 };
+
+                var pageSettingElement = auctionElement.Element("PageSetting") ?? root.Element("PageSetting");
+                if (pageSettingElement != null)
+                {
+                    auction.PageSetting = new PageSetting
+                    {
+                        PageTimerPort = pageSettingElement.Element("PageTimerPort")?.Value,
+                        BoardPage = pageSettingElement.Element("BoardPage")?.Value,
+                        BoardPageTime = pageSettingElement.Element("BoardPageTime")?.Value,
+                        BoardPageTime2 = pageSettingElement.Element("BoardPageTime2")?.Value,
+                        BoardPageTime3 = pageSettingElement.Element("BoardPageTime3")?.Value,
+                        BoardPageTime4 = pageSettingElement.Element("BoardPageTime4")?.Value,
+                        EnableSubFallback = pageSettingElement.Element("EnableSubFallback")?.Value,
+                        SubFallbackTimeoutMs = pageSettingElement.Element("SubFallbackTimeoutMs")?.Value
+                    };
+                }
+
+                userInfo.Auction = auction;
             }
 
             return userInfo;

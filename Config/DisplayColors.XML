@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DisplayColors>
+  <EntityNumber Foreground="#868686" />
+  <EntityNumberShort Foreground="#F2F2F2" Background="#000000" />
+</DisplayColors>

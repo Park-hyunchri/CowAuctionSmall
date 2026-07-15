@@ -10,9 +10,9 @@ namespace CowAuctionSmall.Models.Structures
 
     public class UserInfo
     {
-        public Authentication? Authentication { get; set; } = null;
-        public CurrentInfo? CurrentInfo { get; set; } = null;
-        public Auction? Auction { get; set; } = null;
+        public Authentication? Authentication { get; set; }
+        public CurrentInfo? CurrentInfo { get; set; }
+        public Auction? Auction { get; set; }
 
     }
     /// <summary>
@@ -33,6 +33,8 @@ namespace CowAuctionSmall.Models.Structures
     {
         public string? Address { get; set; } = "";
         public string? AddressEPD { get; set; } = "";
+
+        public string? AddressQcn { get; set; } = "";
         public string? Date { get; set; } = "";
     }
 
@@ -52,9 +54,32 @@ namespace CowAuctionSmall.Models.Structures
         public string? BoardPageTime { get; set; } = "";
         public string? BoardPageTime2 { get; set; } = "";
         public string? BoardPageTime3 { get; set; } = "";
+        public string? BoardPageTime4 { get; set; } = "";
         public string? BidderName { get; set; } = "";
         public string? IsShowOwnerName { get; set; } = "";
         public string? ChangeSexName { get; set; } = "Y";
-        public string? IsGoatAuction { get; set; } = "";
+
+        public string? SelectShowWeight_EPD { get; set; } = "";
+
+        public string? IsShowQQuri { get; set; } = "";
+
+        public string? PageTimerPort { get; set; } = "45123";
+        public string? EnableSubFallback { get; set; } = "";
+        public string? SubFallbackTimeoutMs { get; set; } = "";
+
+        public PageSetting? PageSetting { get; set; }
+    }
+
+    public class PageSetting
+    {
+        public string? PageTimerPort { get; set; } = "45123";
+        public string? EnableSubFallback { get; set; } = "Y";
+        public string? SubFallbackTimeoutMs { get; set; } = "4000";
+
+        public string? BoardPage { get; set; } = "1";
+        public string? BoardPageTime { get; set; } = "";
+        public string? BoardPageTime2 { get; set; } = "";
+        public string? BoardPageTime3 { get; set; } = "";
+        public string? BoardPageTime4 { get; set; } = "";
     }
 }

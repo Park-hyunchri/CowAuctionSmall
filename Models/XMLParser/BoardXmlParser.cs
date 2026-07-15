@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using CowAuctionSmall.Models;
 using CowAuctionSmall.Models.Structures;
 
 namespace CowAuctionSmall.Models.XMLParser
@@ -12,18 +13,25 @@ namespace CowAuctionSmall.Models.XMLParser
     {
         public  BoardList ParseXml(string xmlFilePath)
         {
+            var logger = NLogger.Instance;
             BoardList boardList = new BoardList();
             boardList.MultiBoards = new List<Board>();
 
             XDocument xmlDoc = XDocument.Load(xmlFilePath);
+            var root = xmlDoc.Root;
+            if (root == null)
+            {
+                logger.LogError($"BoardXmlParser: Root element가 없습니다. ({xmlFilePath})");
+                return boardList;
+            }
 
-            var sizeElement = xmlDoc.Root.Element("Size");
+            var sizeElement = root.Element("Size");
             if (sizeElement != null)
             {
                 boardList.Size = sizeElement.Value;
             }
 
-            var multiBoards = xmlDoc.Root.Elements("MultiBoard");
+            var multiBoards = root.Elements("MultiBoard");
             foreach (var multiBoard in multiBoards)
             {
                 Board board = new Board();
@@ -36,15 +44,30 @@ namespace CowAuctionSmall.Models.XMLParser
                     var rowDataStr = rowIdx.Value;
                     if (!string.IsNullOrEmpty(rowDataStr))
                     {
-                        var rowData = rowDataStr.Split(',').Select(s => int.Parse(s)).ToArray();
-                        board.Rows.Add(rowData);
+                        var rowData = new List<int>();
+                        foreach (var token in rowDataStr.Split(','))
+                        {
+                            if (int.TryParse(token, out var value))
+                            {
+                                rowData.Add(value);
+                            }
+                            else
+                            {
+                                logger.LogWarn($"BoardXmlParser: RowIdx parse failed '{token}' in {xmlFilePath}");
+                            }
+                        }
+
+                        if (rowData.Count > 0)
+                        {
+                            board.Rows.Add(rowData.ToArray());
+                        }
                     }
                 }
 
                 boardList.MultiBoards.Add(board);
             }
 
-            var logoBoards = xmlDoc.Root.Elements("LogoBoard");
+            var logoBoards = root.Elements("LogoBoard");
             foreach (var logoRows in logoBoards)
             {
                 Logos logos = new Logos();
@@ -60,8 +83,20 @@ namespace CowAuctionSmall.Models.XMLParser
                     var rowDataStr = rowIdx.Value;
                     if (!string.IsNullOrEmpty(rowDataStr))
                     {
-                        var rowData = rowDataStr.Split(',').Select(s => int.Parse(s)).ToArray(); // 인덱스를 배열로 변환
-                        logoRowIdx.Rows = rowData.ToList(); // 로우 인덱스를 담을 리스트로 변환하여 할당
+                        var rowData = new List<int>();
+                        foreach (var token in rowDataStr.Split(','))
+                        {
+                            if (int.TryParse(token, out var value))
+                            {
+                                rowData.Add(value);
+                            }
+                            else
+                            {
+                                logger.LogWarn($"BoardXmlParser: LogoRowIdx parse failed '{token}' in {xmlFilePath}");
+                            }
+                        }
+
+                        logoRowIdx.Rows = rowData;
                     }
 
                     logos.Rows.Add(logoRowIdx);

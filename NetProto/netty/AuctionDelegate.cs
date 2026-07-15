@@ -1,60 +1,104 @@
 ﻿using CowAuctionSmall.NetProto.interfaces;
 using System;
-using System.Runtime.CompilerServices;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CowAuctionSmall.NetProto.netty
 {
     class AuctionDelegate
     {
-        private static AuctionDelegate? instance = null;
+        private static readonly Lazy<AuctionDelegate> instance = new Lazy<AuctionDelegate>(() => new AuctionDelegate());
+        private AuctionShareNettyClient? mClient; // Netty 클라이언트 객체
+        private readonly object _clientLock = new object();
+        private readonly SemaphoreSlim _disposeGate = new SemaphoreSlim(1, 1);
 
-        public AuctionShareNettyClient? mClient; // 네티 접속 객체
+        private AuctionDelegate() { }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        /// <summary>
+        /// 싱글톤 인스턴스를 반환하는 메서드
+        /// </summary>
         public static AuctionDelegate getInstance()
         {
+            return instance.Value;
+        }
 
-            if (instance == null)
+
+        /// <summary>
+        /// Netty 클라이언트를 생성하고 실행하는 메서드.
+        /// </summary>
+        public void createClients(string host_, int port_, iNettyControllable controllable)
+        {
+            lock (_clientLock)
             {
-                instance = new AuctionDelegate();
+                if (mClient != null && mClient.isActive())
+                {
+                    Debug.WriteLine("✅ Netty 클라이언트가 이미 실행 중입니다.");
+                    return;
+                }
+
+                Debug.WriteLine($"🔄 Netty 클라이언트 생성: {host_}:{port_}");
+                mClient = new AuctionShareNettyClient.Builder(host_, port_)
+                            .setController(controllable)
+                            .buildAndRun();
             }
-
-            return instance;
         }
 
-        public void createClients(String host_, int port_, iNettyControllable controllable)
+        /// <summary>
+        /// Netty 클라이언트를 안전하게 종료하는 메서드.
+        /// </summary>
+        public async Task disposeClients()
         {
-            this.mClient = new AuctionShareNettyClient.Builder(host_, port_).setController(controllable).buildAndRun();
+            await _disposeGate.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                AuctionShareNettyClient? clientToDispose;
+                lock (_clientLock)
+                {
+                    clientToDispose = mClient;
+                    mClient = null;
+                }
+
+                if (clientToDispose == null)
+                {
+                    Debug.WriteLine("⚠️ 종료할 Netty 클라이언트가 없습니다.");
+                    return;
+                }
+
+                Debug.WriteLine("🛑 Netty 클라이언트 종료 중...");
+                await clientToDispose.stopClient().ConfigureAwait(false);
+            }
+            finally
+            {
+                _disposeGate.Release();
+            }
         }
 
-        public void disposeClients()
-        {
-            if (this.isActive() == false || this.mClient == null)
-                return;
-
-            // mClient 사용하기 전에 null 여부를 확인합니다.
-            // 리소스를 명시적으로 해제하기 위해 Dispose 메서드를 호출합니다.
-            this.mClient.stopClient();
-            //this.mClient.Dispose();
-
-            this.mClient = null;
-        }
 
 
 
+        /// <summary>
+        /// 현재 Netty 클라이언트가 활성 상태인지 확인.
+        /// </summary>
         public bool isActive()
         {
-            if (mClient == null)
-                return false;
-            return mClient.isActive();
+            lock (_clientLock)
+            {
+                return mClient != null && mClient.isActive();
+            }
         }
 
         public String sendMessage(String msg)
         {
-
-            if (mClient != null && isActive())
+            AuctionShareNettyClient? currentClient;
+            lock (_clientLock)
             {
-                mClient.sendMessage(msg);
+                currentClient = mClient;
+            }
+
+            if (currentClient != null && currentClient.isActive())
+            {
+                currentClient.sendMessage(msg);
                 return msg;
             }
             else

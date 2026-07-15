@@ -25,7 +25,7 @@ namespace CowAuctionSmall.Models.XMLParser
         }
 
 
-        public (BoardList board, UserInfo userInfo) XmlPaserResult()
+        public (BoardList? board, UserInfo? userInfo) XmlPaserResult()
         {
             BoardList? boardResult;
             UserInfo? userInfoResult;

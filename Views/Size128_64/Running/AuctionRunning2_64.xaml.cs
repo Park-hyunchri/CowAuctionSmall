@@ -1,18 +1,7 @@
-﻿using CowAuctionSmall.Models;
+﻿using CowAuctionSmall.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CowAuctionSmall.Views.Size128_64.Running
 {
@@ -42,10 +31,19 @@ namespace CowAuctionSmall.Views.Size128_64.Running
             }), System.Windows.Threading.DispatcherPriority.Render);
         }
 
+        /*        private void StartScrollingAnimation()
+                {
+                    FlowTextAnimation scrollingText = new FlowTextAnimation(note, canvas); // note는 TextBlock, canvas는 애니메이션할 패널
+                    scrollingText.Start(); // 속도 설정 (속도 값이 클수록 빠름)
+                }*/
         private void StartScrollingAnimation()
         {
-            FlowTextAnimation scrollingText = new FlowTextAnimation(note, canvas); // note는 TextBlock, canvas는 애니메이션할 패널
-            scrollingText.Start(); // 속도 설정 (속도 값이 클수록 빠름)
+            if (DataContext is AuctionContPanelViewModel viewModel)
+            {
+                FlowTextAnimation scrollingText = new FlowTextAnimation(note, canvas, viewModel);
+                scrollingText.Start();
+            }
         }
+
     }
 }

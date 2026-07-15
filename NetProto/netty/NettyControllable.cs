@@ -61,7 +61,13 @@ namespace CowAuctionSmall.NetProto.netty
 
         public void onConnectionException()
         {
-            throw new NotImplementedException();
+            const string msg = "[응찰서버 연결 예외]";
+            Debug.WriteLine(msg);
+            logger.LogError(msg);
+
+            // 연결 실패를 상위 흐름에 알린다.
+            WeakReferenceMessenger.Default.Send(new DataStringMessage(msg));
+            WeakReferenceMessenger.Default.Send(new NettyConnectionResultMessage("2001"));
         }
         /// <summary>
         /// 서버로 오는 데이터1

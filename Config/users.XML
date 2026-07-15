@@ -1,36 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Server>
-		<Authentication>
-			<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auth/login</Address>
-			<UserID>boardman-177-5</UserID>
-			<Password>nacf1234</Password>
-		</Authentication>
 
-		<CurrentInfo>
-			<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auction/8808990656502/entry?date=</Address>
-			<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656502/date/</AddressEPD>
-			<Date>20241023</Date>
-		</CurrentInfo>
-		<Auction>
-				<Address>1.201.161.58</Address>
-				<Port>5001</Port>
-				<Channel>6006</Channel>
-				<Priority>MANAGE</Priority>
-							<AuctionHouseCode>8808990656502</AuctionHouseCode>
-							<StartPosition>0,0</StartPosition>				<!--     프로그램 시작 위치 변경   -->
-	
-							<CowBirth>Y</CowBirth>							<!--     송아지 생년월일 일자 표기 결정    ex. Y or N   사용하지않는 옵션-->
+	<Authentication>
+		<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auth/login</Address>
+		<UserID>boardman-101-3</UserID>
+		<Password>nacf1234</Password>
+	</Authentication>
 
-							<BoardPage>2</BoardPage>						<!--   진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
-							<BoardPageTime>7</BoardPageTime>				<!--   기본 개체정보 패널 표출 시간  -->
-							<BoardPageTime2>7</BoardPageTime2>				<!--   유전능력 패널 표출시간   -->
-							<BoardPageTime3>2</BoardPageTime3>				<!--   판넬 교체 시간  ex. 5 = 5초, 8 = 8초  ex) 아직 3번째 페이지를 적용한 축협 x -->
-	
-							<BidderName>N</BidderName>					<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
-							<IsShowOwnerName>Y</IsShowOwnerName>    	<!--     출하자 이름 표시 ex. Y or N   -->
-							<ChangeSexName>N</ChangeSexName>		<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
-							<IsGoatAuction>Y</IsGoatAuction>			<!--     염소경매데이터 표출 여부 ex. Y or N  -->
-		</Auction>
+	<CurrentInfo>
+		<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auction/8808990656229/entry/board?date=</Address>
+		<!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
+		<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656229/date/</AddressEPD>
+		<AddressQcn>https://xn--o39an74b9ldx9g.kr/api/v1/auction/select/qcn/list</AddressQcn>
+		<Date>20260710</Date>
+	</CurrentInfo>
+
+	<Auction>
+		<Address>1.201.161.58</Address>
+		<Port>5001</Port>
+		<Channel>6006</Channel>
+		<Priority>MANAGE</Priority>
+		<AuctionHouseCode>8808990656229</AuctionHouseCode>
+		<StartPosition>0,0</StartPosition>
+		<!--     프로그램 시작 위치 변경   -->
+
+		<CowBirth>Y</CowBirth>
+		<!--     생년월일 일자 표기 Y or 월령으로표기 N   사용하지않는 옵션-->
+
+		<BidderName>N</BidderName>
+		<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
+		<IsShowOwnerName>y</IsShowOwnerName>
+		<!--     출하자 이름 표시 ex. Y or N   -->
+		<ChangeSexName>N</ChangeSexName>
+		<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
+		<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>
+		<!-- 중량으로 보여줄거면 Y or 중량빼고 EPD 알파벳만 보여주고 싶다면 N (기본값 Y)-->
+		<IsShowQQuri>x</IsShowQQuri>
+		<!--	 뿌리농가 적용여부 ex. Y or N or X   -->
+	</Auction>
+
+	<PageSetting>
+		<PageTimerPort>45123</PageTimerPort>
+		<!-- 페이지 타이머 UDP 포트 -->
+
+		<BoardPage>2</BoardPage>
+		<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
+
+		<BoardPageTime>15</BoardPageTime>
+		<!--     1판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+		<BoardPageTime2>10</BoardPageTime2>
+		<!--     2판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+		<BoardPageTime3>3</BoardPageTime3>
+		<!--     3판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+		<BoardPageTime4>3</BoardPageTime4>
+		<!--     4판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
+	</PageSetting>
+
+
 </Server>
 
 <!--   실서버용   -->

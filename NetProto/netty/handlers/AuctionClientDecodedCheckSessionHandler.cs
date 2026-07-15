@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CowAuctionSmall.NetProto.interfaces;
+﻿using CowAuctionSmall.NetProto.interfaces;
 using CowAuctionSmall.NetProto.models;
 using DotNetty.Transport.Channels;
+using System;
 
 
 namespace CowAuctionSmall.NetProto.netty.handlers
@@ -15,11 +11,11 @@ namespace CowAuctionSmall.NetProto.netty.handlers
      */
     public class AuctionClientDecodedCheckSessionHandler : SimpleChannelInboundHandler<AuctionCheckSession>
     {
-        private iNettyControllable mController;
+        private readonly iNettyControllable mController;
 
         public AuctionClientDecodedCheckSessionHandler(iNettyControllable controller)
         {
-            this.mController = controller;
+            mController = controller ?? throw new ArgumentNullException(nameof(controller));
         }
 
         //@Override

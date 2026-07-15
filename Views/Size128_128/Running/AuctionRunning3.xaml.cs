@@ -1,4 +1,6 @@
 ﻿using CowAuctionSmall.Models;
+using CowAuctionSmall.ViewModels;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using Canvas = System.Windows.Controls.Canvas;
@@ -14,5 +16,6 @@ namespace CowAuctionSmall.Views
         {
             InitializeComponent();
         }
+
     }
 }

@@ -1,5 +1,5 @@
 ﻿using CowAuctionSmall.Models;
-using DocumentFormat.OpenXml.InkML;
+using CowAuctionSmall.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +22,12 @@ namespace CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold
     /// </summary>
     public partial class SanjuUnSold : UserControl
     {
+        private FlowTextAnimation? _flowTextAnimation;
         public SanjuUnSold()
         {
             InitializeComponent();
             Loaded += SanjuUnSold_Loaded;
+            Unloaded += SanjuUnSold_Unloaded;
         }
 
         private void SanjuUnSold_Loaded(object sender, RoutedEventArgs e)
@@ -45,8 +47,25 @@ namespace CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold
 
         private void StartScrollingAnimation()
         {
-            FlowTextAnimation scrollingText = new FlowTextAnimation(note, canvas); // note는 TextBlock, canvas는 애니메이션할 패널
-            scrollingText.Start(); // 속도 설정 (속도 값이 클수록 빠름)
+            if (_flowTextAnimation == null)
+            {
+                if (DataContext is CowAuctionSmall.ViewModels.AuctionContPanelViewModel viewModel)
+                {
+                    _flowTextAnimation = new FlowTextAnimation(note, canvas, viewModel);
+                }
+                else
+                {
+                    _flowTextAnimation = new FlowTextAnimation(note, canvas);
+                }
+            }
+
+            _flowTextAnimation.Start();
+        }
+
+
+        private void SanjuUnSold_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _flowTextAnimation?.Stop();
         }
     }
 }

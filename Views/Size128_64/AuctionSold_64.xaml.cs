@@ -1,5 +1,4 @@
 ﻿using CowAuctionSmall.Models;
-using DocumentFormat.OpenXml.InkML;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,15 +24,7 @@ namespace CowAuctionSmall.Views.Size128_64
         public AuctionSold_64()
         {
             InitializeComponent();
-            Loaded += AuctionSold_64_Loaded;
-        }
-        private void AuctionSold_64_Loaded(object sender, RoutedEventArgs e)
-        {
-
-            if (bidder.Text.Length > 3)
-            {
-                bidder.Text = bidder.Text.Substring(0,3);
-            }
+            //Loaded += AuctionSold_64_Loaded;
         }
     }
 }

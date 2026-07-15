@@ -6,12 +6,18 @@
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_64.Running"
              xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
              TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="Aliased"
              FontFamily="굴림"
              mc:Ignorable="d" 
              d:DesignHeight="64" d:DesignWidth="128">
 
     <UserControl.Resources>
-
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
 
         <!-- 목차 스타일 -->
         <Style x:Key="IndexStyle" TargetType="TextBlock">
@@ -28,44 +34,68 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_128_64 x:Key="CowTypeToStyleConverter_128_64"/>
+        <!-- 추가 -->
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:WeightKGConverter x:Key="WeightKGConverter"/>
+        <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
+        <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
+        <models:SelectShowWeight_EPDString x:Key="SelectShowWeight_EPDString" />
+        <models:BorderOutlineConverter x:Key="BorderOutlineConverter"/>
+        <models:BloolFontStyle x:Key="BloolFontStyle"/>
     </UserControl.Resources>
 
-    <Border x:Name="border" BorderThickness="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
-        <Grid>
+    <Border x:Name="border" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid CacheMode="BitmapCache">
             <Canvas Margin="97,0,0,38">
-                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" x:Name="Sex" Margin="3,-4,0,0" FontSize="24"/>
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_128_64}}" VerticalAlignment="Top" x:Name="Sex"/>
             </Canvas>
 
-            <Canvas Margin="0,0,0,0">
-                <TextBlock Text="개체 :"  Style="{StaticResource IndexStyle}"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="35,0,0,0" Foreground="Silver" Style="{StaticResource DataStyle}" x:Name="EntityNumber"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="61,0,0,0" Foreground="red" Background="Black" Style="{StaticResource DataStyle}" FontWeight="Bold"/>
+            <!-- ======================================================================================================================================================================= -->
+            <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
+            <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
+                <TextBlock Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="11"/>
+                <!-- <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0"/> -->
+                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="35,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="63,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" />
+            </Canvas>
+            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
+            <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="40,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Bold"/>
+            </Canvas>
+            <!-- ======================================================================================================================================================================= -->
+
+            <Canvas Margin="0,13,0,0">
+                <TextBlock Text="KPN" Style="{StaticResource IndexStyle}" FontSize="11"/>
+                <TextBlock Text=":" Style="{StaticResource IndexStyle}" Margin="27,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.KPN}" Margin="35,0,0,0" Foreground="Orange" Style="{StaticResource DataStyle}"/>
             </Canvas>
 
-            <Canvas Margin="0,12,0,0">
-                <TextBlock Text="KPN :" Style="{StaticResource IndexStyle}"/>
-                <TextBlock Text="{Binding CowInfo.KPN}" Margin="42,0,0,0" Foreground="Orange" Style="{StaticResource DataStyle}"/>
-            </Canvas>
-
-            <Canvas Margin="0,24,0,0">
-                <TextBlock Text="산차 :"  Style="{StaticResource IndexStyle}"/>
+            <Canvas Margin="0,25,0,0">
+                <TextBlock Text="산차"  Style="{StaticResource IndexStyle}" FontSize="11"/>
+                <TextBlock Text=":" Style="{StaticResource IndexStyle}" Margin="27,0,0,0"/>
                 <TextBlock Text="{Binding CowInfo.CalvingNumber}" Margin="42,0,0,0" Foreground="Orange" Style="{StaticResource DataStyle}"/>
             </Canvas>
 
-            <Canvas Margin="65,24,0,0">
-                <TextBlock Text="계대:"  Style="{StaticResource IndexStyle}"/>
+            <Canvas Margin="75,25,0,0">
+                <TextBlock Text="계대"  Style="{StaticResource IndexStyle}" FontSize="11"/>
+                <TextBlock Text=":" Style="{StaticResource IndexStyle}" Margin="23,0,0,0"/>
                 <TextBlock Text="{Binding CowInfo.Blood}" Margin="37,0,0,0" Foreground="Orange" Style="{StaticResource DataStyle}"/>
             </Canvas>
 
-            <Canvas Margin="0,36,0,0">
-                <TextBlock Text="어미 :" Style="{StaticResource IndexStyle}"/>
-                <TextBlock Text="{Binding CowInfo.MotherLevel, Converter={StaticResource MotherLevelConverter}}" Margin="42,0,0,0" Foreground="Orange" Style="{StaticResource DataStyle}"/>
+            <!-- ======================================================================================================================================================================= -->
+            <Canvas Margin="0,37,0,0">
+                <TextBlock Text="등록"  Foreground="lime" Margin="2,0,0,0" FontSize="11"/>
+                <TextBlock Text=":" Style="{StaticResource IndexStyle}" Margin="27,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}" Margin="32,0,0,0" Foreground="Orange"/>
             </Canvas>
+            <!-- ======================================================================================================================================================================= -->
 
-            <Canvas Margin="65,36,0,0" >
+            <Canvas Margin="75,37,0,0" >
                 <Canvas.Style>
                     <Style TargetType="Canvas">
                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -76,13 +106,13 @@
                         </Style.Triggers>
                     </Style>
                 </Canvas.Style>
-                <TextBlock Text="임신:"  Style="{StaticResource IndexStyle}"/>
+                <TextBlock Text="임신:"  Style="{StaticResource IndexStyle}" FontSize="11"/>
                 <TextBlock Text="{Binding CowInfo.Pregnant}" Margin="35,0,0,0" Foreground="Yellow" Style="{StaticResource DataStyle}"/>
             </Canvas>
 
             <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="0,48,0,0">
-                <TextBlock x:Name="note" Text="{Binding CowInfo.Note}" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular"/>
+            <Canvas x:Name="canvas" ClipToBounds="True" Margin="0,52,0,0">
+                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
             </Canvas>
         </Grid>
     </Border>
