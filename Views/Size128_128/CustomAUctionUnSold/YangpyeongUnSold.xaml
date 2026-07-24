@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
 
-
+    <!-- 양평축협 유찰 페이지 적용 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">

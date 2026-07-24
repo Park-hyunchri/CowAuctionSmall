@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>livestock.ico</ApplicationIcon>
-	  <Version>1.0.1.14</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
+	  <Version>1.0.1.15</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
   </PropertyGroup>
   <ItemGroup>
     <None Remove="C:\Users\ktnjo\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
@@ -53,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\Size128_128\CustomAuctionSold\ChuncheonSold.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Size128_128\CustomAUctionUnSold\ChuncheonUnSold.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Size128_128\Running\ChuncheonRun.xaml.cs">

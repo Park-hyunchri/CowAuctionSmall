@@ -10,7 +10,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-
+    <!-- 목무신축협 러닝 페이지 적용 -->
     <UserControl.Resources>
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
             <Setter Property="BorderBrush" Value="black"/>

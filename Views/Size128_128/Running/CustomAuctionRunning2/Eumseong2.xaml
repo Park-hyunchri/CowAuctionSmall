@@ -8,7 +8,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-    <!-- 횡성 -->
+    <!-- 횡성축협 유전 페이지 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">

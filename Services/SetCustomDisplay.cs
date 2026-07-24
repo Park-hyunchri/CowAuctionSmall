@@ -182,7 +182,10 @@ namespace CowAuctionSmall.Services
             {
                 return new Standard_non_X_UnSold();
             }
-
+            if (nhCode == "8808990656229") // 춘천
+            {
+                return new ChuncheonUnSold();
+            }
             if (is_QQuri.ToUpper() == "Y" || nh_ability_1_num.Length > 2)
             {
                 return new QQuriUnSold();

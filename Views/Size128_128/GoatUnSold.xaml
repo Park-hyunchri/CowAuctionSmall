@@ -9,7 +9,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-
+    <!-- 염소 유찰 페이지 -->
     <UserControl.Resources>
 
         <!-- 추가 -->

@@ -10,7 +10,7 @@
              mc:Ignorable="d" 
              Height="128" Width="128">
 
-
+    <!-- 예천축협 유찰 페이지 적용 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">

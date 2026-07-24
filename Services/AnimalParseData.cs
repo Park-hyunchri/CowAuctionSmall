@@ -175,6 +175,13 @@ namespace CowAuctionSmall.Services
                         break;
                 }
 
+                // ★ 춘천 축협 코드일 경우 친자일치 값을 강제로 비활성화("-") 처리
+                var nhcode = userInfo.Auction.AuctionHouseCode;
+                if (nhcode == "8808990656229")
+                {
+                    gv.PaternityMatch = "-";
+                }
+
                 if (userInfo.Auction.CowBirth.ToUpper()=="N")
                 {
                     //생년월일 대신 월령으로 표기

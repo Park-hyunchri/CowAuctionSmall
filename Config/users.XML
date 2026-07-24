@@ -3,6 +3,7 @@
 
 	<Authentication>
 		<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auth/login</Address>
+	<!--	<UserID>boardman-101-3</UserID> -->
 		<UserID>boardman-101-3</UserID>
 		<Password>nacf1234</Password>
 	</Authentication>
@@ -12,7 +13,7 @@
 		<!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
 		<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656229/date/</AddressEPD>
 		<AddressQcn>https://xn--o39an74b9ldx9g.kr/api/v1/auction/select/qcn/list</AddressQcn>
-		<Date>20260710</Date>
+		<Date>20260724</Date>
 	</CurrentInfo>
 
 	<Auction>

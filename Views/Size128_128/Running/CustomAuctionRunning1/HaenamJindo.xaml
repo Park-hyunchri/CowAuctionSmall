@@ -11,7 +11,7 @@
              TextOptions.TextHintingMode="Fixed"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-
+    <!-- 해남진도축협 러닝 페이지 적용 -->
     <UserControl.Resources>
 
         <!-- 추가 -->

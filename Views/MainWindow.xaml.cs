@@ -27,7 +27,7 @@ namespace CowAuctionSmall
         public MainWindow()
         {
             logger = NLogger.Instance;
-            //IsLisence();
+            IsLisence();
             CheckMemoryUsageTimer(); // 메모리 사용량 체크 타이머 추가
             SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽1시에는 무조건 프로그램 종료)
             
