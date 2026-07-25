@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.HoengseongRun"
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.JeongeupRun"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,7 +9,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-    <!-- 회성축협 러닝 페이지 적용 -->
+    <!-- 순정축협 정읍 가축시장 러닝 페이지 적용 -->
     <UserControl.Resources>
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
             <Setter Property="BorderBrush" Value="black"/>

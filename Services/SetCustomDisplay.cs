@@ -7,6 +7,7 @@ using CowAuctionSmall.Views.Size128_128.CustomAuctionSold;
 using CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold;
 using CowAuctionSmall.Views.Size128_128.Running;
 using CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1;
+using System;
 using System.Windows.Controls;
 
 namespace CowAuctionSmall.Services
@@ -18,40 +19,32 @@ namespace CowAuctionSmall.Services
         /// </summary>
         /// <param name="nhCode"></param>
         /// <returns></returns>
-        public UserControl CustomAuctionRunning1_128(string nhCode ,string is_QQuri, string CowDistinction,string is_Ｎh_Excellent, string is_Mother_Ｎh_Excellent)
+        public UserControl CustomAuctionRunning1_128(string nhCode, string is_QQuri, string CowDistinction, string is_Ｎh_Excellent, string is_Mother_Ｎh_Excellent)
         {
             if (CowDistinction == "5" || CowDistinction == "6")
             {
                 return new Standard_Goat_Run(); // 염소 또는 말
             }
-            // 춘천 축협 전용 코드 분기 추가
-            if (nhCode == "8808990656229")
+
+            // 조합별(nhCode) 예외 처리
+            if (nhCode == "8808990656229") return new ChuncheonRun(); // 춘천
+            if (nhCode == "8808990656953" || nhCode == "8808990656960") return new JeongeupRun(); // 정읍, 순창
+            if (nhCode == "8808990657202") return new Yecheon_v2(); // 무진장
+
+            // Null 방지용 Safe 값 추출
+            string qquri = is_QQuri?.ToUpper() ?? "";
+            int motherExLen = is_Mother_Ｎh_Excellent?.Length ?? 0;
+
+            if (qquri == "X")
             {
-                // 춘천 전용 경매 진행 화면을 반환합니다
-                return new ChuncheonRun();
+                return new Standard_non_X_Run1();
+            }
+            if (qquri == "Y" || motherExLen > 2)
+            {
+                return new StandardQQuri_Run1();
             }
 
-            // ... 기존 다른 조합 분기 코드들 ...
-            if (is_QQuri.ToUpper() == "X")
-            {
-                return new Standard_non_X_Run1(); //구 화면으로 표출 뿌리농가 적용X 랑 차이점은 완전 구버전 화면
-            }
-            else if (is_QQuri.ToUpper() == "Y" || is_Mother_Ｎh_Excellent.Length>2)
-            {
-                return new StandardQQuri_Run1(); //뿌리농가 적용 O ==============================================================> 임시 0708
-            }
-            else
-            {
-                switch (nhCode)
-                {
-                    case "8808990657202": // 무진장 낙찰 페이지  
-                        return new Yecheon_v2();   //뿌리농가 적용                           
-                    default:
-                        return new HoengseongRun();
-                        //return new Standard_non_QQuri_Run1(); //뿌리농가 적용 X
-
-                }
-            }
+            return new Standard_non_QQuri_Run1();
         }
 
         /// <summary>
@@ -59,72 +52,35 @@ namespace CowAuctionSmall.Services
         /// </summary>
         /// <param name="nhCode"></param>
         /// <returns></returns>
-        public UserControl CustomAuctionRunning2_128(string nhCode , string is_QQuri, string CowDistinction, string is_Ｎh_Excellent, string is_Mother_Ｎh_Excellent)
+        public UserControl CustomAuctionRunning2_128(string nhCode, string is_QQuri, string CowDistinction, string is_Ｎh_Excellent, string is_Mother_Ｎh_Excellent)
         {
-            // ... 기존 염소/말 등의 예외 처리 코드 ...
+            // 1. 염소(5) 또는 말(6) 예외 처리
             if (CowDistinction == "5" || CowDistinction == "6")
             {
-                return new Standard_Goat_Run(); // (예시) 염소 화면 반환 [cite: 562]
+                return new Standard_Goat_Run();
             }
 
-            // 춘천 축협(nhCode: 8808990656229) 조건 분기 추가! [cite: 562]
+            // 2. 춘천 축협 전용 코드
             if (nhCode == "8808990656229")
             {
-                // 표준 유전능력 전광판 화면(AuctionRunning2)을 반환합니다 [cite: 53]
                 return new AuctionRunning2();
             }
 
-            // ... 기존 타 축협 분기 코드 및 기본값 반환 ...
-            if (is_QQuri == "X") //뿌리농가 적용 O
+            // 3. 농협 우수 조건 만족 여부 판단
+            // (is_QQuri가 "Y"이고, 둘 중 하나라도 "N"이 아닌 경우)
+            bool isNhExcellent = is_QQuri == "Y" && (is_Ｎh_Excellent != "N" || is_Mother_Ｎh_Excellent != "N");
+
+            // 4. 번식우 구분(CowDistinction == "3") 여부에 따른 화면 결정
+            bool isBreedingCow = CowDistinction == "3";
+
+            if (isNhExcellent)
             {
-                if (CowDistinction != "3")
-                {
-                    return new AuctionRunning2(); //유전능력
-                }
-                else
-                {
-                    return new AuctionRunning2_3(); //번식우 유전능력
-                }
+                // 농협 우수 유전능력 화면 (번식우 여부에 따라 분기)
+                return isBreedingCow ? new AuctionRunning4() : new AuctionRunning3();
             }
 
-            if (is_QQuri == "Y") //뿌리농가 적용 O
-            {
-                if (is_Ｎh_Excellent == "N" && is_Mother_Ｎh_Excellent == "N")
-                {
-                    if (CowDistinction != "3")
-                    {
-                        return new AuctionRunning2(); //유전능력
-                    }
-                    else
-                    {
-                        return new AuctionRunning2_3(); //번식우 유전능력
-                    }
-                }
-                else
-                {
-                    if (CowDistinction != "3")
-                    {
-                        return new AuctionRunning3(); //농협유전능력
-                    }
-                    else
-                    {
-                        return new AuctionRunning4(); //농협유전능력 번식우
-                    }
-
-                }
-            }
-            else //뿌리농가 적용 X
-            {
-                if (CowDistinction != "3")
-                {
-                    return new AuctionRunning2(); //유전능력
-                }
-                else
-                {
-                    return new AuctionRunning2_3(); //번식우 유전능력
-                }
-            }
-
+            // 그 외 모든 기본 경우 (X, 기본값 등)
+            return isBreedingCow ? new AuctionRunning2_3() : new AuctionRunning2();
         }
 
         /// <summary>
@@ -132,32 +88,34 @@ namespace CowAuctionSmall.Services
         /// </summary>
         /// <param name="nhCode"></param>
         /// <returns></returns>
-        public UserControl CustomAuctionSold_128(string nhCode,string bidderCode ,string is_QQuri, string CowDistinction, string nh_ability_1_num)
+        public UserControl CustomAuctionSold_128(string nhCode, string bidderCode, string is_QQuri, string CowDistinction, string nh_ability_1_num)
         {
-            int.TryParse(CowDistinction, out int result);
-            if (result > 4) // 염소 또는 말
+            // 염소/말 구분
+            if (int.TryParse(CowDistinction, out int result) && result > 4)
             {
                 return new GoatSold();
             }
 
+            // 조합별 전용 낙찰 화면 분기
             switch (nhCode)
             {
-                case "8808990656687": // 영천낙찰 페이지
+                case "8808990656687": // 영천
                     return new Standard_non_X_Sold();
-                case "8808990656526": // 제천단양 낙찰 페이지
+
+                case "8808990656526": // 제천단양
+                case "8808990684321": // 보령
                     return new JecheonDanyangSold();
-                case "8808990684321": // 보령 낙찰 페이지
-                    return new JecheonDanyangSold();
-                case "8808990656229": // 춘천 낙찰 페이지
+
+                case "8808990656229": // 춘천
                     return new ChuncheonSold();
-                //return new GoatSold();
-                case "8808990657202": // 무진장 낙찰 페이지
-                    return new YecheonSold();  
+
+                case "8808990657202": // 무진장
+                    return new YecheonSold();
 
                 default:
-
+                    // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
+                    // if (string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)) return new Standard_non_X_Sold();
                     return new QQuriSold();
-
             }
         }
 
@@ -168,39 +126,28 @@ namespace CowAuctionSmall.Services
         /// <returns></returns>
         public UserControl CustomAuctionUnSold_128(string nhCode, string is_QQuri, string CowDistinction, string nh_ability_1_num)
         {
-            int.TryParse(CowDistinction, out int result);
-            if (result > 4) // 염소 또는 말
+            // 1. 염소 또는 말 구분
+            if (int.TryParse(CowDistinction, out int result) && result > 4)
             {
                 return new GoatUnSold();
             }
 
-            if (nhCode == "8808990656953") // 정읍    
-                {
-                return new NamwonUnSold();
-            }
-            if (nhCode == "8808990684321") // 보령
+            // 2. 특정 지역 조합(nhCode) 분기
+            if (nhCode == "880899065953") return new NamwonUnSold();          // 정읍
+            if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
+            if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
+
+            // 3. 뿌리농가 미적용("X")이면서 유전능력 번호도 없을 때만 Standard_non_X_UnSold
+            bool isX = string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase);
+            int abilityLen = nh_ability_1_num?.Length ?? 0; // null 방지
+
+            if (isX && abilityLen <= 2)
             {
                 return new Standard_non_X_UnSold();
-            }
-            if (nhCode == "8808990656229") // 춘천
-            {
-                return new ChuncheonUnSold();
-            }
-            if (is_QQuri.ToUpper() == "Y" || nh_ability_1_num.Length > 2)
-            {
-                return new QQuriUnSold();
-            }
-            else if (is_QQuri.ToUpper() == "X")
-            {
-                return new Standard_non_X_UnSold();
-            }
-            else
-            {
-                //return new Non_QQuriUnsold();//
-                return new QQuriUnSold();
             }
 
-                
+            // 그 외 모든 경우(Y이거나, X여도 능력치 정보가 길게 있으면) QQuriUnSold 반환
+            return new QQuriUnSold();
         }
 
         //-----------------------------------------------

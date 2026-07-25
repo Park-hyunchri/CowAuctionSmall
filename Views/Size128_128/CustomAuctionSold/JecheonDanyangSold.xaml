@@ -9,7 +9,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-    <!-- 제천단양축협 낙찰페이지 적용 -->
+    <!-- 제천단양,보령축협 낙찰페이지 적용 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">
