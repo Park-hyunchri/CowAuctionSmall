@@ -145,7 +145,8 @@ namespace CowAuctionSmall.Services
         private string? _qcnCacheDate;
         private Qcn? _cachedQcn;
         private DateTime _nextQcnCheckUtc = DateTime.MinValue;
-
+        // 💡 [추가] API 모니터링 로그 주기적 출력을 위한 시각 기록 변수
+        private DateTime _lastApiLogTime = DateTime.MinValue;
         /// <summary>
         /// 주기적으로 서버 데이터를 수신하는 루프를 시작한다.
         /// </summary>
@@ -213,7 +214,14 @@ namespace CowAuctionSmall.Services
                             sw.Stop();
 
                             int elapsed = (int)sw.ElapsedMilliseconds;
-
+                            // -------------------------------------------------------------------
+                            // 💡 [추가] 10분 간격으로 현재까지 누적 API 호출 건수 NLog 파일에 기록
+                            // -------------------------------------------------------------------
+                            if ((DateTime.Now - _lastApiLogTime).TotalMinutes >= 10)
+                            {
+                                _lastApiLogTime = DateTime.Now;
+                                logger.LogInfo($"[API 모니터링] 현재까지 누적 API 호출 건수: {ServerConn.TotalApiCount}회");
+                            }
                             // -------------------------------------------------------------------
                             // 💡 [안성축협 API 호출 제한 방지] 상황별 동적 폴링 주기 설정
                             // -------------------------------------------------------------------
@@ -394,6 +402,9 @@ namespace CowAuctionSmall.Services
         public async Task StopAsync()
         {
             _isRunning = false;
+            // 💡 [추가] 정지 시점 최종 API 누적 건수 기록
+            logger.LogInfo($"[API 모니터링 종료] 최종 누적 API 호출 건수: {ServerConn.TotalApiCount}회");
+
             await Task.Delay(1000).ConfigureAwait(false); // 비동기 작업이 안전하게 종료될 시간을 준다.
         }
 

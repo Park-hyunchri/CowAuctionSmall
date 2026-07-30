@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading; // Interlocked 사용
 using System.Threading.Tasks;
 using UserInfo = CowAuctionSmall.Models.Structures.UserInfo;
 
@@ -32,15 +33,17 @@ namespace CowAuctionSmall.Services
         //private HttpWebRequest request;
 
         private NLogger logger;
-
         private readonly WeakReferenceMessenger _messengerStringDateMsg;
-
         private string? date;
-
         private readonly HttpClient _http;
-
         private UserInfo? _userInfo;
         private string? _token;
+        // -------------------------------------------------------------------
+        // 💡 [추가] API 총 호출 건수 누적 카운터 (스레드 안전)
+        // -------------------------------------------------------------------
+        private static long _totalApiCount = 0;
+        public static long TotalApiCount => Interlocked.Read(ref _totalApiCount);
+        // -------------------------------------------------------------------
 
         public static ServerConn? Instance { get; private set; }
         /// <summary>
@@ -61,10 +64,6 @@ namespace CowAuctionSmall.Services
         /// <summary>
         /// 초기 토큰 생성
         /// </summary>
-        /// <summary>
-        /// 초기 토큰 생성
-        /// </summary>
-        /// 
         public async Task<string?> IssueToken(UserInfo userInfo)
         {
             if (userInfo?.Authentication?.Address == null)
@@ -72,6 +71,8 @@ namespace CowAuctionSmall.Services
                 logger.LogError("IssueToken: userInfo.Authentication.Address가 없습니다.");
                 return null;
             }
+            // 💡 [추가] 토큰 발급 API 호출 카운트 증가
+            Interlocked.Increment(ref _totalApiCount);
 
             _userInfo = userInfo;
 
@@ -231,6 +232,9 @@ namespace CowAuctionSmall.Services
                 logger.LogError("GetCurrentInfo: UserInfo 또는 Token이 null입니다.");
                 return null;
             }
+            // 💡 [추가] 경매 정보 데이터 요청 API 호출 카운트 증가
+            Interlocked.Increment(ref _totalApiCount);
+
             string dateToUse = "";
 
             if (!string.IsNullOrWhiteSpace(forcedDate))
@@ -304,6 +308,9 @@ namespace CowAuctionSmall.Services
         /// </summary>
         public async Task<Qcn?> PostQcn(UserInfo userInfo, string? token, string date, string? qcn = null, string? refresh=null)
         {
+            // 💡 [추가] QCN 정보 조회 API 호출 카운트 증가
+            Interlocked.Increment(ref _totalApiCount);
+
             if (refresh != null && refresh== "refresh")
             {
                 if (_userInfo == null || _token == null)
