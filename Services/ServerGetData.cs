@@ -168,7 +168,7 @@ namespace CowAuctionSmall.Services
 
                         var currentUser = _userInfo;
                         var currentToken = _token;
-
+                        // 경매가 실제로 진행 중일 때만 1초 주기로 동작하고, 경매 대기 중이거나 새벽 시간대에는 3~10초 주기로 동적으로 변환하도록 수정
                         if (runProcessMessageAsync)
                         {
                             var sw = Stopwatch.StartNew();
@@ -213,29 +213,54 @@ namespace CowAuctionSmall.Services
                             sw.Stop();
 
                             int elapsed = (int)sw.ElapsedMilliseconds;
-                            int targetCycle = 1000;
+
+                            // -------------------------------------------------------------------
+                            // 💡 [안성축협 API 호출 제한 방지] 상황별 동적 폴링 주기 설정
+                            // -------------------------------------------------------------------
+                            int targetCycle = 1000; // 기본 1초 (1000ms)
+
+                            // 1. 실제 응찰/경매 진행 중인 출품우가 있거나 일괄 경매 진행 중일 때 -> 1초 유지
+                            if (_runRunSipNumber != -1 || _batchRunningState)
+                            {
+                                targetCycle = 1000;
+                            }
+                            // 2. 새벽 시간대 (04시 ~ 08시 등 경매 개시 전 대기) -> 10초로 완화
+                            else if (DateTime.Now.Hour >= 4 && DateTime.Now.Hour < 8)
+                            {
+                                targetCycle = 10000;
+                            }
+                            // 3. 경매 당일 대기 상태 (진행 중인 소가 없음) -> 3초로 완화
+                            else
+                            {
+                                targetCycle = 3000;
+                            }
+                            // -------------------------------------------------------------------
+
                             int delay = Math.Max(50, targetCycle - elapsed);
 
-                            Debug.WriteLine($"[ProcessMessageAsync] ????: {elapsed}ms, ????: {delay}ms");
+                            Debug.WriteLine($"[ProcessMessageAsync] 소요: {elapsed}ms, 대기: {delay}ms, 주기: {targetCycle}ms");
 
                             await Task.Delay(delay);
                         }
                         else
                         {
+                            // 메시지가 없을 때 CPU 점유율을 낮추기 위한 대기
                             await Task.Delay(200);
                         }
                     }
-
                     catch (Exception ex)
                     {
                         Debug.WriteLine("ProcessMessageAsync에서 예외 발생: " + ex.Message);
                         logger.LogError("ProcessMessageAsync에서 예외 발생 : " + ex.Message);
-                        await Task.Delay(5000); 
-                        isConnecting = false; 
+
+                        // 에러 발생 시 재시도 전 대기
+                        await Task.Delay(5000);
+
+                        // 상태값 리셋 (외부에서 재연결을 유도하거나 루프 조건 제어)
+                        isConnecting = false;
                     }
                 }
             });
-
         }
 
         private bool ShouldRefreshQcn(string date)
