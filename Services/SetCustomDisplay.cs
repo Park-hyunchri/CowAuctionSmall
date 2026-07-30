@@ -110,7 +110,10 @@ namespace CowAuctionSmall.Services
                     return new ChuncheonSold();
 
                 case "8808990657202": // 무진장
-                    return new YecheonSold();
+                    return new BothBidderSold();
+
+                // case "8808990657202": // 무진장
+                //    return new YecheonSold();
 
                 default:
                     // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
