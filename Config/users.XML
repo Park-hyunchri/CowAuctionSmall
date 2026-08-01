@@ -10,7 +10,7 @@
 				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry/board?date=</Address> <!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
 				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
 				<AddressQcn>https://xn--e20bw05b.kr/api/v1/auction/select/qcn/list</AddressQcn>
-				<Date></Date>
+				<Date>20260730</Date>
 		</CurrentInfo>
   
 		<Auction>
