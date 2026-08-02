@@ -31,6 +31,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656229") return new ChuncheonRun(); // 춘천
             if (nhCode == "8808990656953" || nhCode == "8808990656960") return new JeongeupRun(); // 정읍, 순창
             if (nhCode == "8808990656427") return new Mungyeong(); // 문경
+            if (nhCode == "8808990657202") return new AnseongRun(); // 안성, 무진장
+
 
             // Null 방지용 Safe 값 추출
             string qquri = is_QQuri?.ToUpper() ?? "";
@@ -113,8 +115,11 @@ namespace CowAuctionSmall.Services
                 case "8808990656427": // 문경
                     return new MungyeongSold();
 
-                // case "8808990657202": // 무진장
-                //    return new YecheonSold();
+                case "8808990657202": // 안성,무진장
+                    return new AnseongSold();
+
+                // case "8808990657202": // 안성,무진장
+                //    return new AnseongSold();
 
                 default:
                     // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
