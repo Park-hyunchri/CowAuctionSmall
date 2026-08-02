@@ -63,6 +63,7 @@ namespace CowAuctionSmall.Models.XMLParser
                     BoardPageTime4 = auctionElement.Element("BoardPageTime4")?.Value,
                     BidderName = auctionElement.Element("BidderName")?.Value,
                     IsShowOwnerName = auctionElement.Element("IsShowOwnerName")?.Value,
+                    IsPaternityMatch = auctionElement.Element("IsPaternityMatch")?.Value ?? "Y", // 💡 추가
                     ChangeSexName = auctionElement.Element("ChangeSexName")?.Value,
                     SelectShowWeight_EPD = auctionElement.Element("SelectShowWeight_EPD")?.Value,
                     IsShowQQuri = auctionElement.Element("IsShowQQuri")?.Value,

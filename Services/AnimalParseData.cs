@@ -3,6 +3,7 @@ using CowAuctionSmall.Models;
 using CowAuctionSmall.Models.Structures;
 using System;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Web;
 
 namespace CowAuctionSmall.Services
@@ -54,7 +55,6 @@ namespace CowAuctionSmall.Services
 
             //"SC  |  8808990657202  |  2  |  339  |  1  |  410002164159541  |  01  |  73355  |  1  |  박천경  |    |  21.04.30(44개월 17일)  |  KPN1321  |  수  |  혈통  |  410002116992264  |  3  |  0  |  7  |  진안21-07-5954  |  232187979  |  03  |  진안  |  2  |  1  |  0  |  300  |  300  |  송아지 테스트  AA1-2  |  11  |    |  0  |    |  N  |  2  |  N  |  0  |  20250117081625  |    |  45  |  고등  |  0  |  0  |    |    |    |    |    |    |    |    |    |  "
 
-
             if (data == null || data.Length < 35)
                 return gv;
 
@@ -92,9 +92,6 @@ namespace CowAuctionSmall.Services
                     gv.Sex = changeSex(sexCode, gv.CowDistinction); //성별, 송아지 비육우 번식우 구분인자
                 }
             }
-
-
-
 
             if (string.IsNullOrEmpty(data[27]) || data[27] == "0" || data[27] == "null") // 최저가
             {
@@ -134,11 +131,11 @@ namespace CowAuctionSmall.Services
 
                 gv.Birth = data[11].Replace(" ", "");
 
-                if (gv.SpaceIndex.Equals("1"))
-                {
-                    //Debug.WriteLine("");
-                    //gv = conn.InsertEPDValue(gv, data);
-                }
+                // if (gv.SpaceIndex.Equals("1"))
+                // {
+                //Debug.WriteLine("");
+                //gv = conn.InsertEPDValue(gv, data);
+                // }
 
                 //paternityMatch 
                 /*
@@ -150,6 +147,7 @@ namespace CowAuctionSmall.Services
                     5. 모 불일치
                     6. 부 모 불일치
                  */
+                // paternityMatch 파싱
                 switch (data[23])
                 {
                     case "1":
@@ -175,14 +173,16 @@ namespace CowAuctionSmall.Services
                         break;
                 }
 
-                // ★ 춘천 축협 코드일 경우 친자일치 값을 강제로 비활성화("-") 처리
-                var nhcode = userInfo.Auction.AuctionHouseCode;
-                if (nhcode == "8808990656229")
+                // 패킷 파싱 후 최종적으로 user.xml 옵션 및 춘천 축협 예외 처리 적용
+                var nhcode = userInfo.Auction?.AuctionHouseCode;
+                var showPaternity = userInfo.Auction?.IsPaternityMatch?.Trim().ToUpper() ?? "Y";
+
+                if (showPaternity == "N" || nhcode == "8808990656229")
                 {
                     gv.PaternityMatch = "-";
                 }
 
-                if (userInfo.Auction.CowBirth.ToUpper()=="N")
+                if (userInfo.Auction?.CowBirth?.ToUpper() == "N")
                 {
                     //생년월일 대신 월령으로 표기
                     gv.Birth = BirthMonthConverter(data[11], data[39]);

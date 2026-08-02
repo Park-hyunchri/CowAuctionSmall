@@ -28,6 +28,7 @@
 							<ChangeSexName>N</ChangeSexName>				<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
 							<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>	<!-- 중량으로 보여줄거면 Y or 중량빼고 EPD 알파벳만 보여주고 싶다면 N (기본값 Y)-->
 							<IsShowQQuri>N</IsShowQQuri>					<!--	 뿌리농가 적용여부 ex. Y or N or X   -->
+							<IsPaternityMatch>Y</IsPaternityMatch>			<!-- 친자일치 뱃지 표시 여부 (Y: 표출, N: 숨김) -->
 		</Auction>
 
 	<PageSetting>

@@ -68,6 +68,7 @@ namespace CowAuctionSmall.Models.Structures
         public string? SubFallbackTimeoutMs { get; set; } = "";
 
         public PageSetting? PageSetting { get; set; }
+        public string? IsPaternityMatch { get; set; } = "Y"; // 기본값 "Y"
     }
 
     public class PageSetting
