@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold.MungyeongUnSold"
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold.AnseongUnSold"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -71,7 +71,7 @@
                 <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" 
                Text="{Binding EntityNumberShort}" 
                HorizontalAlignment="Center" VerticalAlignment="Center" 
-               Foreground="#FF0000" 
+               Foreground="{DynamicResource EntityNumberShortForeground}" 
                Background="Black" 
                Margin="12,0,0,0" FontSize="13" FontWeight="Normal" />
             </Grid>

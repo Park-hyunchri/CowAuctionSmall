@@ -70,11 +70,6 @@
                 <TextBlock Text="{Binding OwnerName}" Margin="35,0,0,0" Foreground="Silver"/>
             </Canvas>
 
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
         </Grid>
     </Border>
 </UserControl>
-

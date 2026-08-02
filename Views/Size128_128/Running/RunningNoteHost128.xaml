@@ -4,33 +4,26 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running"
-             xmlns:converters="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              Width="128" Height="128" Background="Black">
 
     <UserControl.Resources>
-        <!-- 기존 프로젝트의 친자검사결과 뷰/마진 제어 컨버터 등록 -->
-        <converters:PaternityMatchToVisibilityConverter x:Key="PaternityMatchToVisibilityConverter"/>
-        <converters:PaternityMatchToMarginConverter x:Key="PaternityMatchToMarginConverter"/>
-        <!-- BoolToVis 리소스가 정의되지 않아 기본 BooleanToVisibilityConverter 추가 -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
     <Grid>
-        <!-- ========================================== -->
-        <!-- 1. 페이지 콘텐츠 프레임 (진행/낙찰/유찰 개별 뷰) -->
-        <!-- ========================================== -->
+        <!-- 1. 메인 페이지 레이아웃 (AnseongRun 등) -->
         <ContentControl Content="{Binding PageContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
-        <!-- ========================================== -->
-        <!-- 2. 공통 하단 비고 및 친자일치 뱃지 영역 (고정 표출) -->
-        <!-- ========================================== -->
-        <!-- 클릭 이벤트를 방해하지 않도록 IsHitTestVisible="False" 설정 -->
+        <!-- 2. 최하단 고정 영역 (친자 뱃지 + #f61c2d 비고 자막) -->
         <Canvas IsHitTestVisible="False">
 
-            <!-- 친자일치 뱃지 (PaternityMatch가 "일치"일 때만 보임) -->
+            <!-- 친자 뱃지 (노란 테두리 / 노란 글씨 '친자') -->
             <Border x:Name="borderPaternityMatch"
-                    Margin="2,108,98,3"
+                    Canvas.Left="2" Canvas.Top="108"
+                    Width="28" Height="18"
                     BorderBrush="Yellow"
                     BorderThickness="1"
                     CornerRadius="3"
@@ -39,22 +32,35 @@
                     IsHitTestVisible="False"
                     Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}">
 
-                <TextBlock Text="{Binding CowInfo.PaternityMatch}" 
+                <TextBlock Text="친자" 
                            Foreground="Yellow" 
                            FontSize="11" 
+                           FontWeight="Bold"
                            HorizontalAlignment="Center" 
                            VerticalAlignment="Center"/>
             </Border>
 
-            <!-- 흘러가는 비고 텍스트 (친자일치 여부에 따라 Margin.Left가 40 또는 2로 동적 변환됨) -->
+            <!-- 흘러가는 비고 텍스트 (색상: #f61c2d, 폰트크기: 12) -->
             <Canvas x:Name="canvasNote" 
-                    Margin="{Binding PaternityMatch, Converter={StaticResource PaternityMatchToMarginConverter}}" 
-                    Width="124" Height="20" ClipToBounds="True">
+                    Canvas.Top="110"
+                    Width="124" Height="18" 
+                    ClipToBounds="True">
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Canvas.Left" Value="2"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
+                                <Setter Property="Canvas.Left" Value="32"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
+
                 <TextBlock x:Name="note" 
                            Text="{Binding Note}" 
-                           Foreground="Yellow" 
-                           FontSize="11" 
-                           FontWeight="Bold" 
+                           Foreground="#f61c2d" 
+                           FontSize="12" 
+                           Margin="0,1,0,0"
                            Canvas.Left="0" Canvas.Top="0"/>
             </Canvas>
 

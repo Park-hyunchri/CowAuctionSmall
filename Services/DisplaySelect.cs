@@ -972,18 +972,29 @@ namespace CowAuctionSmall.Services
 
 
         /// <summary>
-        /// 낙찰된 화면 넣기
+        /// 낙찰된 화면 넣기 (128x128 해상도 및 일반 우군일 경우 RunningNoteHost128 공통 호스트 적용)
         /// </summary>
         public void DisplaySold(VirtualizingStackPanel panel, gValues cowInfo)
         {
             var state = GetPanelState(panel);
             var soldKey = BuildSoldKey(cowInfo);
             var signature = cowInfo.UpdateSignature();
+
+            // 💡 128x128 해상도이면서 염소(5) / 말(6)이 아닌 경우 RunningNoteHost128 사용
+            var useNoteHost = _displaySize == DisplaySizeParser.DisplaySize.Size128x128 &&
+                              cowInfo.CowDistinction != "5" &&
+                              cowInfo.CowDistinction != "6";
+
+            // 이미 동일한 낙찰 화면이 표시 중인 경우
             if (state.Mode == PanelDisplayMode.Sold && state.SoldView != null && state.SoldKey == soldKey)
             {
                 if (signature != state.UpdateSignature)
                 {
                     state.SoldView.DataContext = cowInfo;
+                    if (useNoteHost && state.RunningNoteHost != null)
+                    {
+                        state.RunningNoteHost.DataContext = cowInfo;
+                    }
                     state.UpdateSignature = signature;
                 }
                 return;
@@ -993,6 +1004,7 @@ namespace CowAuctionSmall.Services
             panel.Children.Clear();
             panel.DataContext = null;
 
+            // 뷰 객체 생성 또는 재사용
             if (state.SoldView == null || state.SoldKey != soldKey)
             {
                 state.SoldView = _displaySize switch
@@ -1014,25 +1026,57 @@ namespace CowAuctionSmall.Services
             state.SoldView.DataContext = cowInfo;
             state.SoldView.Width = panel.Width;
             state.SoldView.Height = panel.Height;
-            panel.Children.Add(state.SoldView);
+            state.SoldView.Visibility = Visibility.Visible;
+
+            // 💡 RunningNoteHost128 호스트 래핑 처리
+            if (useNoteHost)
+            {
+                var host = state.RunningNoteHost ??= new RunningNoteHost128();
+                host.Width = panel.Width;
+                host.Height = panel.Height;
+                host.DataContext = cowInfo;
+
+                if (!ReferenceEquals(host.PageContent, state.SoldView))
+                {
+                    host.PageContent = state.SoldView;
+                }
+
+                panel.Children.Add(host);
+            }
+            else
+            {
+                panel.Children.Add(state.SoldView);
+            }
+
             state.Mode = PanelDisplayMode.Sold;
             state.UpdateSignature = signature;
         }
 
 
         /// <summary>
-        /// 유찰된 화면 넣기
+        /// 유찰된 화면 넣기 (128x128 해상도 및 일반 우군일 경우 RunningNoteHost128 공통 호스트 적용)
         /// </summary>
         public void DisplayUnSold(VirtualizingStackPanel panel, gValues cowInfo)
         {
             var state = GetPanelState(panel);
             var unSoldKey = BuildUnSoldKey(cowInfo);
             var signature = cowInfo.UpdateSignature();
+
+            // 💡 128x128 해상도이면서 염소(5) / 말(6)이 아닌 경우 RunningNoteHost128 사용
+            var useNoteHost = _displaySize == DisplaySizeParser.DisplaySize.Size128x128 &&
+                              cowInfo.CowDistinction != "5" &&
+                              cowInfo.CowDistinction != "6";
+
+            // 이미 동일한 유찰 화면이 표시 중인 경우
             if (state.Mode == PanelDisplayMode.UnSold && state.UnSoldView != null && state.UnSoldKey == unSoldKey)
             {
                 if (signature != state.UpdateSignature)
                 {
                     state.UnSoldView.DataContext = cowInfo;
+                    if (useNoteHost && state.RunningNoteHost != null)
+                    {
+                        state.RunningNoteHost.DataContext = cowInfo;
+                    }
                     state.UpdateSignature = signature;
                 }
                 return;
@@ -1042,6 +1086,7 @@ namespace CowAuctionSmall.Services
             panel.Children.Clear();
             panel.DataContext = null;
 
+            // 뷰 객체 생성 또는 재사용
             if (state.UnSoldView == null || state.UnSoldKey != unSoldKey)
             {
                 state.UnSoldView = _displaySize switch
@@ -1063,11 +1108,31 @@ namespace CowAuctionSmall.Services
             state.UnSoldView.DataContext = cowInfo;
             state.UnSoldView.Width = panel.Width;
             state.UnSoldView.Height = panel.Height;
-            panel.Children.Add(state.UnSoldView);
+            state.UnSoldView.Visibility = Visibility.Visible;
+
+            // 💡 RunningNoteHost128 호스트 래핑 처리
+            if (useNoteHost)
+            {
+                var host = state.RunningNoteHost ??= new RunningNoteHost128();
+                host.Width = panel.Width;
+                host.Height = panel.Height;
+                host.DataContext = cowInfo;
+
+                if (!ReferenceEquals(host.PageContent, state.UnSoldView))
+                {
+                    host.PageContent = state.UnSoldView;
+                }
+
+                panel.Children.Add(host);
+            }
+            else
+            {
+                panel.Children.Add(state.UnSoldView);
+            }
+
             state.Mode = PanelDisplayMode.UnSold;
             state.UpdateSignature = signature;
         }
-
 
         /// <summary>
         /// 패널의 바인딩과 자식 컨트롤을 정리한다.

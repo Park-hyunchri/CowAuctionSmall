@@ -30,6 +30,7 @@ namespace CowAuctionSmall.Views.Size128_128.Running
             InitializeComponent();
             Loaded += RunningNoteHost128_Loaded;
             Unloaded += RunningNoteHost128_Unloaded;
+            DataContextChanged += RunningNoteHost128_DataContextChanged; // 💡 데이터 변경 감지 추가
         }
 
         private void RunningNoteHost128_Loaded(object sender, RoutedEventArgs e)
@@ -40,6 +41,11 @@ namespace CowAuctionSmall.Views.Size128_128.Running
         private void RunningNoteHost128_Unloaded(object sender, RoutedEventArgs e)
         {
             DisposeAnimation();
+        }
+
+        private void RunningNoteHost128_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            InitNoteAnimation(); // 💡 소 개체 정보가 바뀌면 애니메이션 재시작
         }
 
         private static void OnPageContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -66,10 +72,16 @@ namespace CowAuctionSmall.Views.Size128_128.Running
                 note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 note.Arrange(new Rect(note.DesiredSize));
 
-                // 💡 [수정 1] 생성자에 note(TextBlock)와 canvas(Canvas) 인자 전달
-                _flowTextAnimation = new FlowTextAnimation(note, canvasNote);
+                // 💡 ViewModel이 있으면 ViewModel을 포함하는 생성자 호출
+                if (DataContext is CowAuctionSmall.ViewModels.AuctionContPanelViewModel viewModel)
+                {
+                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, viewModel, speed: 18, useRenderTransform: true);
+                }
+                else
+                {
+                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, speed: 18, useRenderTransform: true);
+                }
 
-                // 💡 [수정 2] Start()는 인자 없이 호출
                 _flowTextAnimation.Start();
             }));
         }

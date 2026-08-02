@@ -19,7 +19,7 @@
             <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
-        
+
         <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
@@ -49,7 +49,7 @@
             <TextBlock Text="{Binding Birth}" Foreground="Cyan" Margin="2,0,0,0"/>
         </Canvas>
 
-        
+
         <!-- ======================================================================================================================================================================= -->
         <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
         <Canvas Margin="0,80,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
@@ -66,15 +66,10 @@
         <!-- ======================================================================================================================================================================= -->
 
         <Canvas Margin="0,95,0,0">
-        <!--    <TextBlock Text="축주"  Foreground="Lime" Margin="2,0,0,0"/>
+            <!--    <TextBlock Text="축주"  Foreground="Lime" Margin="2,0,0,0"/>
             <TextBlock Text="{Binding OwnerName}" Margin="40,0,0,0" Foreground="Cyan"/> -->
             <TextBlock Text="{Binding Location}"  Foreground="Magenta" Margin="2,0,0,0" />
             <TextBlock Text="{Binding OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
-        </Canvas>
-
-        <!-- Note를 표시하는 TextBlock -->
-        <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,111,2,1">
-            <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Red" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
         </Canvas>
 
     </Grid>

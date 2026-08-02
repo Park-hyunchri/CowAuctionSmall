@@ -26,6 +26,7 @@
                                         <DiscreteObjectKeyFrame.Value>
                                             <SolidColorBrush Color="Black"/>
                                         </DiscreteObjectKeyFrame.Value>
+
                                     </DiscreteObjectKeyFrame>
 
                                     <!-- 빨간색 상태 -->
