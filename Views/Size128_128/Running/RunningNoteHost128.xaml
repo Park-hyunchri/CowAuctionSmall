@@ -3,42 +3,61 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             x:Name="root"
-             FontFamily="굴림"
-             TextOptions.TextFormattingMode="Display"
-             mc:Ignorable="d"
-             d:DesignHeight="128" d:DesignWidth="128">
-<!-- 친자일치 여부 및 비고 페이지 -->
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running"
+             xmlns:converters="clr-namespace:CowAuctionSmall.Models.Converter"
+             mc:Ignorable="d" 
+             Width="128" Height="128" Background="Black">
+
     <UserControl.Resources>
+        <!-- 기존 프로젝트의 친자검사결과 뷰/마진 제어 컨버터 등록 -->
+        <converters:PaternityMatchToVisibilityConverter x:Key="PaternityMatchToVisibilityConverter"/>
+        <converters:PaternityMatchToMarginConverter x:Key="PaternityMatchToMarginConverter"/>
+        <!-- BoolToVis 리소스가 정의되지 않아 기본 BooleanToVisibilityConverter 추가 -->
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </UserControl.Resources>
 
     <Grid>
-        <ContentPresenter Content="{Binding ElementName=root, Path=PageContent}"/>
+        <!-- ========================================== -->
+        <!-- 1. 페이지 콘텐츠 프레임 (진행/낙찰/유찰 개별 뷰) -->
+        <!-- ========================================== -->
+        <ContentControl Content="{Binding PageContent, RelativeSource={RelativeSource AncestorType=UserControl}}" />
 
-        <Border x:Name="borderPaternityMatch"
-                Margin="2,108,98,3"
-                BorderBrush="Yellow"
-                BorderThickness="1"
-                CornerRadius="3"
-                Padding="1"
-                Panel.ZIndex="100"
-                IsHitTestVisible="False"
-                Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}">
-            <TextBlock Foreground="Yellow" Text="{Binding CowInfo.PaternityMatch}"/>
-        </Border>
+        <!-- ========================================== -->
+        <!-- 2. 공통 하단 비고 및 친자일치 뱃지 영역 (고정 표출) -->
+        <!-- ========================================== -->
+        <!-- 클릭 이벤트를 방해하지 않도록 IsHitTestVisible="False" 설정 -->
+        <Canvas IsHitTestVisible="False">
 
-        <Canvas x:Name="canvas" ClipToBounds="True" Margin="{Binding NoteMargin}" IsHitTestVisible="False" Panel.ZIndex="110">
-            <TextBlock x:Name="note"
-                       Text="{Binding Note}"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Foreground="#f61c2d"
-                       FontWeight="Regular"
-                       FontSize="12"
-                       TextWrapping="NoWrap"
-                       TextTrimming="CharacterEllipsis"
-                       RenderTransformOrigin="0,0"/>
+            <!-- 친자일치 뱃지 (PaternityMatch가 "일치"일 때만 보임) -->
+            <Border x:Name="borderPaternityMatch"
+                    Margin="2,108,98,3"
+                    BorderBrush="Yellow"
+                    BorderThickness="1"
+                    CornerRadius="3"
+                    Padding="1"
+                    Panel.ZIndex="100"
+                    IsHitTestVisible="False"
+                    Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}">
+
+                <TextBlock Text="{Binding CowInfo.PaternityMatch}" 
+                           Foreground="Yellow" 
+                           FontSize="11" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- 흘러가는 비고 텍스트 (친자일치 여부에 따라 Margin.Left가 40 또는 2로 동적 변환됨) -->
+            <Canvas x:Name="canvasNote" 
+                    Margin="{Binding PaternityMatch, Converter={StaticResource PaternityMatchToMarginConverter}}" 
+                    Width="124" Height="20" ClipToBounds="True">
+                <TextBlock x:Name="note" 
+                           Text="{Binding Note}" 
+                           Foreground="Yellow" 
+                           FontSize="11" 
+                           FontWeight="Bold" 
+                           Canvas.Left="0" Canvas.Top="0"/>
+            </Canvas>
+
         </Canvas>
     </Grid>
 </UserControl>
