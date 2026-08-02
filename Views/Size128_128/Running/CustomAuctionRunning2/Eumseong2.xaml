@@ -127,8 +127,6 @@
 
             </Grid>
             
-            <TextBlock Text="비고 :" Foreground="lime" Margin="2,108,2,1"/>
-            <!-- Note를 표시하는 TextBlock -->
 </Grid>
     </Border>
 </UserControl>
