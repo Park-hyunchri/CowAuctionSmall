@@ -31,7 +31,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656229") return new ChuncheonRun(); // 춘천
             if (nhCode == "8808990656953") return new JeongeupRun(); // 정읍
             if (nhCode == "8808990656427") return new Mungyeong(); // 문경
-            if (nhCode == "8808990837314") return new AnseongRun(); // 안성
+            if (nhCode == "8808990837314" || nhCode == "8808990660783") return new AnseongRun(); // 안성, 임실
+            if (nhCode == "8808990657202") return new AnseongRun(); // 무진장
 
 
             // Null 방지용 Safe 값 추출
@@ -114,10 +115,11 @@ namespace CowAuctionSmall.Services
                     return new MungyeongSold();
 
                 case "8808990837314": // 안성
+                case "8808990656953": // 임실
                     return new AnseongSold();
 
-              //  case "8808990657202": // 정읍,순창,무진장
-              //      return new AnseongSold();
+                case "8808990657202": // 무진장
+                    return new AnseongSold();
 
                 // case "8808990657202": // 안성,무진장
                 //    return new AnseongSold();
@@ -147,7 +149,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
             if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
-            if (nhCode == "8808990837314") return new AnseongUnSold();         // 안성
+            if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
+            if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 
             // 3. 뿌리농가 미적용("X")이면서 유전능력 번호도 없을 때만 Standard_non_X_UnSold
             bool isX = string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase);
