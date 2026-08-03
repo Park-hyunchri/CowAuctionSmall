@@ -26,9 +26,6 @@
     <None Update="Config\Board.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\DisplayColors.XML">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Config\logo.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -49,6 +46,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Resources\" />
     <Folder Include="Views\Size128_64\Running\CustomRunning_64\" />
   </ItemGroup>
   <ItemGroup>

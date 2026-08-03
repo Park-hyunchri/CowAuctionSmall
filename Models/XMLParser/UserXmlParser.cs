@@ -69,7 +69,11 @@ namespace CowAuctionSmall.Models.XMLParser
                     IsShowQQuri = auctionElement.Element("IsShowQQuri")?.Value,
                     PageTimerPort = auctionElement.Element("PageTimerPort")?.Value,
                     EnableSubFallback = auctionElement.Element("EnableSubFallback")?.Value,
-                    SubFallbackTimeoutMs = auctionElement.Element("SubFallbackTimeoutMs")?.Value
+                    SubFallbackTimeoutMs = auctionElement.Element("SubFallbackTimeoutMs")?.Value,
+                    // 💡 [추가] 색상 태그 읽기
+                    EntityNumberForeground = auctionElement.Element("EntityNumberForeground")?.Value,
+                    EntityNumberShortForeground = auctionElement.Element("EntityNumberShortForeground")?.Value,
+                    EntityNumberShortBackground = auctionElement.Element("EntityNumberShortBackground")?.Value,
                 };
 
                 var pageSettingElement = auctionElement.Element("PageSetting") ?? root.Element("PageSetting");

@@ -69,6 +69,11 @@ namespace CowAuctionSmall.Models.Structures
 
         public PageSetting? PageSetting { get; set; }
         public string? IsPaternityMatch { get; set; } = "Y"; // 기본값 "Y"
+
+        // 💡 [추가] 색상 관련 설정 프로퍼티
+        public string? EntityNumberForeground { get; set; } = "Silver";
+        public string? EntityNumberShortForeground { get; set; } = "White";
+        public string? EntityNumberShortBackground { get; set; } = "Black";
     }
 
     public class PageSetting

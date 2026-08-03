@@ -29,6 +29,10 @@
 							<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>	<!-- 중량으로 보여줄거면 Y or 중량빼고 EPD 알파벳만 보여주고 싶다면 N (기본값 Y)-->
 							<IsShowQQuri>N</IsShowQQuri>					<!--	 뿌리농가 적용여부 ex. Y or N or X   -->
 							<IsPaternityMatch>Y</IsPaternityMatch>			<!-- 친자일치 뱃지 표시 여부 (Y: 표출, N: 숨김) -->
+							<!-- 💡 [추가] 개체번호 색상 설정 (색상명 또는 #HEX 입력) -->
+							<EntityNumberForeground>Silver</EntityNumberForeground>	<!-- 개체번호앞 4자리 & 뒤 1자리 색상 -->
+							<EntityNumberShortForeground>White</EntityNumberShortForeground>	<!-- 개체번호앞 가운데 4자리 - 단축 개체번호 색상 -->
+							<EntityNumberShortBackground>Black</EntityNumberShortBackground>
 		</Auction>
 
 	<PageSetting>

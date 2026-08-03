@@ -67,11 +67,9 @@ namespace CowAuctionSmall
 
             //Model 나중에 인터페이스로 변경 예정
             services.AddSingleton<BoardXmlParser>();
-            services.AddSingleton<DisplayColorXmlParser>();
             services.AddSingleton<UserXmlParser>();
             services.AddSingleton<XmlParserCont>();
             services.AddSingleton<NettyAsyncMsgProcess>();
-            services.AddSingleton<DisplayColorResourceService>();
 
             // services.AddSingleton<ServerConn>();
             services.AddSingleton<ServerConn>(sp =>
@@ -110,22 +108,43 @@ namespace CowAuctionSmall
         {
             try
             {
-                var displayColorsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Config", "DisplayColors.XML");
-                Services.GetRequiredService<DisplayColorResourceService>().ApplyFromXml(displayColorsPath, Resources);
+                // 1. users.XML 정보 가져오기
+                var xmlParser = Services.GetRequiredService<XmlParserCont>();
+                var (_, userInfo) = xmlParser.XmlPaserResult();
+
+                if (userInfo?.Auction != null)
+                {
+                    // 2. users.XML 설정값으로 전역 리소스 브러시 적용
+                    ApplyBrushResource("EntityNumberForeground", userInfo.Auction.EntityNumberForeground ?? "Yellow");
+                    ApplyBrushResource("EntityNumberShortForeground", userInfo.Auction.EntityNumberShortForeground ?? "White");
+                    ApplyBrushResource("EntityNumberShortBackground", userInfo.Auction.EntityNumberShortBackground ?? "Black");
+
+                    Logger.Info("users.XML 기반 전광판 색상 적용 완료");
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "DisplayColors 설정 적용 실패. 기본 색상을 사용합니다.");
+                Logger.Error(ex, "users.XML 기반 색상 설정 적용 실패. 기본 색상을 사용합니다.");
             }
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        // 💡 안전하게 SolidColorBrush 생성 및 Freeze 후 Resources에 대입하는 헬퍼 메서드
+        private void ApplyBrushResource(string resourceKey, string colorValue)
         {
-            RenderOptions.ProcessRenderMode = RenderMode.Default;
-            var tier = RenderCapability.Tier >> 16;
-
-            base.OnStartup(e);
-            Logger.Info($"Application started. Render tier: {tier}");
+            try
+            {
+                var converted = ColorConverter.ConvertFromString(colorValue.Trim());
+                if (converted is Color color)
+                {
+                    var brush = new SolidColorBrush(color);
+                    brush.Freeze(); // 성능 최적화
+                    Resources[resourceKey] = brush;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"유효하지 않은 색상입니다. key={resourceKey}, value={colorValue}, err={ex.Message}");
+            }
         }
         protected override void OnExit(ExitEventArgs e)
         {
