@@ -58,6 +58,10 @@ namespace CowAuctionSmall.Services
             if (data == null || data.Length < 35)
                 return gv;
 
+            // 💡 [선언 위치 이동] 메서드 전체에서 접근 가능하도록 공통 변수를 상단으로 끌어올림
+            var code = userInfo.Auction?.AuctionHouseCode;
+            var showPaternity = userInfo.Auction?.IsPaternityMatch?.Trim().ToUpper() ?? "Y";
+
             int i = -1;
             if (int.TryParse(data[34], out i))
                 gv.SpaceIndex = i.ToString();               //계류대 번호
@@ -81,7 +85,7 @@ namespace CowAuctionSmall.Services
                         gv.Sex = "새끼";
                     }
 
-                    if (userInfo.Auction.AuctionHouseCode == "8808990656885") //횡성
+                    if (code == "8808990656885") //횡성
                     {
                         // TODO: HoengseongSex 리팩토링 후에는 반환값을 gv.Sex에 반영
                         HoengseongSex(gv.CowDistinction, SafeGet(data, 39), sexCode);
@@ -173,11 +177,8 @@ namespace CowAuctionSmall.Services
                         break;
                 }
 
-                // 패킷 파싱 후 최종적으로 user.xml 옵션 및 춘천 축협 예외 처리 적용
-                var nhcode = userInfo.Auction?.AuctionHouseCode;
-                var showPaternity = userInfo.Auction?.IsPaternityMatch?.Trim().ToUpper() ?? "Y";
-
-                if (showPaternity == "N" || nhcode == "8808990656229")
+                // user.xml 설정값(IsPaternityMatch)이 "N"인 경우 친자일치 값을 강제로 비활성화("-")
+                if (showPaternity == "N")
                 {
                     gv.PaternityMatch = "-";
                 }
@@ -351,13 +352,7 @@ namespace CowAuctionSmall.Services
             else
             {
                 gv.Blood = "-"; //계대
-
-
             }
-
-            
-            
-
 
             if (userInfo.Auction?.IsShowOwnerName?.Contains("N") == true)
             {
@@ -382,8 +377,6 @@ namespace CowAuctionSmall.Services
             {
                 gv.OwnerName = data[9].Length > 3 ? data[9].Substring(0, 3) : data[9]; //출하주 => 농가명
             }
-
-
 
             gv.Location = data[22].Length > 3 ? data[22].Substring(0, 2) : data[22];                         //출하 지역
 
@@ -415,7 +408,6 @@ namespace CowAuctionSmall.Services
 
             gv.ProcessStatus = 8001;                        //경매 진행 상태
 
-
             string BidderName = (userInfo.Auction?.BidderName ?? string.Empty).Trim().ToUpper();
             bool isValidData = data[29].Equals("23") || data[29].Equals("22");
             bool isInvalidData30 = string.IsNullOrEmpty(data[30]) || data[30] == "0" || data[30] == "null";
@@ -430,7 +422,6 @@ namespace CowAuctionSmall.Services
             }
             else
             {
-
                 string bidderSource = data[0].Equals("SV") ? data[36] : data[38];
                 bidderSource = UrlDecode(bidderSource);
                 switch (BidderName)
@@ -498,25 +489,27 @@ namespace CowAuctionSmall.Services
 
             gv.AuctionResultStatus = data[29];              //경매 결과 (낙유찰)
 
-            gv.IsRunning = false; //진행중 깜박임 제어
+            gv.IsRunning = false; //경매 진행 중을 나타내는 테두리 깜박임 플래그를 기본값인 false로 초기화
 
-            if (!string.IsNullOrEmpty(data[5]))
+            //전체 개체관리번호 띄어쓰기 포맷팅(9자리를 4자리 - 4자리 - 1자리 형태로 보기 쉽게)
+            if (!string.IsNullOrEmpty(data[5])) //15자리 개체관리번호
             {
-                string foo = data[5].Substring(6);
+                string foo = data[5].Substring(6); //9자리 개체관리번호
                 string bar = foo[0].ToString() + foo[1].ToString() + foo[2].ToString() + foo[3].ToString() + " " + foo[4].ToString() + foo[5].ToString() + foo[6].ToString() + foo[7].ToString() + " " + foo[8].ToString();
-                gv.EntityNumber = bar;
+                gv.EntityNumber = bar; //9자리를 4자리 - 4자리 - 1자리 형태로
             }
             else
                 gv.EntityNumber = "";
 
+            
             if (!string.IsNullOrEmpty(data[5]))
             {
-                if (!gv.CowDistinction.Equals("5"))
+                if (!gv.CowDistinction.Equals("5")) // 소(1~3)인 경우
                 {
                     string foo = data[5].Substring(10, 4);
                     gv.EntityNumberShort = foo;
                 }
-                else
+                else // 염소(5)인 경우
                 {
                     string foo = data[5].Substring(11);
                     gv.EntityNumberShort = foo;
@@ -526,7 +519,8 @@ namespace CowAuctionSmall.Services
             else
                 gv.EntityNumberShort = "";
 
-            if (gv.CowDistinction == "5")
+            
+            if (gv.CowDistinction == "5") //축종 구분이 염소("5")인 경우에 작동
             {
                 // 4자리 중 뒤 3자리만 보여주기
                 if (!string.IsNullOrEmpty(gv.EntityNumberShort) && gv.EntityNumberShort.Length == 4)
@@ -535,38 +529,36 @@ namespace CowAuctionSmall.Services
                 }
             }
 
-
+            //users.xml 설정 파일의 SelectShowWeight_EPD 옵션값을 체크
             if (userInfo.Auction.SelectShowWeight_EPD != null && userInfo.Auction.SelectShowWeight_EPD.Equals("N")) // 개체화면에 중량을 보여주고 싶다면 Y OR EPD 알파벳만 보여주고 싶다면 N
             {
                 gv.SelectShowWeight_EPD = "N";
             }
 
+            //냉도체중 값의 길이가 1자보다 클 때 디버그 로그를 찍기 위해 작성 - 미사용
             if (gv.bodyWeightInColdNum.Length > 1)
             {
                 //Debug.WriteLine("");
             }
 
-            var code = userInfo.Auction.AuctionHouseCode;
-
+            //특정 축협(영천/보령) 번식우 임신개월수 예외 처리
             if ((code == "8808990656687" || code == "8808990683973") && gv.CowDistinction == "3")
             {
                 var raw = (data != null && data.Length > 17) ? data[17] : null;
 
                 if (string.IsNullOrEmpty(raw) || raw == "0")
                     gv.Pregnant = "X";
-                else if (code == "8808990683973" && int.TryParse(raw, out var w) && w <= 4)
+                else if (code == "8808990683973" && int.TryParse(raw, out var w) && w <= 4) //보령축협이면서 임신개월수가 4개월 이하인 경우 $\rightarrow$ "미정" 처리
                     gv.Pregnant = "미정";
                 else
                     gv.Pregnant = raw;
             }
 
-            /* 익산군산인경우 비고란에 친자일치인 경우 노란색, 친자불일치인 경우 빨간색으로 표시 라고 요청, 
-             * 그러나 구분에 따른 색상 추가를 하기에는 시간부족으로 인해 
-             * 기존 친자일치 여부를 표시하는 gv.PaternityMatch 필드에 강제로 값 넣기
-             * "친자일치"인 경우 "친자일치(노란색)"
-             * 
-             */
-            if (code == "8808990227283" && !string.IsNullOrEmpty(gv.Note))
+            // ===================================================
+            // 2. [하단] 익산군산(8808990227283) 비고란 파싱 예외 구간
+            // ===================================================
+            // 💡 상단에서 끌어올린 showPaternity, code 변수를 사용합니다.
+            if (showPaternity != "N" && code == "8808990227283" && !string.IsNullOrEmpty(gv.Note))
             {
                 string[] keywords =
                 {
@@ -578,7 +570,7 @@ namespace CowAuctionSmall.Services
 
                 if (keywords.Any(k => gv.Note.Contains(k)))
                 {
-                    gv.PaternityMatch = "친자일치";
+                    gv.PaternityMatch = "친자일치"; // 옵션이 "Y"일 때만 뱃지가 생성됨
 
                     foreach (var keyword in keywords)
                     {
@@ -589,7 +581,6 @@ namespace CowAuctionSmall.Services
                     gv.Note = gv.Note.Trim().Trim(',');
                 }
             }
-
 
             return gv;
         }

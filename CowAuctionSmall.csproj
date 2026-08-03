@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>livestock.ico</ApplicationIcon>
-	  <Version>1.0.1.16</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
+	  <Version>1.0.1.17</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
   </PropertyGroup>
   <ItemGroup>
     <None Remove="C:\Users\ktnjo\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />

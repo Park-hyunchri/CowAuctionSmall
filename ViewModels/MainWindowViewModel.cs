@@ -16,6 +16,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 
+
 namespace CowAuctionSmall.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject, IDisposable
@@ -475,17 +476,23 @@ namespace CowAuctionSmall.ViewModels
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var version = assembly.GetName().Version;
 
-            // 어셈블리 위치
-            string filePath = assembly.Location;
-            DateTime buildDate = System.IO.File.GetLastWriteTime(filePath); // 파일 최종 수정 날짜 기반
+            // 1. 실행 파일 경로 구하기 (단일 파일 게시 호환)
+            string? filePath = Environment.ProcessPath;
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                filePath = AppContext.BaseDirectory;
+            }
 
-            // 포맷: Version : 1.0.0.0 / Build : 2025-04-10
+            // 2. System.IO.File로 명시하여 네임스페이스 오류 해결
+            DateTime buildDate = System.IO.File.Exists(filePath)
+                ? System.IO.File.GetLastWriteTime(filePath)
+                : DateTime.Now;
+
+            // 포맷: Version : 1.0.0.0 / Build : 2026-08-03
             string msg = $"Version : {version} / Build : {buildDate:yyyy-MM-dd}";
             MainWindowTextBox += msg + "\n";
             return msg;
         }
-
-
 
         /// <summary>
         /// 메시지 구독을 해제한다.
