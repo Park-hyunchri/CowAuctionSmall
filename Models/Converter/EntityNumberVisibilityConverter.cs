@@ -9,16 +9,18 @@ namespace CowAuctionSmall.Models.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string strValue)
+            if (value is string strValue && int.TryParse(strValue, out int intValue))
             {
-                int intValue = int.Parse(strValue);
-                if (parameter as string == "Cow")
+                string? param = parameter as string;
+                if (param == "Cow")
                 {
-                    return intValue != 5 && intValue == 1 || intValue == 2 || intValue == 3 ? Visibility.Visible : Visibility.Collapsed;
+                    return (intValue != 5 && (intValue == 1 || intValue == 2 || intValue == 3))
+                        ? Visibility.Visible
+                        : Visibility.Collapsed;
                 }
-                else if (parameter as string == "Goat")
+                else if (param == "Goat")
                 {
-                    return intValue == 5 ? Visibility.Visible : Visibility.Collapsed;
+                    return (intValue == 5) ? Visibility.Visible : Visibility.Collapsed;
                 }
             }
 

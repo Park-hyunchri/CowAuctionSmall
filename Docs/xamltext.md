@@ -71,7 +71,7 @@
 
 ### 유지하는 영역
 - CowDistinction/RegistrationCategory/EntityNumber 등은 좌표가 분리되어 있으므로 유지.
-- 컨버터(예: MotherLevelConverter, BloolFontStyle)는 그대로 유지.
+- 컨버터(예: MotherLevelConverter, BloodFontStyle)는 그대로 유지.
 
 ---
 

@@ -67,7 +67,7 @@
         <!-- 추가 -->
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
         
     </UserControl.Resources>
 
@@ -105,7 +105,7 @@
                 </Canvas>
 
                 <Canvas Margin="0,30,0,0">
-                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}"  Margin="120,0,0,0" />
+                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="120,0,0,0" />
                 </Canvas>
 
                 <Canvas Margin="0,15,0,0">

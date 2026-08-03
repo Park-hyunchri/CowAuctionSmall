@@ -56,7 +56,7 @@
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
         <models:BorderOutlineConverter x:Key="BorderOutlineConverter"/>
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
 
         <models:SelectShowWeightEpdMultiConverter x:Key="SelectShowWeightEpdMultiConverter"/>
         <modelsMokpo:MokpoEPD x:Key="MokpoEPD"/>
@@ -159,7 +159,7 @@
             <!-- ======================================================================================================================================================================= -->
             <Canvas Margin="0,77,0,0">
                 <TextBlock Text="등록 : "  Foreground="lime" Margin="2,0,0,0"/>
-                <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}" />
+                <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}" />
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
             <Canvas Margin="70,77,0,0">

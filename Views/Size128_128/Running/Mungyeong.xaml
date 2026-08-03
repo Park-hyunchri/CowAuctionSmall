@@ -51,7 +51,7 @@
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
         <Style TargetType="TextBlock">
@@ -94,7 +94,7 @@
                 <!-- ======================================================================================================================================================================= -->
                 <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
                 <TextBlock Panel.ZIndex="100" Margin="0,0,0,0" Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
-                <TextBlock Panel.ZIndex="50" Margin="37,0,0,0" Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}" Foreground="Cyan"/>
+                <TextBlock Panel.ZIndex="50" Margin="37,0,0,0" Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}" Foreground="Cyan"/>
                 <TextBlock Panel.ZIndex="100" Margin="60,0,0,108" Text="{Binding CowInfo.EntityNumber}"  Foreground="Silver" />
                 <TextBlock Panel.ZIndex="150" Margin="80,0,0,110" Width="30" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="OrangeRed" Background="Black" />
                 <!-- ======================================================================================================================================================================= -->

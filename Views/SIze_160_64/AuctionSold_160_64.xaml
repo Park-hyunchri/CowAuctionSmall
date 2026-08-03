@@ -26,7 +26,7 @@
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
     </UserControl.Resources>
 
     <Grid>
@@ -68,7 +68,7 @@
                 <!-- ======================================================================================================================================================================= -->
 
                 <Canvas Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="13,0,0,0" VerticalAlignment="Top">
-                    <TextBlock Text="{Binding RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding RegistrationCategory, Converter={StaticResource BloolFontStyle}}"  Margin="0,0,0,0" />
+                    <TextBlock Text="{Binding RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="0,0,0,0" />
                     <TextBlock Text="{Binding OwnerName}" Margin="32,0,0,0" Foreground="Cyan"/>
                 </Canvas>
 

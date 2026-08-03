@@ -135,25 +135,6 @@
                 </StackPanel>
             </Grid>
 
-            <Border x:Name="borderPaternityMatch" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Yellow" BorderThickness="1" CornerRadius="3" Padding="1" Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}" Width="28" HorizontalAlignment="Left">
-                <TextBlock Foreground="Yellow" Text="{Binding PaternityMatch}"/>
-            </Border>
-
-
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="5" x:Name="canvas" ClipToBounds="True">
-                <Canvas.Style>
-                    <Style TargetType="Canvas">
-                        <Setter Property="Margin" Value="2,3,2,0"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
-                                <Setter Property="Margin" Value="32,3,2,0"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Canvas.Style>
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#f61c2d" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
         </Grid>
     </Border>
 </UserControl>

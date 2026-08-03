@@ -91,7 +91,7 @@
         <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
         <models:SelectShowWeight_EPDString x:Key="SelectShowWeight_EPDString" />
         <models:BorderOutlineConverter x:Key="BorderOutlineConverter"/>
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
     </UserControl.Resources>
 
     <Grid>
@@ -130,7 +130,7 @@
 
 
                 <Canvas Margin="0,16,0,0">
-                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}"  Margin="2,0,0,0" />
+                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="2,0,0,0" />
                     <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Margin="30,0,0,0"/>
                 </Canvas>
 

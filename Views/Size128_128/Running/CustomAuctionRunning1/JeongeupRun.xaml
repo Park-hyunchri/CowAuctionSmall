@@ -56,7 +56,7 @@
         <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
         <models:SelectShowWeight_EPDString x:Key="SelectShowWeight_EPDString" />
         <models:BorderOutlineConverter x:Key="BorderOutlineConverter"/>
-        <models:BloolFontStyle x:Key="BloolFontStyle"/>
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
 
         <Style TargetType="TextBlock">
             <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
@@ -142,7 +142,7 @@
             <Canvas>            
                 <Canvas Margin="0,77,0,0">
                     <TextBlock Text="등록 : "  Foreground="lime" Margin="2,0,0,0"/> 
-                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloolFontStyle}}"  Margin="40,0,0,0" />
+                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="40,0,0,0" />
                 </Canvas>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->

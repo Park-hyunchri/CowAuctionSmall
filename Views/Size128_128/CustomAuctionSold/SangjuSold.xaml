@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAuctionSold.SengjuSold"
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAuctionSold.SangjuSold"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -72,9 +72,7 @@
             </Canvas>
 
             <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="Red" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
+            
         </Grid>
     </Border>
 </UserControl>

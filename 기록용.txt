@@ -278,3 +278,24 @@ NettyAsyncMsgProcess
 
 
 여기 서부터는 2025년 07월 07일 이후의 변경사항 기록
+
+
+2026-08-03
+----------------------------------------------------------------------------------------
+춘천 적용 260724
+
+SetCustomDisplay.cs 코드 간소화
+
+경매가 실제로 진행 중일 때만 1초 주기로 동작하고, 경매 대기 중이거나 새벽 시간대에는 3~10초 주기로 동적으로 변환하도록 수정(Services\ServerGetData.cs 파일 내 StartAsync() 메서드의 주기 계산 부분수정)
+
+Services\ServerConn.cs 수정 (카운터 수집) - 파일 상단에 누적 변수를 선언하고, 실제 HTTP 요청이 나가는 3개 메서드(IssueToken, GetCurrentInfo, PostQcn) 입구에 카운트를 올립 ServerGetData.cs 수정 (정기 로그 출력) -10분(또는 1시간) 주기로 누적 카운트를 NLog 파일에 남기고, 프로그램 종료 시에도 최종 누적 수치를 기록
+
+8808990656427 문경적용 진행,낙찰,유찰
+
+안성축협 진행,낙찰,유찰 적용중
+
+RunningNoteHost128.xaml 비고란 레이아웃과 애니메이션 제어기를 통합 배치
+
+친자뱃지 옵션 설정(user.xml) IsPaternityMatch Y,N
+
+익산군산 친자뱃지 예외처리 적용 AnimalParseDisplay.cs

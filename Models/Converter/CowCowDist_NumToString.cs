@@ -13,65 +13,51 @@ namespace CowAuctionSmall.Models.Converter
 {
     public class CowCowDist_NumToString : IValueConverter
     {
+        private static readonly SolidColorBrush YellowBrush = CreateFrozenBrush("#FFFF00");
+        private static readonly SolidColorBrush PinkBrush = CreateFrozenBrush("#FF69B4");
+
+        private static readonly Style CattleStyle;
+        private static readonly Style GoatStyle;
+        private static readonly Style DefaultStyle;
+
+        static CowCowDist_NumToString()
+        {
+            CattleStyle = new Style(typeof(TextBlock));
+            CattleStyle.Setters.Add(new Setter(TextBlock.ForegroundProperty, YellowBrush));
+            CattleStyle.Setters.Add(new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0)));
+            CattleStyle.Seal();
+
+            GoatStyle = new Style(typeof(TextBlock));
+            GoatStyle.Setters.Add(new Setter(TextBlock.FontSizeProperty, 13.0));
+            GoatStyle.Setters.Add(new Setter(TextBlock.ForegroundProperty, YellowBrush));
+            GoatStyle.Setters.Add(new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0)));
+            GoatStyle.Setters.Add(new Setter(TextBlock.RenderTransformOriginProperty, new Point(0.05, 0.5)));
+            GoatStyle.Seal();
+
+            DefaultStyle = new Style(typeof(TextBlock));
+            DefaultStyle.Setters.Add(new Setter(TextBlock.FontSizeProperty, 13.0));
+            DefaultStyle.Setters.Add(new Setter(TextBlock.ForegroundProperty, PinkBrush));
+            DefaultStyle.Setters.Add(new Setter(TextBlock.MarginProperty, new Thickness(0, 2, 0, 0)));
+            DefaultStyle.Seal();
+        }
+
+        private static SolidColorBrush CreateFrozenBrush(string hex)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            brush.Freeze();
+            return brush;
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string? distinction = value as string;
-            switch (distinction)
+            return distinction switch
             {
-                case "송아지": //송아지
-                    return new Style(typeof(TextBlock))
-                    {
-                        Setters =
-                            {
-                                new Setter(TextBlock.ForegroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF00"))),
-                                new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0))
-
-                            }
-                    };
-                case "비육우": //비육우
-                    return new Style(typeof(TextBlock))
-                    {
-                        Setters =
-                            {
-                                new Setter(TextBlock.ForegroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF00"))),
-                                new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0))
-
-                            }
-                    };
-                case "번식우": //번식우
-                    return new Style(typeof(TextBlock))
-                    {
-                        Setters =
-                            {
-                                new Setter(TextBlock.ForegroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF00"))),
-                                new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0))
-
-                            }
-                    };
-                case "염소":
-                    return new Style(typeof(TextBlock))
-                    {
-                        Setters =
-                            {
-                                new Setter(TextBlock.FontSizeProperty, 13.0),
-                                new Setter(TextBlock.ForegroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFFF00"))),
-                                new Setter(TextBlock.MarginProperty, new Thickness(2, 0, 0, 0)),
-                                new Setter(TextBlock.RenderTransformOriginProperty, new Point(0.05, 0.5))
-
-                            }
-                    };
-                default:
-                    return new Style(typeof(TextBlock))
-                    {
-                        Setters =
-                            {
-                                new Setter(TextBlock.FontSizeProperty, 13.0),
-                                new Setter(TextBlock.ForegroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF69B4"))),
-                                new Setter(TextBlock.MarginProperty, new Thickness(0, 2, 0, 0)),
-                            }
-                    };
-            }
-        } 
+                "송아지" or "비육우" or "번식우" => CattleStyle,
+                "염소" => GoatStyle,
+                _ => DefaultStyle
+            };
+        }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

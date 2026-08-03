@@ -11,7 +11,6 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace CowAuctionSmall
 {
@@ -27,7 +26,7 @@ namespace CowAuctionSmall
         public MainWindow()
         {
             logger = NLogger.Instance;
-            IsLisence();
+            IsLicense();
             CheckMemoryUsageTimer(); // 메모리 사용량 체크 타이머 추가
             SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽1시에는 무조건 프로그램 종료)
             
@@ -37,7 +36,7 @@ namespace CowAuctionSmall
 
         }
 
-        private void IsLisence()
+        private void IsLicense()
         {
             string path = @"C:\Windows\SysWOW64\windowsbootadmin64.dll";
             if (File.Exists(path))
@@ -78,7 +77,7 @@ namespace CowAuctionSmall
             DateTime now = DateTime.Now;
             if (now.Hour >= 23 || now.Hour < 1) // 밤 11시부터 새벽 1시까지 
             {
-                logger.Equals("프로그램 종료 : 될때 되서");
+                logger.LogInfo("프로그램 종료 : 자동 종료 시간 도달");
                 Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
             }
         }
@@ -86,7 +85,7 @@ namespace CowAuctionSmall
         // 메모리 사용량 체크 타이머 추가
         private void CheckMemoryUsageTimer()
         {
-            _memoryCheckTimer = new Timer(10000); // 10마다 체크
+            _memoryCheckTimer = new Timer(10000); // 10초마다 체크
             _memoryCheckTimer.Elapsed += CheckMemoryUsageTimer_Tick;
             _memoryCheckTimer.Start();
         }
@@ -126,6 +125,25 @@ namespace CowAuctionSmall
             }
         }
 
+        // 💡 윈도우 닫힐 때 타이머 리소스 해제 (메모리 누수 완전 차단)
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            if (_shutdownTimer != null)
+            {
+                _shutdownTimer.Stop();
+                _shutdownTimer.Dispose();
+                _shutdownTimer = null;
+            }
+
+            if (_memoryCheckTimer != null)
+            {
+                _memoryCheckTimer.Stop();
+                _memoryCheckTimer.Dispose();
+                _memoryCheckTimer = null;
+            }
+        }
 
         private async void Window_KeyDown(object sender, KeyEventArgs e)
         {

@@ -21,7 +21,7 @@ namespace CowAuctionSmall.Models.Converter
                 if (motherLevel.Length > 2)
                 {
                     // 앞에서 2글자만 반환
-                    return motherLevel;
+                    return motherLevel.Substring(0, 2);
                 }
                 else
                 {
