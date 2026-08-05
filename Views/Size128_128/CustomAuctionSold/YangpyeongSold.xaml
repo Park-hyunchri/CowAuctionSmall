@@ -4,12 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAuctionSold"
-             
              xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
+    
     <!-- 양평축협 낙찰페이지 적용 -->
     <UserControl.Resources>
 
@@ -29,50 +29,45 @@
     <Border BorderBrush="#1E90FF" BorderThickness="2">
 
         <Grid Background="Black">
-            <TextBlock Visibility="Collapsed" Text="{Binding CowDistinction}" />
-            <!-- "낙찰"을 표시하는 TextBlock -->
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="25" Foreground="Violet" FontWeight="Bold"/>
-
-            <!-- ======================================================================================================================================================================= -->
-            <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
-            <Canvas Margin="0,30,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
-                <TextBlock Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
-                <TextBlock Text="{Binding EntityNumber}" Margin="44,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="72,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/>
+            <!-- 1. 상단 타이틀: "낙    찰" -->
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="24" Foreground="Violet" FontWeight="Bold" Margin="0,1,0,0"/>
+            
+            <!-- 2. 출하주 -->
+            <Canvas Margin="0,30,0,0">
+                <TextBlock Text="출하주 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+                <TextBlock Text="{Binding OwnerName}" Margin="60,0,0,0" Foreground="White" FontSize="13"/>
             </Canvas>
-            <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
-            <Canvas Margin="0,30,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
-                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" />
-                <TextBlock Text="{Binding SipNumber}" Margin="40,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
-            </Canvas>
-            <!-- ======================================================================================================================================================================= -->
 
+            <!-- 3. 최저가 -->
             <Canvas Margin="0,45,0,0">
                 <TextBlock Text="최저가 : "  Foreground="lime"  Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Margin="60,0,0,0" Foreground="#FFA500" FontSize="13"/>
             </Canvas>
 
+            <!-- 4. 낙찰가 -->
             <Canvas Margin="0,60,0,0">
                 <TextBlock Text="낙찰가 : "  Foreground="lime"  Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Margin="60,0,0,0" Foreground="Yellow" FontSize="13"/>
                 <!--#87CEEB -->
             </Canvas>
 
+            <!-- 5. 낙찰자 -->
             <Canvas Margin="0,75,0,0" >
-                <TextBlock Text="낙찰자 : "  Foreground="Violet"  Margin="2,0,0,0" FontSize="13"/>
-                <Canvas x:Name="canvasBidder" ClipToBounds="True" Height="15" HorizontalAlignment="Left" Canvas.Left="60" VerticalAlignment="Center" Width="64">
-                    <TextBlock x:Name="bidder" Text="{Binding BidderNum}"  Foreground="Cyan" FontSize="13"/>
-                </Canvas>
-
+                <TextBlock Text="낙찰자 : " Foreground="Violet" Margin="2,0,0,0" FontSize="13"/>
+                <TextBlock Text="{Binding Bidder}" Margin="60,0,0,0" Foreground="Cyan" FontSize="13"/>
             </Canvas>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,92,0,0" FontSize="13" Foreground="Cyan" Text="{Binding BidderString}"/>
 
-
-
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,109,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#f61c2d" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
+            <!-- 6. 축종 및 개체번호 (소/염소 구분) -->
+            <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
+                <TextBlock Text="{Binding StrCowDistinction}" Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" FontSize="13" Margin="2,0,0,0" x:Name="StrCowDistinction"/>
+                <TextBlock Text="{Binding EntityNumber}" Margin="45,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
+                <TextBlock Text="{Binding EntityNumberShort}" Margin="77,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
             </Canvas>
+            <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+                <TextBlock Text="{Binding SipNumber}" Margin="44,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold" FontSize="13"/>
+            </Canvas>
+            
         </Grid>
     </Border>
 </UserControl>

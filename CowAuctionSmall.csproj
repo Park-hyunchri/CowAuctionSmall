@@ -32,10 +32,10 @@
     <None Update="Config\logo2.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\users_정.XML">
+    <None Update="Config\users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\users.XML">
+    <None Update="Config\개발_users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Config\춘천_users.XML">
