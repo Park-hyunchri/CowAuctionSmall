@@ -1,69 +1,57 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Server>
-		<Authentication>
-				<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
-				<UserID>board_163_4</UserID>
-				<Password>1111</Password>
-		</Authentication>
-  
-		<CurrentInfo>
-				<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry/board?date=</Address> <!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
-				<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
-				<AddressQcn>https://xn--e20bw05b.kr/api/v1/auction/select/qcn/list</AddressQcn>
-				<Date>20260730</Date>
-		</CurrentInfo>
-  
-		<Auction>
-				<Address>115.41.222.25</Address>
-				<Port>5001</Port>
-				<Channel>6006</Channel>
-				<Priority>MANAGE</Priority>
-							<AuctionHouseCode>8808990657202</AuctionHouseCode>
-							<StartPosition>0,0</StartPosition>				<!--     프로그램 시작 위치 변경   -->
-	
-							<CowBirth>Y</CowBirth>							<!--     생년월일 일자 표기 Y or 월령으로표기 N   사용하지않는 옵션-->
-			
-							<BidderName>N</BidderName>						<!--     낙찰자 이름 표시 ex. Y (이름만) or N (번호만)  or B (둘다)   -->
-							<IsShowOwnerName>N</IsShowOwnerName>			<!--     출하자 이름 표시 ex. Y or N   -->
-							<ChangeSexName>N</ChangeSexName>				<!--	 성별 표시 변경 (기본값 Y) ex. Y 비육우 면서 암 또는 수 이면 비육으로 표시 , N 그냥 등록된 성별로 표시  -->
-							<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>	<!-- 중량으로 보여줄거면 Y or 중량빼고 EPD 알파벳만 보여주고 싶다면 N (기본값 Y)-->
-							<IsShowQQuri>N</IsShowQQuri>					<!--	 뿌리농가 적용여부 ex. Y or N or X   -->
-							<IsPaternityMatch>Y</IsPaternityMatch>			<!-- 친자일치 뱃지 표시 여부 (Y: 표출, N: 숨김) -->
-							<!-- 💡 [추가] 개체번호 색상 설정 (색상명 또는 #HEX 입력) -->
-							<EntityNumberForeground>Silver</EntityNumberForeground>	<!-- 개체번호앞 4자리 & 뒤 1자리 색상 -->
-							<EntityNumberShortForeground>White</EntityNumberShortForeground>	<!-- 개체번호앞 가운데 4자리 - 단축 개체번호 색상 -->
-							<EntityNumberShortBackground>Black</EntityNumberShortBackground>
-		</Auction>
+<UserInfo>
+	<!-- 1. API 로그인 인증 정보 -->
+	<Authentication>
+		<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
+		<UserID>board_163_4</UserID>
+		<Password>1111</Password>
+	</Authentication>
 
-	<PageSetting>
-		<PageTimerPort>45123</PageTimerPort>			<!-- 페이지 타이머 UDP 포트 -->
+	<!-- 2. 경매 데이터 요청 API 주소 -->
+	<CurrentInfo>
+		<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry/board?date=</Address> <!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
+		<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
+		<AddressQcn>https://xn--e20bw05b.kr/api/v1/auction/select/qcn/list</AddressQcn>
+		<Date></Date>	<!-- 비워두면 오늘 날짜, 지정 시 해당 날짜 데이터 테스트 (YYYYMMDD) -->
+	</CurrentInfo>
 
-		<BoardPage>1</BoardPage>					<!--	 진행중일때 몇개의 패널을 보여줄건지 기본값은 1 ex) 3이라면 경매 대기,또는 진행중일때 3개의 패널이 돌아가면서 보여준다 -->
+	<!-- 3. 경매 소켓 서버 및 전광판 표출 제어 옵션 -->
+	<Auction>
+		<Address>115.41.222.25</Address>		<!-- 응찰 소켓 서버 IP -->
+		<Port>45123</Port>		<!-- 응찰 소켓 포트 -->
+		<Channel>6006</Channel>		<!-- 경매 채널 번호 -->
+		<Priority>MANAGE</Priority>		<!-- 동기화 역할 (MASTER / SUB) -->
+		<AuctionHouseCode>8808990657202</AuctionHouseCode>		<!-- 축협 사업장 코드 -->
+		<StartPosition>0,0</StartPosition>		<!-- 메인 윈도우 시작 좌표 (X,Y) -->
 
-		<BoardPageTime>5</BoardPageTime>			<!--     1판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
-		<BoardPageTime2>5</BoardPageTime2>			<!--     2판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
-		<BoardPageTime3>3</BoardPageTime3>			<!--     3판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
-		<BoardPageTime4>3</BoardPageTime4>			<!--     4판넬 교체 시간  ex. 5 = 5초, 8 = 8초   -->
-	</PageSetting>
+		<!-- 표출 세부 옵션 -->
+		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->
+		<BoardPage>1</BoardPage>		<!-- 경매 진행 시 회전할 총 페이지 수 (1~4) -->
+		<BoardPageTime>5</BoardPageTime>		<!-- 1페이지 체류 시간 (초) -->
+		<BoardPageTime2>5</BoardPageTime2>		<!-- 2페이지 체류 시간 (초) -->
+		<BoardPageTime3>3</BoardPageTime3>		<!-- 3페이지 체류 시간 (초) -->
+		<BoardPageTime4>3</BoardPageTime4>		<!-- 4페이지 체류 시간 (초) -->
 
-</Server>
+		<BidderName>Y</BidderName>		<!-- Y: 낙찰자 이름표시, X: 마스킹(김*수), B: 이름+참가번호 -->
+		<IsShowOwnerName>Y</IsShowOwnerName>		<!-- Y: 출하주 성명 전체, N: 마스킹(김*수) -->
+		<ChangeSexName>Y</ChangeSexName>		<!-- Y: 축종별 성별명 변환(비육, 암소 등), N: 원본 성별 -->
+		<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>		<!-- Y: 개체화면에 중량 표출, N: EPD 표출 -->
+		<IsShowQQuri>N</IsShowQQuri>		<!-- Y: 뿌리농가 관련 화면 적용, X: 미적용(N: 뿌리농가 정보 미활성화) -->
+		<IsPaternityMatch>Y</IsPaternityMatch>		<!-- Y: 친자일치 뱃지 활성화, N: 강제 숨김 -->
 
-<!--   개발서버용   -->
-<!--   영주축협   -->
-<!--    
+		<!-- 개체번호 색상 제어 (DisplayColors.xml 대체) -->
+		<EntityNumberForeground>Silver</EntityNumberForeground>		<!-- 앞4자리/뒤1자리 색상 -->
+		<EntityNumberShortForeground>White</EntityNumberShortForeground>		<!-- 가운데 단축4자리 글자색 -->
+		<EntityNumberShortBackground>Black</EntityNumberShortBackground>		<!-- 가운데 단축4자리 배경색 -->
 
-8808990687094
-128*64 일때는 
-BidderName  = Y,N
-ChangeSexName = N
-
-SpaceIndex = 계류대번호
-SipNumber = 출품번호
-MotherLevel = 어미 혈통
-RegistrationCategory = 본인혈통
-CalvingNumber = 어미산차
-Pregnant = 임신개월수
-EntityNumber = 축산개체관리번호
-BirthMonth = 개월령
-Birth = 생년월일
- -->
+		<!-- 다중 전광판 시간 동기화(PageTimerSync) 옵션 -->
+		<PageSetting>
+			<PageTimerPort>45123</PageTimerPort>			<!-- 페이지 타이머 UDP 포트 -->
+			<EnableSubFallback>Y</EnableSubFallback>			<!-- Y: 마스터 신호 안 오면 서브가 자율 회전 -->
+			<SubFallbackTimeoutMs>4000</SubFallbackTimeoutMs>			<!-- 복구 전환 대기 시간(ms) -->
+			<BoardPage>2</BoardPage>
+			<BoardPageTime>25</BoardPageTime>
+			<BoardPageTime2>7</BoardPageTime2>
+		</PageSetting>
+	</Auction>
+</UserInfo>

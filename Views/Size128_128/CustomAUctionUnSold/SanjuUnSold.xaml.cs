@@ -1,19 +1,4 @@
-﻿using CowAuctionSmall.Models;
-using CowAuctionSmall.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows.Controls;
 
 namespace CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold
 {
@@ -22,50 +7,9 @@ namespace CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold
     /// </summary>
     public partial class SanjuUnSold : UserControl
     {
-        private FlowTextAnimation? _flowTextAnimation;
         public SanjuUnSold()
         {
             InitializeComponent();
-            Loaded += SanjuUnSold_Loaded;
-            Unloaded += SanjuUnSold_Unloaded;
-        }
-
-        private void SanjuUnSold_Loaded(object sender, RoutedEventArgs e)
-        {
-
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                if (note.Text.Length > 8)
-                {
-                    if (note.ActualWidth > 120 || note.Text.Replace(" ", "").Length > 8)
-                    {
-                        StartScrollingAnimation();
-                    }
-                }
-            }), System.Windows.Threading.DispatcherPriority.Render);
-        }
-
-        private void StartScrollingAnimation()
-        {
-            if (_flowTextAnimation == null)
-            {
-                if (DataContext is CowAuctionSmall.ViewModels.AuctionContPanelViewModel viewModel)
-                {
-                    _flowTextAnimation = new FlowTextAnimation(note, canvas, viewModel);
-                }
-                else
-                {
-                    _flowTextAnimation = new FlowTextAnimation(note, canvas);
-                }
-            }
-
-            _flowTextAnimation.Start();
-        }
-
-
-        private void SanjuUnSold_Unloaded(object sender, RoutedEventArgs e)
-        {
-            _flowTextAnimation?.Stop();
         }
     }
 }
