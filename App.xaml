@@ -6,8 +6,13 @@
 
     <Application.Resources>
         <ResourceDictionary>
+            <!-- 💡 XAML 디자이너 및 빌드 타임용 기본 동적 브러시 리소스 선언 -->
+            <SolidColorBrush x:Key="EntityNumberForeground" Color="Yellow"/>
+            <SolidColorBrush x:Key="EntityNumberShortForeground" Color="White"/>
+            <SolidColorBrush x:Key="EntityNumberShortBackground" Color="Black"/>
+
             <ResourceDictionary.MergedDictionaries>
-                
+
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
