@@ -19,7 +19,7 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
 
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>

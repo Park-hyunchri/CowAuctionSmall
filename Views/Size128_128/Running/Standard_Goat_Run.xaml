@@ -46,7 +46,7 @@
         </Style>
 
         <!-- 추가 -->
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:WeightKGConverter x:Key="WeightKGConverter"/>
 
@@ -73,7 +73,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="{Binding CowInfo.Sex}"  Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V2}}" x:Name="Sex" Panel.ZIndex="100"/>
+            <TextBlock Text="{Binding CowInfo.Sex}"  Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" x:Name="Sex" Panel.ZIndex="100"/>
 
 
 

@@ -20,7 +20,7 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
 
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
@@ -34,7 +34,7 @@
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="25" Foreground="red" FontWeight="Bold"><Run Text="유    찰"/><Run Language="ko-kr" Text=""/></TextBlock>
 
         <Canvas Margin="0,30,0,0">
-            <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" Margin="77,0,0,0" x:Name="Sex"/>
+            <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" Margin="77,0,0,0" x:Name="Sex"/>
         </Canvas>
 
         <Canvas Margin="0,35,0,0">

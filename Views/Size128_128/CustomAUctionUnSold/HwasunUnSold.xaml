@@ -20,7 +20,7 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
         
-        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:WeightKGConverter x:Key="WeightKGConverter"/>
@@ -32,10 +32,10 @@
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유    찰" FontSize="25" Foreground="red" FontWeight="Bold"/>
 
         <Canvas Margin="0,30,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
-            <TextBlock Text="{Binding Sex}" Style="{Binding Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" Margin="80,0,0,0" x:Name="Sex"/>
+            <TextBlock Text="{Binding Sex}" Style="{Binding Sex, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" Margin="80,0,0,0" x:Name="Sex"/>
         </Canvas>
         <Canvas Margin="0,50,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
-            <TextBlock Text="{Binding Sex}" Style="{Binding Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" Margin="80,0,0,0"/>
+            <TextBlock Text="{Binding Sex}" Style="{Binding Sex, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" Margin="80,0,0,0"/>
         </Canvas>
         <!-- ======================================================================================================================================================================= -->
         <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->

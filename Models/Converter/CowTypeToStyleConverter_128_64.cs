@@ -14,10 +14,10 @@ namespace CowAuctionSmall.Models.Converter
 {
     public class CowTypeToStyleConverter_128_64 : IValueConverter
     {
-        // 각 'Sex'에 따른 스타일 속성을 미리 정의
-        private readonly Dictionary<string, (double FontSize, Brush Foreground, Thickness Margin, ScaleTransform? Transform)> styleSettings =
-    new Dictionary<string, (double, Brush, Thickness, ScaleTransform?)>
-    {
+        // 성별별 폰트 크기, 색상, 마진, 스케일 변환을 정의하는 스타일 딕셔너리
+        private readonly Dictionary<string, (double FontSize, Brush Foreground, Thickness Margin, ScaleTransform? Transform)> styleSettings
+            = new Dictionary<string, (double, Brush, Thickness, ScaleTransform?)>
+        {
         { "암", (25.0, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0064")), new Thickness(0, -3, 0, 0), null) },
         { "수", (25.0, Brushes.DodgerBlue, new Thickness(0, -3, 0, 0), null) },
         { "거세", (24.0, new SolidColorBrush((Color)ColorConverter.ConvertFromString("#D6B700")), new Thickness(1, -3, 0, 0), new ScaleTransform(0.55, 1.0)) },

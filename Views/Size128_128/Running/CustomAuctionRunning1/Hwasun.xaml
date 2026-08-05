@@ -46,7 +46,7 @@
         </Style>
 
         <!-- 추가 -->
-        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
@@ -66,11 +66,11 @@
         <Grid>
 
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}" Margin="0,17,0,0">
-                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top" x:Name="Sex"/>
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             </Canvas>
 
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}" Margin="0,5,0,0">
-                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter}}" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo.Sex, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top"/>
             </Canvas>
 
             <!-- ======================================================================================================================================================================= -->

@@ -19,12 +19,11 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
 
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
     </UserControl.Resources>
 
     <Border BorderBrush="#1E90FF" BorderThickness="2">
@@ -56,7 +55,7 @@
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" Margin="0,0,0,0" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" />
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="5,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="12" FontWeight="Bold" />
 
-            <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex"/>
+            <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="11">
                 <Run Text="{Binding Location}" Foreground="lime"/>
                 <Run Text="{Binding OwnerName}" Foreground="Cyan"/>
@@ -145,26 +144,6 @@
 
                 </StackPanel>
             </Grid>
-
-            <Border x:Name="borderPaternityMatch" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Yellow" BorderThickness="1" CornerRadius="3" Padding="1" Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}" Width="28" HorizontalAlignment="Left">
-                <TextBlock Foreground="Yellow" Text="{Binding PaternityMatch}"/>
-            </Border>
-
-
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="5" x:Name="canvas" ClipToBounds="True">
-                <Canvas.Style>
-                    <Style TargetType="Canvas">
-                        <Setter Property="Margin" Value="2,3,2,0"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
-                                <Setter Property="Margin" Value="32,3,2,0"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Canvas.Style>
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#f61c2d" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
         </Grid>
     </Border>
 </UserControl>

@@ -50,7 +50,7 @@
         </Style>
 
         <!-- 추가 -->
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
@@ -89,7 +89,7 @@
     <Border BorderThickness="2" Style="{StaticResource BlinkingBorderStyle2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
         <Grid>
             <Grid>
-                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex">
+                <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex">
                     <TextBlock.RenderTransform>
                         <TranslateTransform Y="17"/>
                     </TextBlock.RenderTransform>

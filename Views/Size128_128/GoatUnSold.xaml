@@ -13,7 +13,7 @@
     <UserControl.Resources>
 
         <!-- 추가 -->
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:WeightKGConverter x:Key="WeightKGConverter"/>
 
@@ -35,7 +35,7 @@
             <TextBlock Margin="0,0,0,0" Text="유   찰" HorizontalAlignment="Center" Foreground="OrangeRed" FontSize="23" FontWeight="Bold"/>
 
             <Canvas Margin="0,28,0,0">
-                <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" x:Name="Sex" Panel.ZIndex="110"/>
+                <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" x:Name="Sex" Panel.ZIndex="110"/>
             </Canvas>
 
             <!-- ======================================================================================================================================================================= -->

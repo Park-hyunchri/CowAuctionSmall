@@ -20,7 +20,7 @@
 
         <models:CowTypeToStyleConverter_OutLine_V3 x:Key="CowTypeToStyleConverter_OutLine_V3"/>
         <models:NhLabelConverter x:Key="NhLabelConverter"/>
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <models:WeightKGConverter x:Key="WeightKGConverter"/>
@@ -38,7 +38,7 @@
 
             <!-- 2. 우측 상단 성별/구분 (미경/암/수 등 폰트 20 적용하여 숫자 가림 방지) -->
             <Canvas Margin="2,30,0,0">
-                <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex"/>
+                <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             </Canvas>
             
             <!-- 3. 최저가 -->

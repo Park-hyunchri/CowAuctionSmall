@@ -75,7 +75,7 @@
 
 
         <models:NhLabelConverter x:Key="NhLabelConverter"/>
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <models:WeightKGConverter x:Key="WeightKGConverter"/>
@@ -91,7 +91,7 @@
             <!-- "유찰"을 표시하는 TextBlock -->
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유    찰" FontSize="25" Foreground="#e5081b" FontWeight="Bold"/>
 
-            <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex">
+            <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex">
                 <TextBlock.RenderTransform>
                     <TranslateTransform Y="30"/>
                 </TextBlock.RenderTransform>
@@ -145,25 +145,6 @@
             
             
         </Grid>
-
-        <Border x:Name="borderPaternityMatch" Margin="3,107,97,4" BorderBrush="Yellow" BorderThickness="1" CornerRadius="3" Padding="1" Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}">
-            <TextBlock Foreground="Yellow" Text="{Binding PaternityMatch}"/>
-        </Border>
-
-        <!-- Note를 표시하는 TextBlock -->
-        <Canvas x:Name="canvas" ClipToBounds="True">
-            <Canvas.Style>
-                <Style TargetType="Canvas">
-                    <Setter Property="Margin" Value="2,110,2,1"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
-                            <Setter Property="Margin" Value="32,110,2,1"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Canvas.Style>
-            <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#f61c2d" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-        </Canvas>
 
     </Grid>
 

@@ -20,7 +20,7 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
         
-        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
     </UserControl.Resources>

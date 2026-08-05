@@ -19,12 +19,11 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
 
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-        <models:CowTypeToStyleConverter_V2 x:Key="CowTypeToStyleConverter_V2"/>
     </UserControl.Resources>
 
     <Border BorderBrush="#1E90FF" BorderThickness="2">
@@ -55,7 +54,7 @@
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" Margin="0,0,0,0" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" />
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="5,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="12" FontWeight="Bold" />
 
-            <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V2}}" VerticalAlignment="Top" x:Name="Sex"/>
+            <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="12">
                 <Run Text="{Binding Location}" Foreground="lime"/>
                 <Run Text="{Binding OwnerName}" Foreground="Cyan"/>

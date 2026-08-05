@@ -50,8 +50,12 @@ namespace CowAuctionSmall.Models.Converter
         private static readonly Dictionary<string, Style> CachedStyles = new();
 
         // 📋 스타일 설정 목록
-        private static readonly Dictionary<string, (double FontSize, Brush Foreground, Thickness Margin)> StyleSettings =
-            new()
+        private static readonly Dictionary<string, (double FontSize, Brush Foreground, Thickness Margin)> StyleSettings;
+
+        // 🚀 static 생성자에서 딕셔너리 및 축약 키(Alias) 미리 초기화
+        static CowTypeToStyleConverter_V3()
+        {
+            StyleSettings = new()
             {
                 { "암", (28.0, BrushRed, WideMargin) },
                 { "수", (28.0, BrushBlue, WideMargin) },
@@ -67,6 +71,13 @@ namespace CowAuctionSmall.Models.Converter
                 { "기본", (23.0, BrushBlack, DefaultMargin) }
             };
 
+            // 💡 <ChangeSexName>Y</ChangeSexName> 옵션 적용 시 들어오는 축약 키(Alias) 사전 등록
+            StyleSettings["거"] = StyleSettings["거세"];
+            StyleSettings["비거"] = StyleSettings["비거세"];
+            StyleSettings["프리"] = StyleSettings["프리마틴"];
+            StyleSettings["새"] = StyleSettings["새끼"];
+        }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is not gValues cowInfo)
@@ -74,10 +85,12 @@ namespace CowAuctionSmall.Models.Converter
 
             string sex = string.IsNullOrWhiteSpace(cowInfo.Sex) ? "기본" : cowInfo.Sex;
 
+            // 1. 이미 캐시된 Style이 있는지 확인
             if (CachedStyles.TryGetValue(sex, out var cachedStyle))
                 return cachedStyle;
 
-            var settings = StyleSettings.TryGetValue(sex, out var style) ? style : StyleSettings["기본"];
+            // 2. 딕셔너리에서 조회 (축약 키도 사전 등록되어 있으므로 예외 없이 즉시 조회됨)
+            var style = StyleSettings.TryGetValue(sex, out var setting) ? setting : StyleSettings["기본"];
 
             var textStyle = new Style(typeof(TextBlock))
             {

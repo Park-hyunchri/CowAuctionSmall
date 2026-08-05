@@ -80,6 +80,8 @@ namespace CowAuctionSmall.Services
                 if (userInfo.Auction?.ChangeSexName?.ToUpper().Equals("N") == true)
                 {
                     gv.Sex = sexCode; //성별 그대로 표출
+
+                    // 💡 N일 때는 성별 데이터가 "-" 이거나 비어있으면 "새끼"로 보정해 줌
                     if (gv.Sex == "-" || gv.Sex == "")
                     {
                         gv.Sex = "새끼";
@@ -93,6 +95,7 @@ namespace CowAuctionSmall.Services
                 }
                 else
                 {
+                    // 💡 Y일 때는 changeSex() 함수만 호출함
                     gv.Sex = changeSex(sexCode, gv.CowDistinction); //성별, 송아지 비육우 번식우 구분인자
                 }
             }
@@ -590,6 +593,11 @@ namespace CowAuctionSmall.Services
         /// </summary>
         private string changeSex(string sex, string CowDistinction)
         {
+            // 💡 성별 값이 없거나 "-"인 경우 축종에 관계없이 "새끼"로 기본 설정[cite: 1]
+            if (string.IsNullOrEmpty(sex) || sex == "-")
+            {
+                return "새끼";
+            }
             switch (CowDistinction)
             {
                 case "1": //송아지
@@ -610,11 +618,7 @@ namespace CowAuctionSmall.Services
                         sex = "숫소";
                     }
                     break;
-                case "5": //염수
-                    if (sex.Equals("") || sex.Equals("-"))
-                    {
-                        sex = "새끼";
-                    }
+                case "5": //염소
                     break;
                 default: break;
 
