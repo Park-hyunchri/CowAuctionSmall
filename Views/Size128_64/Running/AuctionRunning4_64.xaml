@@ -46,7 +46,7 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
-        <models:CowTypeToStyleConverter x:Key="CowTypeToStyleConverter"/>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
     </UserControl.Resources>
