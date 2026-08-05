@@ -66,7 +66,7 @@ namespace CowAuctionSmall.Services
 
             // 2. 춘천 축협 전용 코드
             if (nhCode == "8808990656229") return new AuctionRunning2();  // 춘천
-            if (nhCode == "8808990656960" || nhCode == "8808990656953") return new Eumseong2(); // 순창, 정읍
+            if (nhCode == "8808990656960" || nhCode == "8808990656953" || nhCode == "8808990643625") return new Eumseong2(); // 순창, 정읍, 양평
 
             // 3. 농협 우수 조건 만족 여부 판단
             // (is_QQuri가 "Y"이고, 둘 중 하나라도 "N"이 아닌 경우)
@@ -151,7 +151,9 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
+            if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
             if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
+
 
             // 3. 뿌리농가 미적용("X")이면서 유전능력 번호도 없을 때만 Standard_non_X_UnSold
             bool isX = string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase);
