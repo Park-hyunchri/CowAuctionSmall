@@ -25,13 +25,7 @@
 		<StartPosition>0,0</StartPosition>		<!-- 메인 윈도우 시작 좌표 (X,Y) -->
 
 		<!-- 표출 세부 옵션 -->
-		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->
-		<BoardPage>1</BoardPage>		<!-- 경매 진행 시 회전할 총 페이지 수 (1~4) -->
-		<BoardPageTime>7</BoardPageTime>		<!-- 1페이지 체류 시간 (초) -->
-		<BoardPageTime2>5</BoardPageTime2>		<!-- 2페이지 체류 시간 (초) -->
-		<BoardPageTime3>3</BoardPageTime3>		<!-- 3페이지 체류 시간 (초) -->
-		<BoardPageTime4>3</BoardPageTime4>		<!-- 4페이지 체류 시간 (초) -->
-
+		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->		
 		<BidderName>Y</BidderName>		<!-- Y: 낙찰자 이름표시, N: 번호, B: 이름+번호 -->
 		<IsShowOwnerName>Y</IsShowOwnerName>		<!-- Y: 출하주 성명 전체, N: 마스킹(김*수) -->
 		<ChangeSexName>N</ChangeSexName>		<!-- Y: 축종별 성별명 변환(비육, 암소 등), N: 원본 성별 -->
@@ -49,9 +43,11 @@
 			<PageTimerPort>45123</PageTimerPort>			<!-- 페이지 타이머 UDP 포트 -->
 			<EnableSubFallback>Y</EnableSubFallback>			<!-- Y: 마스터 신호 안 오면 서브가 자율 회전 -->
 			<SubFallbackTimeoutMs>4000</SubFallbackTimeoutMs>			<!-- 복구 전환 대기 시간(ms) -->
-			<BoardPage>2</BoardPage>
-			<BoardPageTime>25</BoardPageTime>
-			<BoardPageTime2>7</BoardPageTime2>
+			<BoardPage>1</BoardPage>			<!-- 경매 진행 시 회전할 총 페이지 수 (1~4) -->
+			<BoardPageTime>7</BoardPageTime>			<!-- 1페이지 체류 시간 (초) -->
+			<BoardPageTime2>5</BoardPageTime2>			<!-- 2페이지 체류 시간 (초) -->
+			<BoardPageTime3>3</BoardPageTime3>			<!-- 3페이지 체류 시간 (초) -->
+			<BoardPageTime4>3</BoardPageTime4>			<!-- 4페이지 체류 시간 (초) -->
 		</PageSetting>
 	</Auction>
 </UserInfo>

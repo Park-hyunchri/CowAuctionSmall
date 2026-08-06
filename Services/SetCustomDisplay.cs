@@ -116,6 +116,7 @@ namespace CowAuctionSmall.Services
 
                 case "8808990837314": // 안성
                 case "8808990656953": // 임실
+                case "8808990227207": // 남원
                     return new AnseongSold();
 
                 case "8808990643625": // 양평

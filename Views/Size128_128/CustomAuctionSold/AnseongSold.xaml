@@ -82,17 +82,17 @@
                         <Style.Triggers>
                             <!-- CowDistinction 이 2일 때 (중량 보임) => 작게 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="2">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
 
                             <!-- CowDistinction 이 3일 때 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="3">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
 
                             <!-- CowDistinction 이 5일 때 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="5">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -100,7 +100,7 @@
             </TextBlock>
 
             <!-- 낙찰가 : 라벨 -->
-            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0"/>
 
             <!-- 낙찰가 : 값 -->
             <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" Margin="9,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -112,17 +112,17 @@
                         <Style.Triggers>
                             <!-- CowDistinction 이 2일 때 (중량 보임) => 작게 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="2">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
 
                             <!-- CowDistinction 이 3일 때 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="3">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
 
                             <!-- CowDistinction 이 5일 때 -->
                             <DataTrigger Binding="{Binding CowDistinction}" Value="5">
-                                <Setter Property="FontSize" Value="13"/>
+                                <Setter Property="FontSize" Value="12"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
