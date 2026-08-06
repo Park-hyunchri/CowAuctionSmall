@@ -32,7 +32,7 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656953") return new JeongeupRun(); // 정읍
             if (nhCode == "8808990656427") return new Mungyeong(); // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990660783") return new AnseongRun(); // 안성, 임실
-            if (nhCode == "8808990657202") return new AnseongRun(); // 무진장
+            if (nhCode == "8808990656106" || nhCode == "8808990657202") return new HaenamJindo(); // 해남진도, 무진장
 
 
             // Null 방지용 Safe 값 추출
@@ -119,10 +119,12 @@ namespace CowAuctionSmall.Services
                     return new AnseongSold();
 
                 case "8808990643625": // 양평
-                case "8808990657202": // 무진장
                     return new YangpyeongSold();
 
-                // case "8808990657202": // 안성,무진장
+                case "8808990656106": // 해남진도, 무진장
+                    return new HaenamJindoSold();
+
+                // case "8808990657202": // 안성, 무진장
                 //    return new AnseongSold();
 
                 default:
@@ -146,14 +148,15 @@ namespace CowAuctionSmall.Services
             }
 
             // 2. 특정 지역 조합(nhCode) 분기
-            if (nhCode == "880899065953" || nhCode == "8808990657202") return new NamwonUnSold();          // 정읍,무진장
+            if (nhCode == "8808990656953") return new NamwonUnSold();          // 정읍
             if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
             if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
             if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
-            if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
+            if (nhCode == "8808990656106") return new HaenamJindoUnSold(); // 해남진도, 무진장
 
+            // if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 
             // 3. 뿌리농가 미적용("X")이면서 유전능력 번호도 없을 때만 Standard_non_X_UnSold
             bool isX = string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase);
