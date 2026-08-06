@@ -299,13 +299,26 @@ namespace CowAuctionSmall.Services
                 return;
             }
 
-            if (data[5].ToUpper().Equals("P")) // 경매대상 키를 누를경우  GetCurrentInfo의 date 날짜를 강제 변경..
+            string szType = data[5].ToUpper();
+
+            // 💡 'P'(경매대상), 'N'(경매결과), 'Y'(미응찰) 모두 처리하도록 조건 확장
+            if (szType.Equals("P") || szType.Equals("N") || szType.Equals("Y"))
+            {
+                // ServerGetData의 OnChangeDeta로 날짜 전달
+                WeakReferenceMessenger.Default.Send(new DataToServerConnMsg(data[2]));
+
+                // ServerGetData의 OnStringArrMsg(SZ 분기)로 패킷 전달
+                string[] msg = new string[] { _auctionmethod.ToString(), data[0], "8000", data[2] };
+                WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
+            }
+
+            /* if (data[5].ToUpper().Equals("P")) // 경매대상 키를 누를경우  GetCurrentInfo의 date 날짜를 강제 변경..
             {
                 WeakReferenceMessenger.Default.Send(new DataToServerConnMsg(data[2]));
 
                 string[] msg = new string[] { _auctionmethod.ToString(), data[0], "8000", data[2] };// 경매방식, 코드, 경매상태, 경매일자
                 WeakReferenceMessenger.Default.Send(new DataToServerGetArrMsg(msg));
-            }
+            } */
 
         }
     }

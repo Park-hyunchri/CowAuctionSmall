@@ -1038,6 +1038,13 @@ namespace CowAuctionSmall.Services
                         {
                             Debug.WriteLine("\n**************\n**************\n일괄 경매 끝\n**************\n**************");
                             _batchRunningState = false;
+
+                            // 💡 [추가] 일괄경매 종료 신호 수신 즉시 API 데이터를 재조회하여 화면을 낙찰/유찰 상태로 전환
+                            _ = Task.Run(async () =>
+                            {
+                                await Task.Delay(300); // 서버 DB 결과 반영 대기
+                                await ProcessMessageAsync(); // 최신 데이터 수신 및 화면 갱신
+                            });
                         }
                         break;
                     case "SZ":
