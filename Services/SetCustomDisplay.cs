@@ -32,8 +32,11 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656953") return new JeongeupRun(); // 정읍
             if (nhCode == "8808990656427") return new Mungyeong(); // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990660783") return new AnseongRun(); // 안성, 임실
-            if (nhCode == "8808990656106" || nhCode == "8808990657202") return new HaenamJindo(); // 해남진도, 무진장
+            if (nhCode == "8808990656106") return new HaenamJindo(); // 해남진도
+            if (nhCode == "8808990656915") return new MokpoMuanSinan(); // 목무신
+            if (nhCode == "8808990643625") return new YangpyeongRun(); // 양평
 
+            // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
 
             // Null 방지용 Safe 값 추출
             string qquri = is_QQuri?.ToUpper() ?? "";
@@ -117,13 +120,18 @@ namespace CowAuctionSmall.Services
                 case "8808990837314": // 안성
                 case "8808990656953": // 임실
                 case "8808990227207": // 남원
+                case "8808990683973": // 음성
+                case "8808990657202": // 무진장
                     return new AnseongSold();
 
                 case "8808990643625": // 양평
                     return new YangpyeongSold();
 
-                case "8808990656106": // 해남진도, 무진장
+                case "8808990656106": // 해남진도
                     return new HaenamJindoSold();
+
+                case "8808990656915": // 목무신
+                    return new MokpoMuanSinanSold();
 
                 // case "8808990657202": // 안성, 무진장
                 //    return new AnseongSold();
@@ -149,13 +157,13 @@ namespace CowAuctionSmall.Services
             }
 
             // 2. 특정 지역 조합(nhCode) 분기
-            if (nhCode == "8808990656953") return new NamwonUnSold();          // 정읍
+            if (nhCode == "8808990656953" || nhCode == "8808990656915") return new NamwonUnSold();          // 정읍, 목무신
             if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
             if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
             if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
-            if (nhCode == "8808990656106") return new HaenamJindoUnSold(); // 해남진도, 무진장
+            if (nhCode == "8808990656106") return new HaenamJindoUnSold(); // 해남진도
 
             // if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 
