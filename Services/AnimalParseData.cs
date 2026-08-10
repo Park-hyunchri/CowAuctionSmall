@@ -192,6 +192,9 @@ namespace CowAuctionSmall.Services
                     gv.Birth = BirthMonthConverter(data[11], data[39]);
                 }
 
+                // 💡 users.xml 설정값(LowestPriceTitle) 전달 (설정값이 없으면 기본 "최저가")
+                gv.LowestPriceTitle = userInfo.Auction?.LowestPriceTitle ?? "최저가";
+
 
                 //EPD값 넣기
                 if (data.Length > 41)

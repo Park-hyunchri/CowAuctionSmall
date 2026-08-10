@@ -76,9 +76,9 @@
                 <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
             </TextBlock>
 
-            <!-- 3행: 동적 타이틀 (내정/시중/최저) 및 가격 -->
+            <!-- 3행: 동적 타이틀 (시중: / 내정: / 최저:) 및 가격 -->
             <TextBlock Margin="2,32,0,0" Foreground="lime" FontSize="13">
-                <Run Text="{Binding CowInfo.LowestPriceTitle, FallbackValue='내정:', TargetNullValue='내정:', StringFormat='{}{0}:'}"/>
+                <Run Text="{Binding CowInfo.LowestPriceTitleShort, FallbackValue='내정:'}"/>
                 <Run Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
             </TextBlock>
 

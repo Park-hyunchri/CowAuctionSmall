@@ -2,27 +2,30 @@
 <UserInfo>
 	<!-- 1. API 로그인 인증 정보 -->
 	<Authentication>
-		<Address>https://xn--e20bw05b.kr/api/v1/auth/login</Address>
-		<UserID>board_163_4</UserID>
-		<Password>1111</Password>
+		<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auth/login</Address>
+		<UserID>boardman-105-3</UserID>
+		<Password>nacf1234</Password>
 	</Authentication>
 
-	<!-- 2. 경매 데이터 요청 API 주소 -->
+	<!-- 2. 경매 데이터 요청 API 주소 횡성-->
 	<CurrentInfo>
-		<Address>https://xn--e20bw05b.kr/api/v1/auction/8808990657202/entry/board?date=</Address> <!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
-		<AddressEPD>https://xn--e20bw05b.kr/api/v1/epd/info/8808990657202/date/</AddressEPD>
-		<AddressQcn>https://xn--e20bw05b.kr/api/v1/auction/select/qcn/list</AddressQcn>
-		<Date></Date>	<!-- 비워두면 오늘 날짜, 지정 시 해당 날짜 데이터 테스트 (YYYYMMDD) -->
+		<Address>https://xn--o39an74b9ldx9g.kr/api/v1/auction/8808990656885/entry/board?date=</Address>		<!-- 25.01.17 API 정의서 변경에 따른 주소 변경-->
+		<AddressEPD>https://xn--o39an74b9ldx9g.kr/api/v1/epd/info/8808990656885/date/</AddressEPD>
+		<AddressQcn>https://xn--o39an74b9ldx9g.kr/api/v1/auction/select/qcn/list</AddressQcn>
+		<Date>20260802</Date>		<!-- 비워두면 오늘 날짜, 지정 시 해당 날짜 데이터 테스트 (YYYYMMDD) -->
 	</CurrentInfo>
 
 	<!-- 3. 경매 소켓 서버 및 전광판 표출 제어 옵션 -->
 	<Auction>
-		<Address>115.41.222.25</Address>		<!-- 응찰 소켓 서버 IP -->
-		<Port>45123</Port>		<!-- 응찰 소켓 포트 -->
+		<Address>1.201.161.58</Address>		<!-- 응찰 소켓 서버 IP -->
+		<Port>5001</Port>		<!-- 응찰 소켓 포트 -->
 		<Channel>6006</Channel>		<!-- 경매 채널 번호 -->
 		<Priority>MANAGE</Priority>		<!-- 동기화 역할 -->
-		<AuctionHouseCode>8808990657202</AuctionHouseCode>		<!-- 축협 사업장 코드 -->
+		<AuctionHouseCode>8808990656885</AuctionHouseCode>		<!-- 축협 사업장 코드 -->
 		<StartPosition>0,0</StartPosition>		<!-- 메인 윈도우 시작 좌표 (X,Y) -->
+		
+		<!-- 💡 횡성축협 행사 시 "시중가", 평시에는 "내정가" 또는 "최저가"로 메모장에서 변경 가능 -->
+		<LowestPriceTitle>시중가</LowestPriceTitle>
 
 		<!-- 표출 세부 옵션 -->
 		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->
@@ -30,12 +33,12 @@
 		<IsShowOwnerName>Y</IsShowOwnerName>		<!-- Y: 출하주 성명 전체, N: 마스킹(김*수) -->
 		<ChangeSexName>N</ChangeSexName>		<!-- Y: 축종별 성별명 변환(비육, 암소 등), N: 원본 성별 -->
 		<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>		<!-- Y: 개체화면에 중량 표출, N: EPD 표출 -->
-		<IsShowQQuri>X</IsShowQQuri>		<!-- Y: 뿌리농가 관련 화면 적용, X: 미적용(N: 뿌리농가 정보 미활성화) -->
-		<IsPaternityMatch>N</IsPaternityMatch>		<!-- Y: 친자일치 뱃지 활성화, N: 강제 숨김 -->
+		<IsShowQQuri>N</IsShowQQuri>		<!-- Y: 뿌리농가 관련 화면 적용, X: 미적용(N: 뿌리농가 정보 미활성화) -->
+		<IsPaternityMatch>X</IsPaternityMatch>		<!-- Y: 친자일치 뱃지 활성화, N: 강제 숨김 -->
 
 		<!-- 개체번호 색상 제어 (DisplayColors.xml 대체) -->
 		<EntityNumberForeground>Silver</EntityNumberForeground>		<!-- 앞4자리/뒤1자리 색상 -->
-		<EntityNumberShortForeground>Red</EntityNumberShortForeground>		<!-- 가운데 단축4자리 글자색 -->
+		<EntityNumberShortForeground>White</EntityNumberShortForeground>		<!-- 가운데 단축4자리 글자색 -->
 		<EntityNumberShortBackground>Black</EntityNumberShortBackground>		<!-- 가운데 단축4자리 배경색 -->
 
 		<!-- 다중 전광판 시간 동기화(PageTimerSync) 옵션 -->
@@ -44,10 +47,10 @@
 			<EnableSubFallback>Y</EnableSubFallback>			<!-- Y: 마스터 신호 안 오면 서브가 자율 회전 -->
 			<SubFallbackTimeoutMs>4000</SubFallbackTimeoutMs>			<!-- 복구 전환 대기 시간(ms) -->
 			<BoardPage>2</BoardPage>			<!-- 경매 진행 시 회전할 총 페이지 수 (1~4) -->
-			<BoardPageTime>12</BoardPageTime>			<!-- 1페이지 체류 시간 (초) -->
-			<BoardPageTime2>8</BoardPageTime2>			<!-- 2페이지 체류 시간 (초) -->
-			<BoardPageTime3>2</BoardPageTime3>			<!-- 3페이지 체류 시간 (초) -->
-			<BoardPageTime4>2</BoardPageTime4>			<!-- 4페이지 체류 시간 (초) -->
+			<BoardPageTime>14</BoardPageTime>			<!-- 1페이지 체류 시간 (초) -->
+			<BoardPageTime2>7</BoardPageTime2>			<!-- 2페이지 체류 시간 (초) -->
+			<BoardPageTime3>3</BoardPageTime3>			<!-- 3페이지 체류 시간 (초) -->
+			<BoardPageTime4>3</BoardPageTime4>			<!-- 4페이지 체류 시간 (초) -->
 		</PageSetting>
 	</Auction>
 </UserInfo>

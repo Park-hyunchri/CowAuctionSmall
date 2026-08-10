@@ -41,7 +41,7 @@
     <None Update="Config\고창부안_users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\횡성_users.XML">
+    <None Update="Config\users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Config\목무신_users.XML">
@@ -50,7 +50,7 @@
     <None Update="Config\해남_users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Config\users.XML">
+    <None Update="Config\개발_users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Config\춘천_users.XML">

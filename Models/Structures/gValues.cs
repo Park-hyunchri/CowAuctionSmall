@@ -118,6 +118,38 @@ namespace CowAuctionSmall.Models.Structures
         public string SipNumber { get; set; } = "-1";               //경매 번호
         public string Sex { get; set; } = "-";                      //성별
         public string LowestPrice { get; set; } = "-";              //최저가
+                                                                    
+        public string LowestPriceTitle { get; set; } = "최저가"; // 💡 users.xml의 <LowestPriceTitle> 옵션 값을 담을 프로퍼티 추가
+        // 💡 진행 화면(HoengseongRun) 전용: '가'를 떼고 ':' 추가 ("시중:", "내정:", "최저:")
+        public string LowestPriceTitleShort
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정:";
+                string title = LowestPriceTitle.Trim().Replace(":", "");
+                if (title.EndsWith("가") && title.Length > 1)
+                {
+                    title = title.Substring(0, title.Length - 1);
+                }
+                return title + ":";
+            }
+        }
+
+        // 💡 낙찰 화면(HoengseongSold) 전용: '가'와 ':' 붙이기 ("시중가:", "내정가:", "최저가:")
+        public string LowestPriceTitleFull
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정가:";
+                string title = LowestPriceTitle.Trim().Replace(":", "");
+                if (!title.EndsWith("가"))
+                {
+                    title += "가";
+                }
+                return title + ":";
+            }
+        }
+
         public string Weight { get; set; } = "-";                   //중량
         public string Birth { get; set; } = "-";                    //출생일 + 개월수
         public string BirthMonth { get; set; } = "-";                    //월령
