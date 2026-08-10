@@ -35,6 +35,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656106") return new HaenamJindo(); // 해남진도
             if (nhCode == "8808990656915") return new MokpoMuanSinan(); // 목무신
             if (nhCode == "8808990643625") return new YangpyeongRun(); // 양평
+            if (nhCode == "8808990657189" || nhCode == "8808990656717") return new GochangBuanRun(); // 고창부안, 곡성
+            if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongRun(); // 횡성
 
             // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
 
@@ -70,6 +72,8 @@ namespace CowAuctionSmall.Services
             // 2. 춘천 축협 전용 코드
             if (nhCode == "8808990656229") return new AuctionRunning2();  // 춘천
             if (nhCode == "8808990656960" || nhCode == "8808990656953" || nhCode == "8808990643625") return new Eumseong2(); // 순창, 정읍, 양평
+            if (nhCode == "8808990656717") return new TestRunning2(); // 곡성
+            if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongRun2(); // 횡성
 
             // 3. 농협 우수 조건 만족 여부 판단
             // (is_QQuri가 "Y"이고, 둘 중 하나라도 "N"이 아닌 경우)
@@ -121,7 +125,6 @@ namespace CowAuctionSmall.Services
                 case "8808990656953": // 임실
                 case "8808990227207": // 남원
                 case "8808990683973": // 음성
-                case "8808990657202": // 무진장
                     return new AnseongSold();
 
                 case "8808990643625": // 양평
@@ -132,6 +135,13 @@ namespace CowAuctionSmall.Services
 
                 case "8808990656915": // 목무신
                     return new MokpoMuanSinanSold();
+
+                case "8808990656717": // 곡성, 무진장
+                    return new QQuriSold_v3();
+
+                case "8808990656885": // 횡성
+                case "8808990657202": // 무진장
+                    return new HoengseongSold();
 
                 // case "8808990657202": // 안성, 무진장
                 //    return new AnseongSold();
@@ -163,7 +173,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
             if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
-            if (nhCode == "8808990656106") return new HaenamJindoUnSold(); // 해남진도
+            if (nhCode == "8808990656106" || nhCode == "8808990656717") return new HaenamJindoUnSold(); // 해남진도, 곡성
+            if (nhCode == "8808990656885" || nhCode == "8808990657202"  ) return new HoengseongUnSold();      // 횡성
 
             // if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 

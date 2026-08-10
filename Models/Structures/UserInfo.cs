@@ -74,6 +74,9 @@ namespace CowAuctionSmall.Models.Structures
         public string? EntityNumberForeground { get; set; } = "Silver";
         public string? EntityNumberShortForeground { get; set; } = "White";
         public string? EntityNumberShortBackground { get; set; } = "Black";
+
+        // 💡 내정가/시중가/최저가 표출 타이틀 설정 - 횡성축협
+        public string? LowestPriceTitle { get; set; } = "최저가";
     }
 
     public class PageSetting

@@ -32,6 +32,18 @@
     <None Update="Config\logo2.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Config\구미칠곡_users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\곡성_users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\고창부안_users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\횡성_users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Config\목무신_users.XML">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -60,6 +72,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\Size128_128\Running\ChuncheonRun.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Size128_128\Running\GochangBuanRun.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

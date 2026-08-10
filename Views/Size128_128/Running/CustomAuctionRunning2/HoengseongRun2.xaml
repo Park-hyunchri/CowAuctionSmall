@@ -1,14 +1,15 @@
-﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2.Eumseong2"
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2.HoengseongRun2"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning2"
-                          FontFamily="굴림"
+             FontFamily="굴림"
+             FontWeight="Bold"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-    
+    <!-- 횡성축협 유전능력(EPD) 페이지 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">
@@ -58,8 +59,8 @@
                         <BeginStoryboard x:Name="BlinkStoryboard">
                             <Storyboard RepeatBehavior="Forever">
                                 <ObjectAnimationUsingKeyFrames
-                                    Storyboard.TargetProperty="(Border.BorderBrush)"
-                                    Duration="0:0:1">
+                                Storyboard.TargetProperty="(Border.BorderBrush)"
+                                Duration="0:0:1">
                                     <!-- 검정색 상태 -->
                                     <DiscreteObjectKeyFrame KeyTime="0:0:0">
                                         <DiscreteObjectKeyFrame.Value>
@@ -105,12 +106,12 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="냉도체중"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="도 체 중 "  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CowInfo.bodyWeightInColdNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding CowInfo.bodyWeightInColdString}"  Style="{StaticResource EpdStringStyle}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="배최장근"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="등심면적"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="1" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CowInfo.longestMuscleCrossSectionNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding CowInfo.longestMuscleCrossSectionString}" Style="{StaticResource EpdStringStyle}"/>
@@ -120,13 +121,13 @@
                 <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CowInfo.fatThicknessOnBackNum}" Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CowInfo.fatThicknessOnBackString}" Style="{StaticResource EpdStringStyle}"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="근내지방"  Style="{StaticResource EpdIndexStyle}"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="육질등급"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="3" Grid.Column="1" Text=":"  Style="{StaticResource EpdIndexStyle}"/>
                 <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding CowInfo.intramuscularFatContentNum}"  Style="{StaticResource EpdNumStyle}"/>
                 <TextBlock Grid.Row="3" Grid.Column="3" Text="{Binding CowInfo.intramuscularFatContentString}" Style="{StaticResource EpdStringStyle}"/>
 
             </Grid>
-            
-</Grid>
+
+        </Grid>
     </Border>
 </UserControl>
