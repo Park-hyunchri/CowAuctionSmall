@@ -584,6 +584,8 @@ namespace CowAuctionSmall.Services
                 else
                 {
                     logger.LogWarn($"로고 파일이 없어 표시를 건너뜁니다. panel={panel.Name}, path={logoPath}, fallback={fallbackPath}");
+                    ClearRunningViewModel(state, panel);
+                    panel.Children.Clear();
                     state.Mode = PanelDisplayMode.Logo;
                     state.UpdateSignature = null;
                     return;
@@ -592,14 +594,15 @@ namespace CowAuctionSmall.Services
 
             if (state.Mode == PanelDisplayMode.Logo &&
                 state.LogoView != null &&
+                panel.Children.Count == 1 &&
+                panel.Children[0] == state.LogoView &&
                 string.Equals(state.LogoPath, logoPath, StringComparison.OrdinalIgnoreCase))
             {
                 return;
             }
-
+            // 💡 잔여 뷰모델 및 NoteHost 완벽 정리
             ClearRunningViewModel(state, panel);
             panel.Children.Clear();
-            panel.DataContext = null;
 
             try
             {
@@ -621,7 +624,6 @@ namespace CowAuctionSmall.Services
             panel.Children.Add(state.LogoView);
             state.Mode = PanelDisplayMode.Logo;
             state.UpdateSignature = null;
-
         }
 
         // 패널에서 뷰모델을 제거하는 메서드
@@ -1216,19 +1218,30 @@ namespace CowAuctionSmall.Services
         /// </summary>
         private void ClearRunningViewModel(PanelDisplayState state, VirtualizingStackPanel panel)
         {
-            if (state.Mode != PanelDisplayMode.Running || state.RunningViewModel == null)
+            if (state.RunningViewModel != null)
             {
-                return;
+                TodayAuctionItems.Remove(state.RunningViewModel);
+                state.RunningViewModel.Dispose();
+                state.RunningViewModel = null;
             }
 
-            TodayAuctionItems.Remove(state.RunningViewModel);
-            state.RunningViewModel.Dispose();
-            state.RunningViewModel = null;
+            // 💡 런닝 노트 호스트 및 바인딩 완전히 초기화 (친자 뱃지 잔재 제거)
+            if (state.RunningNoteHost != null)
+            {
+                state.RunningNoteHost.PageContent = null;
+                state.RunningNoteHost.DataContext = null;
+                state.RunningNoteHost = null;
+            }
+
             state.RunningKey = null;
             state.RunningPages = null;
-            state.RunningNoteHost = null;
             state.UseRunningNoteHost = false;
             state.UpdateSignature = null;
+            state.SoldView = null;
+            state.SoldKey = null;
+            state.UnSoldView = null;
+            state.UnSoldKey = null;
+
             panel.DataContext = null;
         }
 

@@ -90,7 +90,7 @@ namespace CowAuctionSmall.Services
                     if (code == "8808990656885") //횡성
                     {
                         // TODO: HoengseongSex 리팩토링 후에는 반환값을 gv.Sex에 반영
-                        HoengseongSex(gv.CowDistinction, SafeGet(data, 39), sexCode);
+                        gv.Sex = HoengseongSex(gv.CowDistinction, SafeGet(data, 39), sexCode);
                     }
                 }
                 else
@@ -675,7 +675,7 @@ namespace CowAuctionSmall.Services
                     break;
 
                 case "3": // 번식우
-                    if (month >= 9)
+                    if (sex == "암" || month >= 9)
                     {
                         sex = "암소";
                     }

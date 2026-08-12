@@ -125,13 +125,20 @@ namespace CowAuctionSmall.Models.Structures
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정:";
-                string title = LowestPriceTitle.Trim().Replace(":", "");
-                if (title.EndsWith("가") && title.Length > 1)
+                try
                 {
-                    title = title.Substring(0, title.Length - 1);
+                    if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정:";
+                    string title = LowestPriceTitle.Trim().Replace(":", "");
+                    if (title.EndsWith("가") && title.Length > 1)
+                    {
+                        title = title.Substring(0, title.Length - 1);
+                    }
+                    return title + ":";
                 }
-                return title + ":";
+                catch
+                {
+                    return "내정:";
+                }
             }
         }
 

@@ -9,8 +9,9 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
-    <!-- 횡성축협 진행 페이지 (두 번째 사진 양식 적용) -->
+
     <UserControl.Resources>
+        <!-- 진행 중 테두리 깜박임 스타일 -->
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
             <Setter Property="BorderBrush" Value="black"/>
             <Style.Triggers>
@@ -42,7 +43,6 @@
 
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
-        <models:PregnancyValueConverter x:Key="PregnancyValueConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
 
         <Style TargetType="TextBlock">
@@ -54,68 +54,66 @@
     </UserControl.Resources>
 
     <Border BorderThickness="2" Style="{StaticResource BlinkingBorderStyle2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
-        <Grid>
-            <!-- 성별 -->
-            <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex">
+        <Canvas Width="124" Height="124">
+
+            <!-- 우측 암/수/거세 성별 표출 -->
+            <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" Canvas.Left="0" Canvas.Top="0">
                 <TextBlock.RenderTransform>
                     <TranslateTransform Y="17"/>
                 </TextBlock.RenderTransform>
             </TextBlock>
 
-            <!-- 1행:개체번호 -->
-            <Canvas>
-                <TextBlock Text="개체:" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="42,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="74,0,0,0" Foreground="Red" Background="Black" FontSize="13"/>
-            </Canvas>
+            <!-- 1행: 개체번호 라인 (Y=0) -->
+            <TextBlock Text="개체:" Foreground="lime" Canvas.Left="2" Canvas.Top="0" FontSize="13"/>
+            <TextBlock Text="{Binding CowInfo.EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" Canvas.Left="42" Canvas.Top="0" FontSize="13"/>
+            <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Foreground="Red" Background="Black" Canvas.Left="74" Canvas.Top="0" FontSize="13"/>
 
-            <!-- 2행:출하지역 / 농가명 -->
-            <TextBlock Margin="2,16,0,0" Foreground="#7E84F7" FontSize="13">
+            <!-- 2행: 출하지역 / 농가명 (Y=16) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="16" Foreground="#7E84F7" FontSize="13">
                 <Run Text="{Binding CowInfo.Location}"/>
                 <Run Text=" "/>
                 <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
             </TextBlock>
 
-            <!-- 3행: 동적 타이틀 (시중: / 내정: / 최저:) 및 가격 -->
-            <TextBlock Margin="2,32,0,0" Foreground="lime" FontSize="13">
-                <Run Text="{Binding CowInfo.LowestPriceTitleShort, FallbackValue='내정:'}"/>
+            <!-- 3행: 내정가 / 최저가 (Y=32) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13">
+                <Run Text="내정:"/>
                 <Run Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
             </TextBlock>
 
-            <!-- 4행: 중량 및 임신 -->
-            <TextBlock Margin="2,48,0,0" Foreground="lime" FontSize="13">
-                <Run Text="중량: "/>
+            <!-- 4행: 중량 및 임신 (Y=48) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="48" Foreground="lime" FontSize="13">
+                <Run Text="중량:"/>
                 <Run Text="{Binding CowInfo.Weight, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
             </TextBlock>
-            <Canvas Margin="68,48,0,0">
-                <TextBlock Foreground="lime" FontSize="13">
-                    <Run Text="임신: "/>
-                    <Run Text="{Binding CowInfo.Pregnant, FallbackValue='-', TargetNullValue='-'}" Foreground="Red"/>
-                </TextBlock>
-            </Canvas>
+            <TextBlock Canvas.Left="68" Canvas.Top="48" Foreground="lime" FontSize="13">
+                <Run Text="임신:"/>
+                <Run Text="{Binding CowInfo.Pregnant}" Foreground="Red"/>
+            </TextBlock>
 
-            <!-- 5행: 생년월일 -->
-            <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Margin="2,64,0,0" FontSize="13"/>
+            <!-- 5행: 생년월일 (Y=64) -->
+            <TextBlock Text="{Binding CowInfo.Birth}" Foreground="Cyan" Canvas.Left="2" Canvas.Top="64" FontSize="13"/>
 
-            <!-- 6행: 어미 / 계대 -->
-            <TextBlock Margin="2,80,0,0" Foreground="lime" FontSize="13">
-                <Run Text="어미: "/>
+            <!-- 6행: 어미 / 계대 (Y=80) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="80" Foreground="lime" FontSize="13">
+                <Run Text="어미:"/>
                 <Run Text="{Binding CowInfo.MotherLevel, Converter={StaticResource MotherLevelConverter}}" Foreground="Orange"/>
             </TextBlock>
-            <TextBlock Margin="68,80,0,0" Foreground="lime" FontSize="13">
-                <Run Text="계대: "/>
+            <TextBlock Canvas.Left="68" Canvas.Top="80" Foreground="lime" FontSize="13">
+                <Run Text="계대:"/>
                 <Run Text="{Binding CowInfo.Blood}" Foreground="Orange"/>
             </TextBlock>
 
-            <!-- 7행: KPN / 산차 -->
-            <TextBlock Margin="2,96,0,0" Foreground="lime" FontSize="13">
-                <Run Text="KPN: "/>
+            <!-- 7행: KPN / 산차 (Y=96) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="96" Foreground="lime" FontSize="13">
+                <Run Text="KPN:"/>
                 <Run Text="{Binding CowInfo.KPN}" Foreground="Orange"/>
             </TextBlock>
-            <TextBlock Margin="68,96,0,0" Foreground="lime" FontSize="13">
-                <Run Text="산차: "/>
+            <TextBlock Canvas.Left="68" Canvas.Top="96" Foreground="lime" FontSize="13">
+                <Run Text="산차:"/>
                 <Run Text="{Binding CowInfo.CalvingNumber}" Foreground="Orange"/>
             </TextBlock>
-        </Grid>
+
+        </Canvas>
     </Border>
 </UserControl>
