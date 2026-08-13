@@ -98,9 +98,9 @@
                 <TextBlock Panel.ZIndex="150" Margin="40,0,0,110" Width="30" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" />
                 <!-- ======================================================================================================================================================================= -->
 
-                <TextBlock Margin="2,16,0,0" Foreground="lime">
-                    <Run Text="{Binding CowInfo.Location}"/>
-                    <Run Text=""/>
+                <TextBlock Margin="2,16,0,0">
+                    <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
+                    <Run Text=" "/>
                     <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
                 </TextBlock>
 

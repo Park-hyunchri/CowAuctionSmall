@@ -74,6 +74,9 @@ namespace CowAuctionSmall.Models.XMLParser
                     EntityNumberForeground = auctionElement.Element("EntityNumberForeground")?.Value,
                     EntityNumberShortForeground = auctionElement.Element("EntityNumberShortForeground")?.Value,
                     EntityNumberShortBackground = auctionElement.Element("EntityNumberShortBackground")?.Value,
+                    // 💡 [신규 추가] users.XML 태그 파싱 (기본값 설정)
+                    LocationForeground = auctionElement.Element("LocationForeground")?.Value ?? "lime",
+                    EpdGradeForeground = auctionElement.Element("EpdGradeForeground")?.Value ?? "Yellow",
                     // 💡 users.xml에서 LowestPriceTitle 읽기 (없을 경우 기본값 "내정가")
                     LowestPriceTitle = auctionElement.Element("LowestPriceTitle")?.Value ?? "최저가",
                 };

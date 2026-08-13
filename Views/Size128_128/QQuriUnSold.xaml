@@ -119,11 +119,11 @@
             <Grid Margin="2,60,0,50" Visibility="{Binding Nh_ability_1_str, Converter={StaticResource NH_EPD_ShowToVisibilityConverter}, ConverterParameter=Invert}">
 
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Foreground="lime" Text="육종:"/>
-                    <TextBlock Text="{Binding bodyWeightInColdString}" Style="{StaticResource NhAbility1Style}" Foreground="Silver"  Margin="1,0,0,0"/>
-                    <TextBlock Text="{Binding longestMuscleCrossSectionString}" Style="{StaticResource AbcdColorStyle}" Foreground="Silver"  Margin="1,0,0,0"/>
-                    <TextBlock Text="{Binding fatThicknessOnBackString}" Style="{StaticResource AbcdColorStyle}" Foreground="Silver"  Margin="1,0,0,0"/>
-                    <TextBlock Text="{Binding intramuscularFatContentString}" Style="{StaticResource AbcdColorStyle}" Foreground="Silver"  Margin="1,0,0,0"/>
+                    <TextBlock Text="육종 :" Foreground="lime"/>
+                    <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Foreground="{DynamicResource EpdGradeForeground}" Margin="2,0,0,0"/>
+                    <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Foreground="{DynamicResource EpdGradeForeground}"/>
+                    <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Foreground="{DynamicResource EpdGradeForeground}"/>
+                    <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Foreground="{DynamicResource EpdGradeForeground}"/>
                 </StackPanel>
             </Grid>
 

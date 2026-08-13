@@ -119,6 +119,10 @@ namespace CowAuctionSmall
                     ApplyBrushResource("EntityNumberShortForeground", userInfo.Auction.EntityNumberShortForeground ?? "White");
                     ApplyBrushResource("EntityNumberShortBackground", userInfo.Auction.EntityNumberShortBackground ?? "Black");
 
+                    // 💡 [신규 추가] 출하자 지역 및 육종 등급 색상 리소스 등록
+                    ApplyBrushResource("LocationForeground", userInfo.Auction.LocationForeground ?? "lime");
+                    ApplyBrushResource("EpdGradeForeground", userInfo.Auction.EpdGradeForeground ?? "Yellow");
+
                     Logger.Info("users.XML 기반 전광판 색상 적용 완료");
                 }
             }

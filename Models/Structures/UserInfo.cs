@@ -75,6 +75,10 @@ namespace CowAuctionSmall.Models.Structures
         public string? EntityNumberShortForeground { get; set; } = "White";
         public string? EntityNumberShortBackground { get; set; } = "Black";
 
+        // 💡 [신규 추가] 출하자 지역 및 육종 등급 색상 프로퍼티
+        public string? LocationForeground { get; set; } = "Yellow";
+        public string? EpdGradeForeground { get; set; } = "Silver";
+
         // 💡 내정가/시중가/최저가 표출 타이틀 설정 - 횡성축협
         public string? LowestPriceTitle { get; set; } = "최저가";
     }
