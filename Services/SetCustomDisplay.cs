@@ -106,51 +106,26 @@ namespace CowAuctionSmall.Services
             }
 
             // 조합별 전용 낙찰 화면 분기
-            switch (nhCode)
+            return nhCode switch
             {
-                case "8808990656687": // 영천
-                    return new Standard_non_X_Sold();
+            "8808990656687" => new Standard_non_X_Sold(), // 영천
+            "8808990656526" or "8808990684321" => new JecheonDanyangSold(), // 제천단양, 보령
+            "8808990656229" => new ChuncheonSold(), // 춘천
+            "8808990656427" => new MungyeongSold(), // 문경
+            "8808990837314" or "8808990656953" or "8808990227207" or "8808990683973" or "8808990659787" => new AnseongSold(), // 안성, 임실, 남원, 음성, 파주연천
+            "8808990643625" => new YangpyeongSold(), // 양평
+            "8808990656106" => new HaenamJindoSold(), // 해남진도
+            "8808990656915" => new MokpoMuanSinanSold(), // 목무신
+            "8808990656717" => new QQuriSold_v3(), // 곡성
+            "8808990656885" => new HoengseongSold(), // 횡성
 
-                case "8808990656526": // 제천단양
-                case "8808990684321": // 보령
-                    return new JecheonDanyangSold();
+            // "8808990657202" => new AnseongSold(), // 안성, 무진장
 
-                case "8808990656229": // 춘천
-                    return new ChuncheonSold();
-
-                case "8808990656427": // 문경
-                    return new MungyeongSold();
-
-                case "8808990837314": // 안성
-                case "8808990656953": // 임실
-                case "8808990227207": // 남원
-                case "8808990683973": // 음성
-                    return new AnseongSold();
-
-                case "8808990643625": // 양평
-                    return new YangpyeongSold();
-
-                case "8808990656106": // 해남진도
-                    return new HaenamJindoSold();
-
-                case "8808990656915": // 목무신
-                    return new MokpoMuanSinanSold();
-
-                case "8808990656717": // 곡성, 무진장
-                    return new QQuriSold_v3();
-
-                case "8808990656885": // 횡성
-                case "8808990657202": // 무진장
-                    return new HoengseongSold();
-
-                // case "8808990657202": // 안성, 무진장
-                //    return new AnseongSold();
-
-                default:
-                    // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
-                    if (string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)) return new Standard_non_X_Sold();
-                    return new QQuriSold();
-            }
+            // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
+            _ => string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)
+                ? new Standard_non_X_Sold()
+                : new QQuriSold()
+            };
         }
 
         /// <summary>

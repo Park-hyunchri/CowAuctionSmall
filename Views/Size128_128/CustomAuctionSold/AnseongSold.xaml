@@ -58,16 +58,19 @@
                 <!-- 품목 구분 (번식우, 송아지 등) -->
                 <TextBlock Text="{Binding StrCowDistinction}" Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="13" FontWeight="Normal" VerticalAlignment="Center" Margin="0"/>
 
-                <!-- 개체번호 (전체 및 뒷자리 주황색 강조) -->
+                <!-- 개체번호 (users.xml 동적 색상 적용) -->
                 <Grid VerticalAlignment="Center" Margin="1,0,0,0">
-                    <TextBlock Text="{Binding EntityNumber}" Foreground="Silver" FontSize="13" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding EntityNumber}" 
+                               Foreground="{DynamicResource EntityNumberForeground}" 
+                               FontSize="13" 
+                               VerticalAlignment="Center" />
+
                     <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" 
                                Text="{Binding EntityNumberShort}" 
                                HorizontalAlignment="Center" VerticalAlignment="Center" 
                                Foreground="{DynamicResource EntityNumberShortForeground}" 
-                               Background="Black" 
+                               Background="{DynamicResource EntityNumberShortBackground}" 
                                Margin="22,0,0,0" FontSize="13" FontWeight="Normal" />
-                    <!-- TextBlock Text="{Binding EntityNumberShort}" Foreground="OrangeRed" FontSize="13" FontWeight="Bold" Margin="30,0,0,0" Background="Black" VerticalAlignment="Center" /> -->
                 </Grid>
             </StackPanel>
 
