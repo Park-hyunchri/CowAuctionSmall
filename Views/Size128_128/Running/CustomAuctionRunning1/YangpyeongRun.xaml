@@ -58,7 +58,8 @@
 
         <Style x:Key="AbcdColorStyle" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Regular"/>
-            <Setter Property="Foreground" Value="Silver"/>
+            <!-- 💡users.xml 파일의 <EpdGradeForeground> 옵션값(동적 브러시)을 적용 -->
+            <Setter Property="Foreground" Value="{DynamicResource EpdGradeForeground}"/>
         </Style>
     </UserControl.Resources>
 
@@ -69,7 +70,7 @@
                 <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             </Canvas>
 
-            <!-- 1행: 축종 / 개체관리번호 -->
+            <!-- 1행: 축종 / 개체관리번호 (users.xml 동적 색상 적용) -->
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="{Binding CowInfo.StrCowDistinction}" Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
                 <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="44,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
@@ -80,9 +81,9 @@
                 <TextBlock Text="{Binding CowInfo.SipNumber}" Margin="40,0,0,0" Foreground="Silver" Background="Black" FontWeight="Bold"/>
             </Canvas>
 
-            <!-- 2행: 출하지역 / 농가명 -->
-            <TextBlock Margin="2,16,0,0" Foreground="magenta">
-                <Run Text="{Binding CowInfo.Location}"/>
+            <!-- 2행: 출하지역 색상값 (users.xml 동적 색상 적용) -->
+            <TextBlock Margin="2,16,0,0">
+                <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
                 <Run Text=" "/>
                 <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
             </TextBlock>

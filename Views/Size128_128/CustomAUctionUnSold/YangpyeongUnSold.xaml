@@ -79,10 +79,10 @@
 
             <Canvas Margin="0,65,0,0">
                 <TextBlock Text="육종:"  Foreground="lime" Margin="2,0,0,0"/>
-                <TextBlock Text="{Binding bodyWeightInColdString}" Margin="30,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding intramuscularFatContentString}" Margin="60,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                <TextBlock Text="{Binding bodyWeightInColdString}" Margin="30,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding intramuscularFatContentString}" Margin="60,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
             </Canvas>
         </Canvas>
 

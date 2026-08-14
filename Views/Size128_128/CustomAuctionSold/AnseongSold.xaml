@@ -164,10 +164,6 @@
                 </TextBlock>
             </StackPanel>
 
-
-
-
-
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text="낙찰자" Foreground="Violet" FontSize="13" VerticalAlignment="Center"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text=":" Foreground="Violet" FontSize="12" Margin="41,0,0,0" VerticalAlignment="Center"/>
 
@@ -208,7 +204,6 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-
                 <!-- B : 윗줄 숫자, 아랫줄 이름 -->
                 <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel.Style>
@@ -229,11 +224,8 @@
 
                     <!-- 아랫줄 : 이름 (2줄 허용) -->
                     <TextBlock Text="{Binding BidderString}" Foreground="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="80" TextWrapping="NoWrap" FontSize="11.5" />
-
                 </StackPanel>
             </Grid>
-
-            
         </Grid>
     </Border>
 </UserControl>

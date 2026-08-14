@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.HaenamJindo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1"
+             xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             TextOptions.TextRenderingMode="Aliased"
+             TextOptions.TextHintingMode="Fixed"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+    <!-- 해남진도축협 러닝 페이지 코드 간소화 적용 -->
+    <UserControl.Resources>
+        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:MotherLevelConverter x:Key="MotherLevelConverter" />
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:ShowMatherBloodConverter x:Key="ShowMatherBloodConverter" />
+        <models:BloodFontStyle x:Key="BloodFontStyle"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border BorderThickness="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Canvas Width="122" Height="122">
+            <Canvas x:Name="LedCanvas" IsHitTestVisible="False" Margin="-3"/>
+
+            <!-- 우측 암/수 성별 표출 -->
+            <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" Canvas.Left="0" Canvas.Top="17" x:Name="Sex"/>
+
+            <!-- 1행: 소 개체관리번호 (1, 2, 3) -->
+            <Canvas Canvas.Left="0" Canvas.Top="0" Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
+                <TextBlock Text="{Binding CowInfo.StrCowDistinction}" Foreground="#FFD700" FontWeight="Bold" Canvas.Left="2" Canvas.Top="0" x:Name="StrCowDistinction"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" FontWeight="SemiBold" Canvas.Left="40" Canvas.Top="0"/>
+            </Canvas>
+
+            <!-- 1행: 염소 개체관리번호 (5) -->
+            <Canvas Canvas.Left="0" Canvas.Top="0" Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+                <TextBlock Text="개체 : " Foreground="lime" Canvas.Left="2" Canvas.Top="0"/>
+                <TextBlock Text="{Binding CowInfo.SipNumber}" Foreground="Silver" Background="Black" FontWeight="Bold" Canvas.Left="40" Canvas.Top="0"/>
+            </Canvas>
+
+            <!-- 2행: 출하지역 / 출하주 (Y=13) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="13" Foreground="{DynamicResource LocationForeground}" Text="{Binding CowInfo.Location}"/>
+            <TextBlock Canvas.Left="28" Canvas.Top="13" Foreground="#FFD700" Text="{Binding CowInfo.OwnerName}"/>
+
+            <!-- 3행: KPN (Y=24) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="24" Foreground="lime" Text="KPN : "/>
+            <TextBlock Canvas.Left="35" Canvas.Top="24" Foreground="#FFD700" Text="{Binding CowInfo.KPN}"/>
+
+            <!-- 4행: 등록구분 (Y=35) -->
+            <Canvas Canvas.Left="0" Canvas.Top="35" Visibility="{Binding CowInfo.RegistrationCategory, Converter={StaticResource ShowMatherBloodConverter}, ConverterParameter=MyBlood}">
+                <TextBlock Canvas.Left="2" Canvas.Top="0" Foreground="lime" Text="등록 : "/>
+                <TextBlock Canvas.Left="36" Canvas.Top="0" Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"/>
+            </Canvas>
+
+            <!-- 5행: 생년월일 / 개월수 (Y=47) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="47" Foreground="Cyan" Text="{Binding CowInfo.BirthMonth}"/>
+
+            <!-- 6행: 어미 번호 (Y=59) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="59" Foreground="lime" Text="어미 : "/>
+            <TextBlock Canvas.Left="35" Canvas.Top="59" Foreground="Yellow" Text="{Binding CowInfo.MatherEntityNumber}"/>
+
+            <!-- 7행: 브루셀라 검사일 (Y=71) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="71" Foreground="#FF0064" Text="브루셀라:"/>
+            <TextBlock Canvas.Left="50" Canvas.Top="71" Foreground="#FF0064" Text="{Binding CowInfo.brucellosisTestDate}"/>
+
+            <!-- 8행: 구제역 예방접종일 (Y=83) 💡 세로 라인 정렬을 위해 콜론(:) 위치 X=46 고정 -->
+            <TextBlock Canvas.Left="2" Canvas.Top="83" Foreground="#FF0064" Text="구 제 역"/>
+            <TextBlock Canvas.Left="46" Canvas.Top="83" Foreground="#FF0064" Text=":"/>
+            <TextBlock Canvas.Left="50" Canvas.Top="83" Foreground="#FF0064" Text="{Binding CowInfo.footAndMouthDiseaseTestDate}"/>
+
+            <!-- 9행: 최저가 / 산차 (Y=95) -->
+            <TextBlock Canvas.Left="2" Canvas.Top="95" Foreground="lime" FontSize="13" FontWeight="Bold" Text="최저"/>
+            <TextBlock Canvas.Left="32" Canvas.Top="95" Foreground="Yellow" FontSize="13" FontWeight="Bold" Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}, ConverterParameter=-}"/>
+
+            <TextBlock Canvas.Left="80" Canvas.Top="97" Foreground="lime" Text="산차"/>
+            <TextBlock Canvas.Left="105" Canvas.Top="97" Foreground="lime" Text=":"/>
+            <TextBlock Canvas.Left="110" Canvas.Top="97" Foreground="Yellow" Text="{Binding CowInfo.CalvingNumber}"/>
+
+        </Canvas>
+    </Border>
+</UserControl>

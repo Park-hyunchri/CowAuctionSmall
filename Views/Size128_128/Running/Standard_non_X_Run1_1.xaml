@@ -50,7 +50,9 @@
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
+        <models:WeightKGConverter x:Key="WeightKGConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
+        <models:SelectShowWeight_EPDString x:Key="SelectShowWeight_EPDString" />
         <models:BloodFontStyle x:Key="BloodFontStyle"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 
@@ -93,15 +95,18 @@
 
                 <!-- ======================================================================================================================================================================= -->
                 <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
-                <TextBlock Panel.ZIndex="100" Margin="0,0,0,0" Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" Foreground="Cyan"/>
-                <TextBlock Panel.ZIndex="100" Margin="40,0,0,110" Text="{Binding CowInfo.EntityNumber}"  Foreground="Silver" />
-                <TextBlock Panel.ZIndex="150" Margin="40,0,0,110" Width="30" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="OrangeRed" Background="Black" />
+                <TextBlock Panel.ZIndex="100" Margin="0,0,0,0" Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
+                <!-- 전체 개체관리번호 (users.xml 동적 색상 적용) -->
+                <TextBlock Panel.ZIndex="100" Margin="40,0,0,110" Text="{Binding CowInfo.EntityNumber}"  Foreground="{DynamicResource EntityNumberForeground}" />
+                <!-- 4자리 단축 번호 강조 박스 (users.xml 동적 색상 적용) -->
+                <TextBlock Panel.ZIndex="150" Margin="40,0,0,110" Width="30" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" />
                 <!-- ======================================================================================================================================================================= -->
 
-                <TextBlock Margin="2,16,0,0" Foreground="lime">
-                    <Run Text="{Binding CowInfo.Location}"/>
-                    <Run Text=""/>
-                    <Run Text="{Binding CowInfo.OwnerName}" Foreground="Yellow"/>
+                <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
+                <TextBlock Margin="2,16,0,0">
+                    <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
+                    <Run Text=" "/>
+                    <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
                 </TextBlock>
 
                 <TextBlock Margin="2,32,0,77" Foreground="lime">
@@ -110,10 +115,23 @@
                 </TextBlock>
 
                 <!-- ======================================================================================================================================================================= -->
-                <TextBlock Margin="2,47,50,62" Foreground="lime">
-                    <Run Text="중량 :"/>
-                    <Run Text="{Binding CowInfo.Weight}" Foreground="Yellow"/>
-                </TextBlock>
+                <!-- users.xml 설정적용 SelectShowWeight_EPD == "Y" -->
+                <Canvas Visibility="{Binding CowInfo.SelectShowWeight_EPD, Converter={StaticResource SelectShowWeight_EPDString}, ConverterParameter=ShowWeight}">
+                    <Canvas Margin="0,47,0,0">
+                        <TextBlock Text="중량 : "  Foreground="lime" Margin="2,0,0,0"/>
+                        <TextBlock Text="{Binding CowInfo.Weight, Converter={StaticResource WeightKGConverter}}" Margin="40,0,0,0" Foreground="Yellow"/>
+                    </Canvas>
+                </Canvas>
+                <!-- users.xml 설정적용 SelectShowWeight_EPD == "N" -->
+                <Canvas Visibility="{Binding CowInfo.SelectShowWeight_EPD, Converter={StaticResource SelectShowWeight_EPDString}, ConverterParameter=ShowEPD}">
+                    <Canvas Margin="0,47,0,0">
+                        <TextBlock Text="육종:"  Foreground="lime" Margin="2,0,0,0"/>
+                        <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Margin="30,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Margin="60,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                    </Canvas>
+                </Canvas>
                 <!-- ======================================================================================================================================================================= -->
                 <Canvas Margin="70,47,0,0" >
                     <Canvas.Style>

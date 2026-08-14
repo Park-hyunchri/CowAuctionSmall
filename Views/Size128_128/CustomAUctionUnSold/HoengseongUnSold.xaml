@@ -46,12 +46,12 @@
             <Canvas Margin="0,73,0,0">
                 <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding EntityNumber}" Margin="42,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="80,0,0,0" Foreground="Red" Background="Black" FontSize="13"/>
+                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
             </Canvas>
 
             <!-- 지역 / 농가명 -->
             <TextBlock Margin="2,89,0,0" FontSize="12">
-                <Run Text="{Binding Location}" Foreground="#7E84F7"/>
+                <Run Text="{Binding Location}" Foreground="{DynamicResource LocationForeground}"/>
                 <Run Text=" "/>
                 <Run Text="{Binding OwnerName}" Foreground="Cyan"/>
             </TextBlock>

@@ -87,7 +87,7 @@
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
             <Canvas Margin="0,16,0,0">
-                <TextBlock Text="{Binding CowInfo.Location}"  Foreground="Lime"  Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding CowInfo.Location}"  Foreground="{DynamicResource LocationForeground}"  Margin="2,0,0,0"/>
                 <TextBlock Text="{Binding CowInfo.OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
             </Canvas>
 
@@ -106,10 +106,10 @@
 
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}" Margin="0,47,0,0">
                 <TextBlock Text="육종:"  Foreground="lime" Margin="2,0,0,0"/>
-                <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Margin="30,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Margin="60,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Margin="30,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
+                <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Margin="60,0,0,0" Foreground="{DynamicResource EpdGradeForeground}" FontWeight="Bold"/>
             </Canvas>
 
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}" Margin="0,47,0,0">

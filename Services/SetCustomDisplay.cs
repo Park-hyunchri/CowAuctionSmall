@@ -28,14 +28,12 @@ namespace CowAuctionSmall.Services
             }
 
             // 조합별(nhCode) 예외 처리
-            if (nhCode == "8808990656229") return new ChuncheonRun(); // 춘천
-            if (nhCode == "8808990656953") return new JeongeupRun(); // 정읍
-            if (nhCode == "8808990656427") return new Mungyeong(); // 문경
-            if (nhCode == "8808990837314" || nhCode == "8808990660783") return new AnseongRun(); // 안성, 임실
+            if (nhCode == "8808990656953") return new Standard_non_X_Run1_1(); // 정읍
+            if (nhCode == "8808990656427") return new Standard_non_QQuri_Run1_1(); // 문경
             if (nhCode == "8808990656106") return new HaenamJindo(); // 해남진도
             if (nhCode == "8808990656915") return new MokpoMuanSinan(); // 목무신
             if (nhCode == "8808990643625") return new YangpyeongRun(); // 양평
-            if (nhCode == "8808990657189" || nhCode == "8808990656717") return new GochangBuanRun(); // 고창부안, 곡성
+            if (nhCode == "8808990656557") return new YecheonRun(); // 예천
             if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongRun(); // 횡성
 
             // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
@@ -110,12 +108,11 @@ namespace CowAuctionSmall.Services
             {
             "8808990656687" => new Standard_non_X_Sold(), // 영천
             "8808990656526" or "8808990684321" => new JecheonDanyangSold(), // 제천단양, 보령
-            "8808990656229" => new ChuncheonSold(), // 춘천
-            "8808990656427" => new MungyeongSold(), // 문경
-            "8808990837314" or "8808990656953" or "8808990227207" or "8808990683973" or "8808990659787" => new AnseongSold(), // 안성, 임실, 남원, 음성, 파주연천
+            "8808990837314" or "8808990656953" or "8808990227207" or "8808990683973" or "8808990659787" or "8808990656427" => new AnseongSold(), // 안성, 임실, 남원, 음성, 파주연천, 문경
             "8808990643625" => new YangpyeongSold(), // 양평
+            "8808990656557" => new YecheonSold(), // 예천
             "8808990656106" => new HaenamJindoSold(), // 해남진도
-            "8808990656915" => new MokpoMuanSinanSold(), // 목무신
+            "8808990656915" or "8808990656229" => new MokpoMuanSinanSold(), // 목무신, 춘천
             "8808990656717" => new QQuriSold_v3(), // 곡성
             "8808990656885" => new HoengseongSold(), // 횡성
 
@@ -148,6 +145,7 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
             if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
             if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
+            if (nhCode == "8808990656557") return new YecheonUnSold(); // 예천
             if (nhCode == "8808990656106" || nhCode == "8808990656717") return new HaenamJindoUnSold(); // 해남진도, 곡성
             if (nhCode == "8808990656885" || nhCode == "8808990657202"  ) return new HoengseongUnSold();      // 횡성
 

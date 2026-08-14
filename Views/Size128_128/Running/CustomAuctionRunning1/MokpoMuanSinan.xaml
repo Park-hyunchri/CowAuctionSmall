@@ -86,8 +86,9 @@
                 <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="72,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
+            <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
             <TextBlock Margin="0,16,0,0" Foreground="lime" FontSize="11">
-                <Run Text="{Binding CowInfo.Location}"/>
+                <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
                 <Run Text=" "/>
                 <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
             </TextBlock>
@@ -107,12 +108,13 @@
                     </MultiBinding>
                 </Canvas.Visibility>
 
+                <!-- 육종 ABCD 색상값 (users.xml 동적 색상 적용) -->
                 <Canvas Margin="0,47,0,0">
                     <TextBlock Text="육종:"  Foreground="lime" />
-                    <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Margin="30,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Margin="40,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Margin="50,0,0,0" Foreground="Silver" FontWeight="Bold"/>
-                    <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Margin="60,0,0,0" Foreground="Silver" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding CowInfo.bodyWeightInColdString}" Foreground="{DynamicResource EpdGradeForeground}" Margin="2,0,0,0"/>
+                    <TextBlock Text="{Binding CowInfo.longestMuscleCrossSectionString}" Foreground="{DynamicResource EpdGradeForeground}"/>
+                    <TextBlock Text="{Binding CowInfo.fatThicknessOnBackString}" Foreground="{DynamicResource EpdGradeForeground}"/>
+                    <TextBlock Text="{Binding CowInfo.intramuscularFatContentString}" Foreground="{DynamicResource EpdGradeForeground}"/>
                 </Canvas>
             </Canvas>
 
@@ -172,9 +174,7 @@
                 <Run Text="산차 :"/>
                 <Run Text="{Binding CowInfo.CalvingNumber}" Foreground="Orange"/>
             </TextBlock>
-
-            <!-- Note를 표시하는 TextBlock -->
-</Grid>
+        </Grid>
     </Border>
 
 </UserControl>

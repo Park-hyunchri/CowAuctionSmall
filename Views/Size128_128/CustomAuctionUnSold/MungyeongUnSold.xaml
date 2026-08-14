@@ -56,10 +56,10 @@
             <!-- 5. 육종 정보 (밝은 실버색 적용) -->
             <StackPanel Orientation="Horizontal" Margin="2,57,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="육종 :" Foreground="lime" FontSize="13"/>
-                <TextBlock Text="{Binding bodyWeightInColdString}" Foreground="Silver" FontSize="13" Margin="2,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
-                <TextBlock Text="{Binding fatThicknessOnBackString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
-                <TextBlock Text="{Binding intramuscularFatContentString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding bodyWeightInColdString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" Margin="2,0,0,0" FontWeight="Bold"/>
+                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding fatThicknessOnBackString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding intramuscularFatContentString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
             </StackPanel>
 
             <!-- 6. 품목 구분 및 개체번호(번식우, 송아지 등) -->

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold"
-                                       xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
@@ -130,26 +130,6 @@
             <TextBlock Margin="2,90,0,0" Text="{Binding Birth}" Foreground="Cyan"/>
 
         </Grid>
-
-        <Border x:Name="borderPaternityMatch" Margin="3,107,97,4" BorderBrush="Yellow" BorderThickness="1" CornerRadius="3" Padding="1" Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}}">
-            <TextBlock Foreground="Yellow" Text="{Binding PaternityMatch}"/>
-        </Border>
-
-        <!-- Note를 표시하는 TextBlock -->
-        <Canvas x:Name="canvas" ClipToBounds="True">
-            <Canvas.Style>
-                <Style TargetType="Canvas">
-                    <Setter Property="Margin" Value="2,110,2,1"/>
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
-                            <Setter Property="Margin" Value="32,110,2,1"/>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Canvas.Style>
-            <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#f61c2d" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-        </Canvas>
-
     </Grid>
 
 </UserControl>

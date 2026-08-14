@@ -65,16 +65,13 @@
     <Folder Include="Views\Size128_64\Running\CustomRunning_64\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\Size128_128\CustomAuctionSold\ChuncheonSold.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Views\Size128_128\CustomAUctionUnSold\ChuncheonUnSold.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Size128_128\Running\ChuncheonRun.xaml.cs">
+    <Compile Update="Views\Size128_128\Running\CustomAuctionRunning1\HaenamJindoRun.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Size128_128\Running\GochangBuanRun.xaml.cs">
+    <Compile Update="Views\Size128_128\Running\Standard_non_QQuri_Run1_1.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

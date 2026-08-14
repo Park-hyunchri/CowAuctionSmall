@@ -57,7 +57,7 @@
 
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="11">
-                <Run Text="{Binding Location}" Foreground="lime"/>
+                <Run Text="{Binding Location}" Foreground="{DynamicResource LocationForeground}"/>
                 <Run Text="{Binding OwnerName}" Foreground="Cyan"/>
             </TextBlock>
 

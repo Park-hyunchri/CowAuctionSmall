@@ -39,7 +39,7 @@
             <Canvas Margin="2,30,0,0">
                 <TextBlock Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             </Canvas>
-            
+
             <!-- 3. 최저가 -->
             <TextBlock Margin="2,25,0,0" FontSize="13">
                 <Run Text="최저 : " Foreground="lime"/>
@@ -55,10 +55,10 @@
             <!-- 5. 육종 정보 (밝은 실버색 적용) -->
             <StackPanel Orientation="Horizontal" Margin="2,57,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="육종 :" Foreground="lime" FontSize="13"/>
-                <TextBlock Text="{Binding bodyWeightInColdString}" Foreground="Silver" FontSize="13" Margin="2,0,0,0" FontWeight="Bold"/>
-                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
-                <TextBlock Text="{Binding fatThicknessOnBackString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
-                <TextBlock Text="{Binding intramuscularFatContentString}" Foreground="Silver" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding bodyWeightInColdString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" Margin="2,0,0,0" FontWeight="Bold"/>
+                <TextBlock Text="{Binding longestMuscleCrossSectionString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding fatThicknessOnBackString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
+                <TextBlock Text="{Binding intramuscularFatContentString}" Foreground="{DynamicResource EpdGradeForeground}" FontSize="13" FontWeight="Bold"/>
             </StackPanel>
 
             <!-- 6. 품목 구분 및 개체번호(번식우, 송아지 등) -->
@@ -66,13 +66,13 @@
 
             <!-- 개체번호 (전체 및 뒷자리 주황색 강조) -->
             <Grid VerticalAlignment="Center" Margin="45,33,2,0">
-                <TextBlock Text="{Binding EntityNumber}" Foreground="Silver" FontSize="13" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" 
-               Text="{Binding EntityNumberShort}" 
-               HorizontalAlignment="Center" VerticalAlignment="Center" 
-               Foreground="{DynamicResource EntityNumberShortForeground}" 
-               Background="Black" 
-               Margin="12,0,0,0" FontSize="13" FontWeight="Normal" />
+                           Text="{Binding EntityNumberShort}" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center" 
+                           Foreground="{DynamicResource EntityNumberShortForeground}" 
+                           Background="{DynamicResource EntityNumberShortBackground}" 
+                           Margin="12,0,0,0" FontSize="13" FontWeight="Normal" />
             </Grid>
 
             <!-- 7. 생년월일 / 개월수 -->

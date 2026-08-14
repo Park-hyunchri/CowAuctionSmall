@@ -3,11 +3,11 @@
 namespace CowAuctionSmall.Views.Size128_128.Running
 {
     /// <summary>
-    /// ChuncheonRun.xaml에 대한 상호 작용 논리
+    /// Standard_non_QQuri_Run1_1.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ChuncheonRun : UserControl
+    public partial class Standard_non_QQuri_Run1_1 : UserControl
     {
-        public ChuncheonRun()
+        public Standard_non_QQuri_Run1_1()
         {
             InitializeComponent();
         }

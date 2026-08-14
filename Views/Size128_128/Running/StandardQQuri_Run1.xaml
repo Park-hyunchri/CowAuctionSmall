@@ -166,15 +166,17 @@
                 <TextBlock Margin="0,0,0,110" Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" Panel.ZIndex="100"/>
 
                 <TextBlock Margin="37,0,0,110" Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}" Panel.ZIndex="100"/>
+                <!-- 전체 개체관리번호 (users.xml 동적 색상 적용) -->
                 <TextBlock Margin="60,0,0,110" Text="{Binding CowInfo.EntityNumber}"  Foreground="{DynamicResource EntityNumberForeground}" Panel.ZIndex="99"/>
+                <!-- 4자리 단축 번호 강조 박스 (users.xml 동적 색상 적용) -->
                 <TextBlock Margin="80,0,0,110" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" Panel.ZIndex="100" Width="30"/>
                 <!-- ======================================================================================================================================================================= -->
 
                 <!-- 새로 -->
                 <comon:NhQquriBadge Canvas.Left="0" Canvas.Top="0" />
-
-                <TextBlock Margin="0,26,0,0" Foreground="lime" FontSize="11">
-                    <Run Text="{Binding CowInfo.Location}"/>
+                <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
+                <TextBlock Margin="0,26,0,0">
+                    <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
                     <Run Text=" "/>
                     <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
                 </TextBlock>
