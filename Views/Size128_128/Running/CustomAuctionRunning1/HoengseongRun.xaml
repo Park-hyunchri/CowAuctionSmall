@@ -69,17 +69,12 @@
             <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Foreground="Red" Background="Black" Canvas.Left="74" Canvas.Top="0" FontSize="13"/>
 
             <!-- 2행: 출하지역 / 농가명 (Y=16) -->
-            <TextBlock Canvas.Left="2" Canvas.Top="16" FontSize="13">
-                <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
-                <Run Text=" "/>
-                <Run Text="{Binding CowInfo.OwnerName}" Foreground="Cyan"/>
-            </TextBlock>
+            <TextBlock Canvas.Left="2" Canvas.Top="16" Foreground="{DynamicResource LocationForeground}" FontSize="13" Text="{Binding CowInfo.Location}"/>
+            <TextBlock Canvas.Left="35" Canvas.Top="16" Foreground="Cyan" FontSize="13" Text="{Binding CowInfo.OwnerName}"/>
 
             <!-- 3행: 내정가 / 최저가 (Y=32) -->
-            <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13">
-                <Run Text="내정:"/>
-                <Run Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
-            </TextBlock>
+            <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13" Text="내정:"/>
+            <TextBlock Canvas.Left="35" Canvas.Top="32" Foreground="Yellow" FontSize="13" Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}"/>
 
             <!-- 4행: 중량 및 임신 (Y=48) -->
             <TextBlock Canvas.Left="2" Canvas.Top="48" Foreground="lime" FontSize="13">

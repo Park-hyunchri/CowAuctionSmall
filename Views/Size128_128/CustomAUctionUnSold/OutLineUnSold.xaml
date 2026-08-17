@@ -82,15 +82,9 @@
             <!-- ======================================================================================================================================================================= -->
 
             <Canvas Margin="0,95,0,0">
-                <TextBlock Text="{Binding Location}"  Foreground="lime" Margin="2,0,0,0"/>
-                <TextBlock Text="{Binding OwnerName}" Margin="28,0,0,0" Foreground="Cyan"/>
+                <TextBlock Text="{Binding Location}"  Foreground="{DynamicResource LocationForeground}" Margin="2,0,0,0"/>
+                <TextBlock Text="{Binding OwnerName}" Margin="35,0,0,0" Foreground="Cyan"/>
             </Canvas>
-
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="2,111,2,1">
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#f61c2d" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
-
         </Grid>
     </Border>
 

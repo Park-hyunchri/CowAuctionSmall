@@ -109,7 +109,8 @@ namespace CowAuctionSmall.Services
                 gv.LowestPrice = data[27];
             }
 
-            gv.Weight = data[25];                           //중량
+            // 💡 "0"이거나 비어있으면 "-"로 변환하여 대입
+            gv.Weight = IsNullorEmpty(data[25]);            //중량
 
             gv.MatherEntityNumber = data[15].Length > 0 ? MatherEntityNumberConverter(data[15]) : "";                //어미 축산개체관리번호
 
@@ -117,8 +118,9 @@ namespace CowAuctionSmall.Services
             {
                 gv.DataType = data[0];
                 gv.Blood = data[18];                            //계대
-                gv.Pregnant = data[17];                        //임실개월수  020103_KIH
-                
+                // 💡 "0"이거나 빈 값이면 "-"로 변환하여 대입
+                gv.Pregnant = IsNullorEmpty(data[17]);         //임실개월수  020103_KIH
+
 
                 gv.CalvingNumber = data[16];                    //어미 산차
 
@@ -661,10 +663,10 @@ namespace CowAuctionSmall.Services
             switch (cowDistinction)
             {
                 case "1": // 송아지
-                    if (month >= 5 && sex == "수")
-                    {
-                        sex = "거세";
-                    }
+                    /*    if (month >= 5 && sex == "수")
+                        {
+                            sex = "거세";
+                        } */   // 송아지: 서버에서 수/암/거세 전달된 값 그대로 유지
                     break;
 
                 case "2": // 비육우

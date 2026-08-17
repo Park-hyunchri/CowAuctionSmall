@@ -57,7 +57,7 @@
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="12">
-                <Run Text="{Binding CowInfo.Location}" Foreground="{DynamicResource LocationForeground}"/>
+                <Run Text="{Binding Location}" Foreground="{DynamicResource LocationForeground}"/>
                 <Run Text=" "/>
                 <Run Text="{Binding OwnerName}" Foreground="Cyan"/>
             </TextBlock>

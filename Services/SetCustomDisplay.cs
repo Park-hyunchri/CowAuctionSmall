@@ -34,7 +34,8 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656915") return new MokpoMuanSinan(); // 목무신
             if (nhCode == "8808990643625") return new YangpyeongRun(); // 양평
             if (nhCode == "8808990656557") return new YecheonRun(); // 예천
-            if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongRun(); // 횡성
+            if (nhCode == "8808990656885") return new HoengseongRun(); // 횡성
+            if (nhCode == "8808990661315") return new Hwasun(); // 화순
 
             // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
 
@@ -70,7 +71,7 @@ namespace CowAuctionSmall.Services
             // 2. 춘천 축협 전용 코드
             if (nhCode == "8808990656229") return new AuctionRunning2();  // 춘천
             if (nhCode == "8808990656960" || nhCode == "8808990656953" || nhCode == "8808990643625") return new Eumseong2(); // 순창, 정읍, 양평
-            if (nhCode == "8808990656717") return new TestRunning2(); // 곡성
+            if (nhCode == "8808990656717" || nhCode == "8808990817675") return new TestRunning2(); // 곡성, 장성
             if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongRun2(); // 횡성
 
             // 3. 농협 우수 조건 만족 여부 판단
@@ -108,18 +109,22 @@ namespace CowAuctionSmall.Services
             {
             "8808990656687" => new Standard_non_X_Sold(), // 영천
             "8808990656526" or "8808990684321" => new JecheonDanyangSold(), // 제천단양, 보령
-            "8808990837314" or "8808990656953" or "8808990227207" or "8808990683973" or "8808990659787" or "8808990656427" => new AnseongSold(), // 안성, 임실, 남원, 음성, 파주연천, 문경
+            "8808990837314" or "8808990227207" or "8808990683973" or "8808990659787" or "8808990656427" or "8808990844220" or "8808990227283" or "8808990656458" or "8808990795874" or "8808990657639" or "8808990659268" or "8808990657615" or "8808990679549" or "8808990671086" => new AnseongSold(),
+            // 안성, 남원, 음성, 파주연천, 문경, 이천, 익산군산, 고성, 평택, 상주, 논산계룡, 구미칠곡, 포항, 옥천
+                "8808990660783" => new QQuriSold_Weight(), // 임실
+    
             "8808990643625" => new YangpyeongSold(), // 양평
             "8808990656557" => new YecheonSold(), // 예천
             "8808990656106" => new HaenamJindoSold(), // 해남진도
-            "8808990656915" or "8808990656229" => new MokpoMuanSinanSold(), // 목무신, 춘천
-            "8808990656717" => new QQuriSold_v3(), // 곡성
+            "8808990656915" or "8808990656229" or "8808990659701" or "8808990844220" or "8808998656496" or "8808990657196" => new MokpoMuanSinanSold(), // 목무신, 춘천, 거창, 홍천, 수원, 예산
+            "8808990656717" or "8808990817675" => new QQuriSold_v3(), // 곡성, 장성
             "8808990656885" => new HoengseongSold(), // 횡성
+            "8808990661315" => new HwasunSold(), // 화순
 
-            // "8808990657202" => new AnseongSold(), // 안성, 무진장
+                // "8808990657202" => new AnseongSold(), // 안성, 무진장
 
-            // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
-            _ => string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)
+                // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
+                _ => string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)
                 ? new Standard_non_X_Sold()
                 : new QQuriSold()
             };
@@ -140,14 +145,17 @@ namespace CowAuctionSmall.Services
 
             // 2. 특정 지역 조합(nhCode) 분기
             if (nhCode == "8808990656953" || nhCode == "8808990656915") return new NamwonUnSold();          // 정읍, 목무신
-            if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
-            if (nhCode == "8808990656229") return new ChuncheonUnSold();       // 춘천
-            if (nhCode == "8808990656427") return new MungyeongUnSold();       // 문경
-            if (nhCode == "8808990837314" || nhCode == "8808990656953") return new AnseongUnSold();         // 안성, 임실
-            if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
+            if (nhCode == "8808990837314" || nhCode == "8808990660783") return new QQuriUnSold();         // 안성, 임실
+            if (nhCode == "8808990656229" || nhCode == "8808990656106" || nhCode == "8808990656717") return new OutLineUnSold(); // 춘천, 해남진도, 곡성
+            if (nhCode == "8808990656885" || nhCode == "8808990657202") return new HoengseongUnSold();      // 횡성
             if (nhCode == "8808990656557") return new YecheonUnSold(); // 예천
-            if (nhCode == "8808990656106" || nhCode == "8808990656717") return new HaenamJindoUnSold(); // 해남진도, 곡성
-            if (nhCode == "8808990656885" || nhCode == "8808990657202"  ) return new HoengseongUnSold();      // 횡성
+            if (nhCode == "8808990684321") return new Standard_non_X_UnSold(); // 보령
+            if (nhCode == "8808990661315") return new HwasunUnSold(); // 화순
+            if (nhCode == "8808990844220") return new OutLineUnSold_2(); // 홍천
+
+            if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
+            
+            
 
             // if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 

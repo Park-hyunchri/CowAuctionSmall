@@ -10,7 +10,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="128" d:DesignWidth="128">
 
-    <!-- 남원,순정축협 유찰 페이지 적용 -->
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">
@@ -29,6 +28,7 @@
     </UserControl.Resources>
 
     <Grid Background="black">
+        <Border BorderThickness="2" BorderBrush="OrangeRed"/>
 
         <!-- "유찰"을 표시하는 TextBlock -->
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="25" Foreground="red" FontWeight="Bold"><Run Text="유    찰"/><Run Language="ko-kr" Text=""/></TextBlock>

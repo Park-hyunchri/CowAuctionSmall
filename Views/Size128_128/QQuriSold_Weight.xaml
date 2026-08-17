@@ -55,18 +55,22 @@
                 </TextBlock>
             </StackPanel>
 
-
+            <!-- 낙찰자 라벨 -->
             <TextBlock Text="낙찰자" Foreground="Violet" FontSize="13" Margin="2,87,0,0"/>
             <TextBlock Text=":" Foreground="Violet" FontSize="13" Margin="45,87,0,0"/>
 
-            <Grid Margin="35,65,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="8*"/>
-                    <RowDefinition Height="51*"/>
-                </Grid.RowDefinitions>
+            <Grid Margin="55,73,0,0" VerticalAlignment="Top" Height="36">
 
                 <!-- N : 숫자만 (현재와 동일한 형태) -->
-                <TextBlock x:Name="tbBidderNumberOnly" Text="{Binding Bidder}" Foreground="Yellow" FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,22,0,0" Grid.Row="1">
+                <!-- N : 숫자만 (첨부 이미지와 동일한 위치/크기) -->
+                <TextBlock x:Name="tbBidderNumberOnly" 
+                           Text="{Binding Bidder}" 
+                           Foreground="Yellow" 
+                           FontSize="26" 
+                           FontWeight="Bold" 
+                           HorizontalAlignment="Left" 
+                           VerticalAlignment="Center"
+                           Margin="0,6,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -80,29 +84,35 @@
                 </TextBlock>
 
                 <!-- Y : 사람 이름만 (2줄/줄바꿈) -->
-                <TextBlock x:Name="tbBidderNameOnly" Text="{Binding Bidder}" Foreground="Yellow" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" MaxWidth="200" Margin="0,22,0,0" Grid.Row="1">
+                <TextBlock x:Name="tbBidderNameOnly" 
+                           Text="{Binding Bidder}" 
+                           Foreground="Yellow" 
+                           TextWrapping="Wrap" 
+                           TextAlignment="Left" 
+                           HorizontalAlignment="Left" 
+                           VerticalAlignment="Center" 
+                           MaxWidth="70">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>
-                            <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="FontSize" Value="16"/>
                             <Style.Triggers>
                                 <!-- 1) Y일 때만 보이게 -->
                                 <DataTrigger Binding="{Binding BidderName}" Value="Y">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
 
-                                <!-- 2) 2줄짜리 이름이면 폰트 14 -->
+                                <!-- 2) 2줄짜리 이름이면 폰트 13 -->
                                 <DataTrigger Binding="{Binding IsTwoLineName}" Value="True">
-                                    <Setter Property="FontSize" Value="14"/>
+                                    <Setter Property="FontSize" Value="13"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
 
-
                 <!-- B : 윗줄 숫자, 아랫줄 이름 -->
-                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,22,0,0" Grid.Row="1">
+                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -115,21 +125,14 @@
                     </StackPanel.Style>
 
                     <!-- 윗줄 : 숫자 -->
-                    <TextBlock  Foreground="Yellow" FontSize="16"  TextAlignment="Left" FontWeight="Bold" >
+                    <TextBlock Foreground="Yellow" FontSize="18" FontWeight="Bold">
                         <Run Text="{Binding BidderNum}" />
                     </TextBlock>
 
                     <!-- 아랫줄 : 이름 (2줄 허용) -->
-                    <TextBlock Text="{Binding BidderString}" Foreground="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="80" TextWrapping="NoWrap" FontSize="11" />
-
+                    <TextBlock Text="{Binding BidderString}" Foreground="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="70" TextWrapping="NoWrap" FontSize="11" />
                 </StackPanel>
             </Grid>
-
-
-            <!-- Note를 표시하는 TextBlock -->
-            <Canvas x:Name="canvas" ClipToBounds="True" Margin="0,109,0,0" >
-                <TextBlock x:Name="note" Text="{Binding Note}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#f61c2d" FontWeight="Regular" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" RenderTransformOrigin="0,0"/>
-            </Canvas>
         </Grid>
     </Border>
 </UserControl>
