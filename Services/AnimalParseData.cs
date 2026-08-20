@@ -388,7 +388,18 @@ namespace CowAuctionSmall.Services
 
             gv.Location = data[22].Length > 3 ? data[22].Substring(0, 2) : data[22];                         //출하 지역
 
-            if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990227283", StringComparison.Ordinal)) // 익산 군산의 경우
+            if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990656106", StringComparison.Ordinal)) // 해남진도의 경우
+            {
+                if (data[22].Contains("해남"))
+                {
+                    gv.Location = "해남";
+                }
+                else if (data[22].Contains("진도"))
+                {
+                    gv.Location = "진도";
+                }
+            }
+            else if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990227283", StringComparison.Ordinal)) // 익산 군산의 경우
             {
                 if (gv.Location.Contains("익산") || gv.Location.Contains("군산"))
                 {

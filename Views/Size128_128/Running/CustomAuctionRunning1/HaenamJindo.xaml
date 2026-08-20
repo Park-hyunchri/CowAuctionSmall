@@ -67,10 +67,12 @@
                 <TextBlock Text="{Binding CowInfo.KPN}" Margin="35,0,0,0" Foreground="#FFD700" FontSize="11"/>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
-            <Canvas Visibility="{Binding CowInfo.RegistrationCategory, Converter={StaticResource ShowMatherBloodConverter}, ConverterParameter=MyBlood}">
+            <!-- 해남진도축협: KPN 아래에 개체 등록구분(기초/혈통/고등/미등록)을 항상 표출 -->
+            <Canvas>
                 <Canvas Margin="0,35,0,0">
                     <TextBlock Text="등록 : "  Foreground="lime" Margin="2,0,0,0" FontSize="11"/>
-                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Foreground="#FFD700" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="36,0,0,0" FontSize="11"/>
+                    <!-- HaenamJindo 매개변수 지정 시 미등을 미등록으로 변환 -->
+                    <TextBlock Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}, ConverterParameter=HaenamJindo}" Foreground="#FFD700" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}"  Margin="36,0,0,0" FontSize="11"/>
                 </Canvas>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->

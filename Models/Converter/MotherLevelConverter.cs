@@ -17,6 +17,12 @@ namespace CowAuctionSmall.Models.Converter
         {
             if (value is string motherLevel)
             {
+                // 해남진도축협 전광판에서는 등록구분 "미등"을 "미등록"으로 전체 표출한다.
+                if (string.Equals(parameter as string, "HaenamJindo", StringComparison.Ordinal) && motherLevel == "미등")
+                {
+                    return "미등록";
+                }
+
                 // 문자열 길이가 2자 이상인지 확인
                 if (motherLevel.Length > 2)
                 {
