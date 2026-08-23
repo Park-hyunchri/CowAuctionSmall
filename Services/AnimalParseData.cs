@@ -388,15 +388,40 @@ namespace CowAuctionSmall.Services
 
             gv.Location = data[22].Length > 3 ? data[22].Substring(0, 2) : data[22];                         //출하 지역
 
-            if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990656106", StringComparison.Ordinal)) // 해남진도의 경우
+            if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990656106", StringComparison.Ordinal)) // 해남진도축협
             {
-                if (data[22].Contains("해남"))
+                // 1. 모든 공백을 제거하여 띄어쓰기 불규칙 문제 해결
+                string cleanLoc = (data[22] ?? "").Replace(" ", "");
+
+                // 2. 세부 읍·면 지명 (우선 검색 목록)
+                string[] detailTowns =
                 {
-                    gv.Location = "해남";
+                // 해남군 관내 면 (13개)
+               "황산", "화산", "마산", "계곡", "북일", "현산", "화원","옥천", "삼산", "문내", "송지", "산이", "북평",
+        
+                // 진도군 관내 면 (6개)
+               "고군", "군내", "의신", "임회", "지산", "조도"
+                };
+
+                // 3. 군 단위 명칭 (차순위 검색 목록)
+                string[] countyNames = { "해남", "진도" };
+
+                // 세부 읍·면 지명이 있는지 먼저 확인
+                string? matchedTown = detailTowns.FirstOrDefault(t => cleanLoc.Contains(t));
+
+                if (!string.IsNullOrEmpty(matchedTown))
+                {
+                    gv.Location = matchedTown; // "마산", "고군", "문내" 등 2글자 표출
                 }
-                else if (data[22].Contains("진도"))
+                else
                 {
-                    gv.Location = "진도";
+                    // 읍·면이 없으면 "해남" / "진도" 군 단위 확인
+                    string? matchedCounty = countyNames.FirstOrDefault(c => cleanLoc.Contains(c));
+                    if (!string.IsNullOrEmpty(matchedCounty))
+                    {
+                        gv.Location = matchedCounty; // "해남", "진도" 표출
+                    }
+                    // 4. 관내 지명이 전혀 없는 타지역인 경우: 상단에서 대입된 기존 기본값 유지
                 }
             }
             else if (string.Equals(userInfo.Auction?.AuctionHouseCode, "8808990227283", StringComparison.Ordinal)) // 익산 군산의 경우
