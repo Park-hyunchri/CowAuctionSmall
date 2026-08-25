@@ -87,6 +87,7 @@
             </Style.Triggers>
         </Style>
 
+        <!-- 뿌리농가 벳지 표출 (뱃지 UI 컴포넌트: Views\Common\NhQquriBadge.xaml)-->
         <common:NhQquriBadge x:Key="NhQquriBadge" />
 
     </UserControl.Resources>
@@ -96,7 +97,7 @@
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유 전 능 력" FontSize="16" Foreground="Violet" FontWeight="Bold" Margin="0,0,0,0"/>
         <common:NhQquriBadge HorizontalAlignment="Center" VerticalAlignment="Top" Margin="-80,3,0,0"   LabelText="뿌리 농가" LabelFontSize="13" LabelForeground="Yellow" />
 
-        <Grid Margin="2,20,2,2">
+        <Grid Margin="2,30,2,2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="5"/>

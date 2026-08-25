@@ -36,6 +36,7 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656557") return new YecheonRun(); // 예천
             if (nhCode == "8808990656885") return new HoengseongRun(); // 횡성
             if (nhCode == "8808990661315") return new Hwasun(); // 화순
+            if (nhCode == "8808990656441") return new GimjeRun(); // 김제
 
             // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
 
@@ -68,7 +69,20 @@ namespace CowAuctionSmall.Services
                 return new Standard_Goat_Run();
             }
 
-            // 2. 춘천 축협 전용 코드
+            // 2. 조합별 전용 코드
+            // 💡 고성축협 전용 분기 (번식우 '3'은 AuctionRunning2_3, 그 외 송아지/비육우는 AuctionRunning2)
+            if (nhCode == "8808990656458")
+            {
+                if (CowDistinction == "3")
+                {
+                    return new AuctionRunning2_3(); // 번식우용
+                }
+                else
+                {
+                    return new AuctionRunning2();   // 송아지/비육우용
+                }
+            }
+
             if (nhCode == "8808990656229") return new AuctionRunning2();  // 춘천
             if (nhCode == "8808990656960" || nhCode == "8808990656953" || nhCode == "8808990643625") return new Eumseong2(); // 순창, 정읍, 양평
             if (nhCode == "8808990656717" || nhCode == "8808990817675") return new TestRunning2(); // 곡성, 장성

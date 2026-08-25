@@ -87,6 +87,7 @@
             </Style.Triggers>
         </Style>
 
+        <!-- 뿌리농가 벳지 표출 (뱃지 UI 컴포넌트: Views\Common\NhQquriBadge.xaml)-->
         <common:NhQquriBadge x:Key="NhQquriBadge" />
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
 

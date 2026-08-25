@@ -8,7 +8,7 @@
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
              Height="128" Width="128">
-<!-- 횡성 -->
+
     <UserControl.Resources>
 
         <Style TargetType="TextBlock">
