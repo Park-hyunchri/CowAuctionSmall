@@ -25,6 +25,11 @@ namespace CowAuctionSmall.Models
 
          public string GetLogoPath(string panelName)
          {
+             if (string.IsNullOrEmpty(panelName))
+             {
+                 return DefaultLogoPath();
+             }
+
              // 캐시 확인
              if (_logoPathCache.TryGetValue(panelName, out var cachedPath))
              {
@@ -32,7 +37,7 @@ namespace CowAuctionSmall.Models
              }
 
              // 캐시에 없으면 계산
-             if (string.IsNullOrEmpty(panelName) || !panelName.Contains("_"))
+             if (!panelName.Contains("_"))
              {
                  return CacheAndReturn(panelName, DefaultLogoPath());
              }
@@ -70,10 +75,20 @@ namespace CowAuctionSmall.Models
 
          private string GetLogoFileName(int panelId)
          {
-             var logoRows = _boardInfo?.LogoBoard?[0]?.Rows ?? new List<LogoRowIdx>();
+             if (_boardInfo?.LogoBoard == null || _boardInfo.LogoBoard.Count == 0)
+             {
+                 return "logo.bmp";
+             }
+
+             var logoRows = _boardInfo.LogoBoard[0]?.Rows ?? new List<LogoRowIdx>();
              var matchingRow = logoRows.FirstOrDefault(row => row.Rows?.Contains(panelId) == true);
 
-             string fileName = matchingRow?.ID ?? "logo.bmp";
+             if (matchingRow == null)
+             {
+                 return "logo.bmp";
+             }
+
+             string fileName = matchingRow.ID ?? "logo.bmp";
 
              // GIF가 있으면 우선적으로 반환
              string gifPath = Path.Combine(_baseDirectory, "Config", Path.ChangeExtension(fileName, ".gif"));

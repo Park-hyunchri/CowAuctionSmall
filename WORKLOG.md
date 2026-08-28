@@ -15,6 +15,71 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 
 <!-- 새 작업 기록을 이 주석 바로 아래에 추가하세요. -->
 
+## 2026-08-28 — LogoBoard 누락 시 로고 기본값 처리
+
+### 작업 날짜
+
+- 2026-08-28
+
+### 작업명
+
+- LogoBoard 설정 누락 및 패널 ID 불일치 시 로고 처리 보완
+
+### 작업 목적
+
+- `board.XML`의 `LogoBoard` 태그가 누락되거나 비어 있어도 프로그램이 기동 실패하지 않도록 한다.
+
+### 문제 현상
+
+- `LogoBoard`가 누락되거나 빈 리스트일 때 `LogoManager.GetLogoFileName(panelId)`의 `[0]` 접근에서 `ArgumentOutOfRangeException`이 발생했다.
+
+### 원인
+
+- `_boardInfo?.LogoBoard?[0]`은 리스트가 null인 경우만 보호하고, 빈 리스트인 경우는 보호하지 않았다.
+
+### 수정 파일
+
+- `Models/LogoManager.cs` — LogoBoard·패널 ID 검증 및 기본 로고 경로 처리
+- `WORKLOG.md` — 승인된 작업 내역 기록
+
+### 수정 내용
+
+- `LogoBoard`가 null 또는 빈 리스트이면 `logo.bmp`를 반환한다.
+- 일치하는 로고 행이 없으면 `logo.bmp`를 반환한다.
+- 빈 패널명은 `Config\\logo.bmp` 기본 경로로 반환한다.
+- 기존 GIF 우선 탐색 및 캐시 로직은 유지한다.
+
+### 영향 범위
+
+- 로고 파일명 및 로고 경로 선택 흐름
+- 경매 상태, 통신·파싱 및 다른 화면 로직에는 영향이 없어야 한다.
+
+### 빌드 결과
+
+- 대상: `CowAuctionSmall.csproj` Debug 구성
+- 명령 또는 방법: `dotnet build .\\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공
+- 경고·오류 또는 미수행 사유: 오류 0개, 기존 경고 100개
+
+### 테스트 결과
+
+- [ ] LogoBoard 누락
+- [ ] LogoBoard 빈 리스트
+- [ ] 유효하지 않은 패널 ID
+- [ ] 기본 로고 경로 fallback
+- [ ] GIF 우선 탐색 및 캐시 회귀
+- 결과 및 미수행 항목: Restore 제외 Debug 빌드 성공. 실제 전광판 실행 및 자동화 테스트는 미수행.
+
+### Git
+
+- 제안 commit 메시지: `fix: LogoBoard 누락 시 기본 로고 처리`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 실제 배포 환경에서 `Config\\logo.bmp` 파일 존재 여부 확인 필요
+
 ## 2026-08-28 — 횡성 프리마틴 성별 표시 축약
 
 ### 작업 날짜
