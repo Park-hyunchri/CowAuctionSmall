@@ -158,6 +158,26 @@ namespace CowAuctionSmall.Models.Structures
             }
         }
 
+        public string SuccessfulBidPriceTitle
+        {
+            get
+            {
+                return string.Equals(LowestPriceTitle?.Trim().Replace(":", ""), "분양가", StringComparison.Ordinal)
+                    ? "분양가:"
+                    : "낙찰가:";
+            }
+        }
+
+        public string SuccessfulBidderTitle
+        {
+            get
+            {
+                return string.Equals(LowestPriceTitle?.Trim().Replace(":", ""), "분양가", StringComparison.Ordinal)
+                    ? "당첨자:"
+                    : "낙찰자:";
+            }
+        }
+
         public string Weight { get; set; } = "-";                   //중량
         public string Birth { get; set; } = "-";                    //출생일 + 개월수
         public string BirthMonth { get; set; } = "-";                    //월령

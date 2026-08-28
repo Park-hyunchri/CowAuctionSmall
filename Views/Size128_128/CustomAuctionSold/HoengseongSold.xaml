@@ -39,13 +39,13 @@
 
             <!-- 2. 낙찰가 라인 (Y=40) -->
             <Canvas Margin="0,40,0,0">
-                <TextBlock Text="낙찰가:" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+                <TextBlock Text="{Binding SuccessfulBidPriceTitle}" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Margin="55,0,0,0" Foreground="Yellow" FontSize="14"/>
             </Canvas>
 
             <!-- 3. 낙찰자 라인 (Y=58) -->
             <Canvas Margin="0,58,0,0">
-                <TextBlock Text="낙찰자:" Foreground="Violet" Margin="2,0,0,0" FontSize="13"/>
+                <TextBlock Text="{Binding SuccessfulBidderTitle}" Foreground="Violet" Margin="2,0,0,0" FontSize="13"/>
                 <StackPanel Orientation="Vertical" Canvas.Left="55" Canvas.Top="0">
                     <!-- 윗줄 : 낙찰자 성명 -->
                     <TextBlock x:Name="bidder" Text="{Binding BidderString}" Foreground="Silver" FontSize="13"/>

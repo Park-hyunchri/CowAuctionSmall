@@ -597,6 +597,24 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 
 ### 추가 확인사항
 
+## 2026-08-28 — 횡성축협 낙찰 화면 행사 타이틀 동적 표시
+
+- 요청 내용: `LowestPriceTitle`이 `분양가`일 때 횡성축협 낙찰 화면의 `낙찰가:`를 `분양가:`, `낙찰자:`를 `당첨자:`로 표시하고 평소에는 기존 제목을 유지한다.
+- 변경 파일:
+  - `Models/Structures/gValues.cs`
+  - `Views/Size128_128/CustomAuctionSold/HoengseongSold.xaml`
+  - `WORKLOG.md`
+- 주요 변경:
+  - `SuccessfulBidPriceTitle`, `SuccessfulBidderTitle` 프로퍼티를 추가했다.
+  - `HoengseongSold.xaml`의 두 하드코딩 제목을 신규 프로퍼티 바인딩으로 교체했다.
+  - 기존 `LowestPriceTitleShort`, `LowestPriceTitleFull` 변환 로직과 128x128 배치를 유지했다.
+- 검증:
+  - 빌드 명령: `dotnet build .\\CowAuctionSmall.csproj --configuration Debug --no-restore`
+  - 빌드 결과: 성공, 오류 0개, 경고 100개
+  - 수동 화면 확인: 미수행
+- Git commit: 미생성
+- Git push: 미수행
+
 - 실제 춘천축협 전광판에서 진행·낙찰·유찰 전환 시 뱃지가 표시되지 않는지 확인 필요
 
 ---
