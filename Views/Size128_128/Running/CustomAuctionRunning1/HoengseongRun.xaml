@@ -57,7 +57,7 @@
         <Canvas Width="124" Height="124">
 
             <!-- 우측 암/수/거세 성별 표출 -->
-            <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" Canvas.Left="0" Canvas.Top="0">
+            <TextBlock Text="{Binding CowInfo.Sex}" Style="{Binding CowInfo, Converter={StaticResource CowTypeToStyleConverter_V3}}" Canvas.Left="78" Canvas.Top="0" Width="46" Margin="0" TextAlignment="Right">
                 <TextBlock.RenderTransform>
                     <TranslateTransform Y="17"/>
                 </TextBlock.RenderTransform>
@@ -73,8 +73,8 @@
             <TextBlock Canvas.Left="35" Canvas.Top="16" Foreground="Cyan" FontSize="13" Text="{Binding CowInfo.OwnerName}"/>
 
             <!-- 3행: 내정가 / 최저가 (Y=32) -->
-            <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13" Text="내정:"/>
-            <TextBlock Canvas.Left="35" Canvas.Top="32" Foreground="Yellow" FontSize="13" Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}"/>
+            <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13" Text="{Binding CowInfo.LowestPriceTitleShort}"/>
+            <TextBlock Canvas.Left="43" Canvas.Top="32" Foreground="Yellow" FontSize="13" Text="{Binding CowInfo.LowestPrice, Converter={StaticResource NumberFormatConverter}}"/>
 
             <!-- 4행: 중량 및 임신 (Y=48) -->
             <TextBlock Canvas.Left="2" Canvas.Top="48" Foreground="lime" FontSize="13">

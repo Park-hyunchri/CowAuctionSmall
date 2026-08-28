@@ -99,3 +99,35 @@ Git diff를 확인할 때 사용자에게 이미 있던 변경을 내 작업으�
 - Git commit과 push는 직접 수행하지 않는다. commit 전에는 hash를 `미생성`, push 여부를 `미수행`으로 기록하고 commit 메시지만 제안한다.
 - 업무 정보, 개인정보, 인증 정보, 운영 접속 정보와 불필요하게 긴 로그를 기록하지 않는다.
 
+## 8. Git 작업 규칙
+
+Git Commit 및 Push는 사용자의 명시적인 요청이 있을 때만 수행한다.
+
+허용되는 요청 예시
+
+- 커밋
+- Commit
+- 커밋해줘
+- 커밋 및 푸시
+- Commit & Push
+
+Commit 수행 전에는 반드시
+
+1. git status
+2. 변경 파일 목록
+3. Commit Message
+
+를 확인한다.
+
+Commit Message를 사용자가 지정한 경우
+해당 메시지를 그대로 사용한다.
+
+사용자가 지정하지 않은 경우
+Codex가 적절한 메시지를 제안한다.
+
+Commit 성공 후 Push를 수행한다.
+
+Push 실패 시 원인을 보고한다.
+
+사용자가 Git 관련 작업을 취소하면
+Commit과 Push를 수행하지 않는다.

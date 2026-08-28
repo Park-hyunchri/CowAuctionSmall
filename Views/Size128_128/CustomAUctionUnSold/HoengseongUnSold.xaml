@@ -31,7 +31,7 @@
 
             <!-- 내정/시중/최저가 -->
             <TextBlock Margin="2,25,0,0" FontSize="13">
-                <Run Text="{Binding LowestPriceTitle, StringFormat='{}{0} : '}"/>
+                <Run Text="내정가 : "/>
                 <Run Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
             </TextBlock>
 

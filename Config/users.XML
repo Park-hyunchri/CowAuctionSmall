@@ -25,7 +25,7 @@
 		<StartPosition>0,0</StartPosition>		<!-- 메인 윈도우 시작 좌표 (X,Y) -->
 		
 		<!-- 💡 횡성축협 행사 시 "시중가", 평시에는 "내정가" 또는 "최저가"로 메모장에서 변경 가능 -->
-		<LowestPriceTitle>시중가</LowestPriceTitle>
+		<LowestPriceTitle>분양가</LowestPriceTitle>
 
 		<!-- 표출 세부 옵션 -->
 		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->
