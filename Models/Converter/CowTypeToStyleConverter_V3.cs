@@ -56,6 +56,7 @@ namespace CowAuctionSmall.Models.Converter
             {
                 { "암", (28.0, BrushRed, WideMargin) },
                 { "수", (28.0, BrushBlue, WideMargin) },
+                { "프", (28.0, BrushBlue, WideMargin) },
                 { "거세", (23.0, BrushGold, DefaultMargin) },
                 { "비육", (23.0, BrushYellow, DefaultMargin) },
                 { "암소", (23.0, BrushDarkRed, DefaultMargin) },

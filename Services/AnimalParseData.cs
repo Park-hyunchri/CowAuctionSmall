@@ -730,6 +730,11 @@ namespace CowAuctionSmall.Services
                     break;
             }
 
+            if (sex == "프리마틴" || sex == "프리")
+            {
+                sex = "프";
+            }
+
             return sex;
         }
 
