@@ -48,7 +48,7 @@
         <Style x:Key="DistributionEventHiddenTextStyle" TargetType="TextBlock">
             <Setter Property="Visibility" Value="Visible"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding CowInfo.LowestPriceTitle}" Value="분양가">
+                <DataTrigger Binding="{Binding CowInfo.LowestPriceTitle}" Value="행사용">
                     <Setter Property="Visibility" Value="Collapsed"/>
                 </DataTrigger>
             </Style.Triggers>

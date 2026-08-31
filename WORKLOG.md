@@ -868,3 +868,25 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 ### 추가 확인사항
 
 - 실제 users.XML 값별 전광판 표시를 수동 확인해야 함
+## 2026-08-31 횡성축협 행사 전용 분양 낙찰 뷰 분리
+
+- 작업 내용: `LowestPriceTitle` 값에 따라 횡성축협 128x128 낙찰 뷰를 행사형/경매형으로 분리
+- 변경 파일: `Services/DisplaySelect.cs`, `Services/SetCustomDisplay.cs`, `Views/Size128_128/CustomAuctionSold/HoengseongSold.xaml`, `Views/Size128_128/CustomAuctionSold/HoengseongBunyangSold.xaml`, `Views/Size128_128/CustomAuctionSold/HoengseongBunyangSold.xaml.cs`
+- 주요 변경: `행사용`이면 신규 분양 뷰, 그 외에는 기존 경매 뷰를 선택하도록 라우팅하고, 두 뷰의 128x128 레이아웃을 분리함
+- 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 빌드 결과: 성공, 오류 0개, 기존 경고 100개
+- 테스트 결과: 자동 테스트 미수행; diff 및 XAML 컴파일 확인
+- Git commit: 미생성
+- Git push: 미수행
+- 추가 확인: users.XML 값별 실제 전광판 화면 수동 확인 필요
+## 2026-08-31 횡성축협 LowestPriceTitle 표시 및 행사 모드 숨김 조건 수정
+
+- 작업 내용: `행사용`/`경매용` 설정값을 횡성 진행 화면 표시 제목으로 변환하고 행사 모드 숨김 조건 수정
+- 변경 파일: `Models/Structures/gValues.cs`, `Views/Size128_128/Running/CustomAuctionRunning1/HoengseongRun.xaml`
+- 주요 변경: 행사형은 `분양가:`, 경매형 및 기본값은 `내정:`/`내정가:`로 표시하며 기존 `시중가`/`최저가` 특수 제목은 유지함. 행사형에서 Location, OwnerName, Pregnant를 숨김
+- 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 빌드 결과: 성공, 오류 0개, 기존 경고 100개
+- 테스트 결과: 자동 테스트 미수행; Debug 빌드 및 XAML 컴파일 확인
+- Git commit: 미생성
+- Git push: 미수행
+- 추가 확인: 행사형에서 성별·중량 유지 및 경매형에서 일반 정보 표시 확인 필요

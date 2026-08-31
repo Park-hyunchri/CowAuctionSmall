@@ -127,14 +127,10 @@ namespace CowAuctionSmall.Models.Structures
             {
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정:";
-                    string title = LowestPriceTitle.Trim().Replace(":", "");
-                    if (title == "분양가") return "분양가:";
-                    if (title.EndsWith("가") && title.Length > 1)
-                    {
-                        title = title.Substring(0, title.Length - 1);
-                    }
-                    return title + ":";
+                    string title = LowestPriceTitle?.Trim().Replace(":", "") ?? "";
+                    if (title == "행사용") return "분양가:";
+                    if (title == "시중가" || title == "최저가") return title.Substring(0, title.Length - 1) + ":";
+                    return "내정:";
                 }
                 catch
                 {
@@ -148,14 +144,10 @@ namespace CowAuctionSmall.Models.Structures
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정가:";
-                string title = LowestPriceTitle.Trim().Replace(":", "");
-                if (title == "분양가") return "분양가:";
-                if (!title.EndsWith("가"))
-                {
-                    title += "가";
-                }
-                return title + ":";
+                string title = LowestPriceTitle?.Trim().Replace(":", "") ?? "";
+                if (title == "행사용") return "분양가:";
+                if (title == "시중가" || title == "최저가") return title + ":";
+                return "내정가:";
             }
         }
 
