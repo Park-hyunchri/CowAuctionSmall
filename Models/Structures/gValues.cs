@@ -148,8 +148,9 @@ namespace CowAuctionSmall.Models.Structures
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(LowestPriceTitle) || LowestPriceTitle.Trim().Replace(":", "") == "분양가") return "내정가:";
+                if (string.IsNullOrWhiteSpace(LowestPriceTitle)) return "내정가:";
                 string title = LowestPriceTitle.Trim().Replace(":", "");
+                if (title == "분양가") return "분양가:";
                 if (!title.EndsWith("가"))
                 {
                     title += "가";

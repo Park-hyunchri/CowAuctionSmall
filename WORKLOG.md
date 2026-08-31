@@ -690,3 +690,54 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 - 실제 춘천축협 전광판에서 진행·낙찰·유찰 전환 시 뱃지가 표시되지 않는지 확인 필요
 
 ---
+## 2026-08-31 HoengseongSold 낙찰 화면 분양가 제목 표시 수정
+
+### 작업 날짜
+
+- 2026-08-31
+
+### 작업명
+
+- HoengseongSold 128x128 낙찰 화면 2번째 줄 가격 제목 조건부 바인딩
+
+### 작업 목적
+
+- `LowestPriceTitle`이 `분양가`일 때 2번째 줄도 `분양가:`로 표시하고 일반 경매 표시를 유지
+
+### 문제 현상 및 원인
+
+- 2번째 줄 가격 제목이 XAML에 `내정가:`로 하드코딩되어 있었음
+- `LowestPriceTitleFull`도 `분양가` 조건에서 `내정가:`를 반환하고 있었음
+
+### 수정 파일 및 내용
+
+- `Models/Structures/gValues.cs`: `분양가` 조건에서 `LowestPriceTitleFull`이 `분양가:`를 반환하도록 수정
+- `Views/Size128_128/CustomAuctionSold/HoengseongSold.xaml`: 2번째 줄 TextBlock을 `LowestPriceTitleFull` 바인딩으로 변경
+- `WORKLOG.md`: 본 작업 기록 추가
+
+### 영향 범위
+
+- 분양가 모드: 2번째 줄 `분양가:`, 3번째 줄 `분양가:`, 4번째 줄 `당첨자:`
+- 일반 경매 모드의 기존 내정가/시중가/최저가 및 낙찰가/낙찰자 표시 유지
+- 기존 128x128 좌표·스타일·3·4번째 줄 바인딩은 변경하지 않음
+
+### 빌드 결과
+
+- 명령: `dotnet build .\\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 기존 경고 100개
+
+### 테스트 결과
+
+- [x] Debug 빌드 및 XAML 컴파일
+- [x] diff로 바인딩·반환 로직 확인
+- [ ] 실제 전광판 분양가/일반 경매 수동 확인 (미수행)
+
+### Git
+
+- 제안 commit 메시지: `fix: HoengseongSold 분양가 가격 제목 표시`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 실제 users.XML 값별 전광판 표시를 수동 확인해야 함
