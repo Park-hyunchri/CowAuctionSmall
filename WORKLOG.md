@@ -15,6 +15,73 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 
 <!-- 새 작업 기록을 이 주석 바로 아래에 추가하세요. -->
 
+## 2026-08-31 — 횡성축협 낙찰 화면 전용 분기 우선 처리
+
+### 작업 날짜
+
+- 2026-08-31
+
+### 작업명
+
+- 횡성축협 `HoengseongSold` 낙찰 화면 선택 오류 수정
+
+### 작업 목적
+
+- 횡성축협 낙찰 화면에서 `QQuriSold_v3`가 먼저 선택되지 않고 `HoengseongSold`가 표출되도록 한다.
+
+### 문제 현상
+
+- 횡성축협 `nhCode=8808990656885`이고 `bidderCode=B`인 낙찰 건에서 `HoengseongSold.xaml` 대신 `QQuriSold_v3.xaml`이 표출되었다.
+
+### 원인
+
+- `CustomAuctionSold_128()`에서 `bidderCode == "B"` 조건이 조합별 전용 화면 switch보다 먼저 평가되었다.
+
+### 수정 파일
+
+- `Services/SetCustomDisplay.cs` — 조합별 전용 낙찰 화면을 먼저 선택하고 일반 조합에만 `bidderCode=B`를 적용
+- `WORKLOG.md` — 승인된 작업 내역 기록
+
+### 수정 내용
+
+- 염소·말 특수 축종 검사를 유지했다.
+- `nhCode` 기반 조합별 전용 낙찰 화면 switch를 먼저 평가하도록 변경했다.
+- 전용 화면이 없는 일반 조합에서 기본 결과가 `QQuriSold`일 때만 `bidderCode=B`이면 `QQuriSold_v3`를 반환하도록 변경했다.
+- 횡성 `8808990656885`는 `bidderCode`와 무관하게 `HoengseongSold`를 반환한다.
+
+### 영향 범위
+
+- 128×128 낙찰 화면 선택 로직
+- 횡성 및 기존 조합별 전용 낙찰 화면의 우선순위
+- 일반 조합의 `bidderCode=B` 화면 선택
+- 진행·유찰 화면 및 XAML 파일은 변경하지 않았다.
+
+### 빌드 결과
+
+- 대상: `CowAuctionSmall.csproj` Debug 구성
+- 명령 또는 방법: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공
+- 경고·오류 또는 미수행 사유: 오류 0개, 기존 경고 100개
+
+### 테스트 결과
+
+- [x] 특수 축종 검사 유지 여부
+- [x] 횡성 `nhCode=8808990656885` 전용 화면 우선 여부
+- [x] 일반 조합 `bidderCode=B` 화면 분기
+- [x] 기본 `is_QQuri` 분기 유지 여부
+- [x] Debug 빌드 및 XAML 컴파일
+- 결과 및 미수행 항목: 소스 분기 및 diff 점검 완료. 실제 전광판 실행, 화면 전환·반복 진입, 자동화 테스트는 미수행.
+
+### Git
+
+- 제안 commit 메시지: `fix: 횡성축협 낙찰 화면 전용 분기 우선 처리`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 실제 횡성축협 전광판에서 `bidderCode=B` 낙찰 건이 `HoengseongSold`로 표출되는지 확인 필요
+
 ## 2026-08-31 — 영주축협 낙찰자 이름·번호 동시 표시
 
 ### 작업 날짜

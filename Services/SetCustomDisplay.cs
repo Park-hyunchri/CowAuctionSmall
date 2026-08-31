@@ -118,14 +118,8 @@ namespace CowAuctionSmall.Services
                 return new GoatSold();
             }
 
-            // 이름과 번호를 함께 표시하는 낙찰자 설정은 전용 조합 분기보다 우선한다.
-            if (string.Equals(bidderCode, "B", StringComparison.OrdinalIgnoreCase))
-            {
-                return new QQuriSold_v3();
-            }
-
             // 조합별 전용 낙찰 화면 분기
-            return nhCode switch
+            UserControl customSoldDisplay = nhCode switch
             {
             "8808990656687" => new Standard_non_X_Sold(), // 영천
             "8808990656526" or "8808990684321" => new JecheonDanyangSold(), // 제천단양, 보령
@@ -148,6 +142,15 @@ namespace CowAuctionSmall.Services
                 ? new Standard_non_X_Sold()
                 : new QQuriSold()
             };
+
+            // 전용 화면이 없는 일반 조합에서만 이름과 번호를 함께 표시한다.
+            if (string.Equals(bidderCode, "B", StringComparison.OrdinalIgnoreCase)
+                && customSoldDisplay is QQuriSold)
+            {
+                return new QQuriSold_v3();
+            }
+
+            return customSoldDisplay;
         }
 
         /// <summary>
