@@ -118,6 +118,12 @@ namespace CowAuctionSmall.Services
                 return new GoatSold();
             }
 
+            // 이름과 번호를 함께 표시하는 낙찰자 설정은 전용 조합 분기보다 우선한다.
+            if (string.Equals(bidderCode, "B", StringComparison.OrdinalIgnoreCase))
+            {
+                return new QQuriSold_v3();
+            }
+
             // 조합별 전용 낙찰 화면 분기
             return nhCode switch
             {

@@ -15,6 +15,78 @@ CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이�
 
 <!-- 새 작업 기록을 이 주석 바로 아래에 추가하세요. -->
 
+## 2026-08-31 — 영주축협 낙찰자 이름·번호 동시 표시
+
+### 작업 날짜
+
+- 2026-08-31
+
+### 작업명
+
+- `BidderName=B` 설정 시 이름과 번호를 함께 표시하는 낙찰 화면 적용
+
+### 작업 목적
+
+- `BidderName`이 `B`일 때 128×128 낙찰 화면에서 낙찰자 이름과 번호를 모두 표시한다.
+- 이번 작업 반영 버전을 `1.0.1.21`로 변경한다.
+
+### 문제 현상
+
+- `QQuriSold_v3`는 이름·번호 동시 표시 레이아웃을 갖고 있었지만, `CustomAuctionSold_128()`에서 `BidderName=B` 설정을 화면 선택 조건으로 사용하지 않았다.
+
+### 원인
+
+- `bidderCode` 인자가 낙찰 화면 선택 메서드에 전달되지만 `B` 조건 분기에 사용되지 않았다.
+- `B` 파싱 경로에서 `BidderString`에 길이 제한이 적용되어 이름 표시가 잘릴 수 있었다.
+
+### 수정 파일
+
+- `Services/SetCustomDisplay.cs` — `bidderCode=B`일 때 `QQuriSold_v3` 선택
+- `Services/AnimalParseData.cs` — `B` 파싱 시 이름과 번호 필드 명시적 할당
+- `Config/users.XML` — `<BidderName>B</BidderName>` 적용
+- `WORKLOG.md` — 승인된 작업 내역 기록
+
+### 수정 내용
+
+- 염소·말 화면을 제외하고 `bidderCode=B`이면 `QQuriSold_v3`를 반환하도록 추가했다.
+- `B` 파싱 시 `gv.BidderString`에 낙찰자 이름, `gv.BidderNum`에 낙찰자 번호를 할당하도록 정리했다.
+- `users.XML`의 `BidderName`을 `B`로 변경했다.
+- 프로그램 버전을 `1.0.1.21`로 변경했다.
+
+### 영향 범위
+
+- 128×128 낙찰 화면의 낙찰자 표시 및 화면 선택
+- 염소·말 낙찰 화면과 `BidderName`이 `Y` 또는 `N`인 기존 흐름은 유지한다.
+- 실제 영주축협 운영 설정 및 전광판 표출은 별도 확인이 필요하다.
+
+### 빌드 결과
+
+- 대상: `CowAuctionSmall.csproj` Debug 구성
+- 명령 또는 방법: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공
+- 경고·오류 또는 미수행 사유: 오류 0개, 기존 경고 100개
+
+### 테스트 결과
+
+- [ ] 영주축협 128×128 낙찰 화면
+- [ ] 낙찰자 이름 표시
+- [ ] 낙찰자 번호 표시
+- [ ] `BidderName=Y/N` 기존 화면 선택 회귀
+- [ ] 염소·말 낙찰 화면 회귀
+- [ ] 화면 전환 및 반복 진입
+- 결과 및 미수행 항목: Restore 제외 Debug 빌드 성공. 실제 전광판 실행 확인과 자동화 테스트는 미수행.
+
+### Git
+
+- 제안 commit 메시지: `feat: 낙찰자 이름과 번호 동시 표시`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 현재 `Config/users.XML`의 `AuctionHouseCode`가 영주축협 운영 설정인지 확인 필요
+- 실제 전광판에서 이름 길이와 번호 표시의 잘림·겹침 여부 확인 필요
+
 ## 2026-08-28 — LogoBoard 누락 시 로고 기본값 처리
 
 ### 작업 날짜

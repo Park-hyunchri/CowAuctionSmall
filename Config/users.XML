@@ -29,7 +29,7 @@
 
 		<!-- 표출 세부 옵션 -->
 		<CowBirth>Y</CowBirth>		<!-- Y: 생년월일 표출, N: 월령으로 대체 표출 -->
-		<BidderName>N</BidderName>		<!-- Y: 낙찰자 이름표시, N: 번호, B: 이름+번호 -->
+		<BidderName>B</BidderName>		<!-- Y: 낙찰자 이름표시, N: 번호, B: 이름+번호 -->
 		<IsShowOwnerName>N</IsShowOwnerName>		<!-- Y: 출하주 성명 전체, N: 마스킹(김*수) -->
 		<ChangeSexName>N</ChangeSexName>		<!-- Y: 축종별 성별명 변환(비육, 암소 등), N: 원본 성별 -->
 		<SelectShowWeight_EPD>Y</SelectShowWeight_EPD>		<!-- Y: 개체화면에 중량 표출, N: EPD 표출 -->

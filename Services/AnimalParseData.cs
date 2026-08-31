@@ -495,13 +495,9 @@ namespace CowAuctionSmall.Services
                         break;
 
                     case "B": // 낙찰자 이름 + 참가번호
-                        gv.Bidder =  bidderSource;
+                        gv.Bidder = bidderSource;
+                        gv.BidderString = bidderSource;
                         gv.BidderNum = data[30];
-                        gv.BidderString = bidderSource.Length > 7 ? bidderSource.Substring(0,7) : bidderSource;
-                        if (gv.Is_Nh_QQuri == "Y" || gv.Nh_ability_1_num.Length > 2)
-                        {
-                            gv.BidderString = bidderSource;
-                        }
                         break;
 
                     default: // 참가번호만 표시
