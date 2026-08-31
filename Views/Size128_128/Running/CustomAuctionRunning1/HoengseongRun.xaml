@@ -45,6 +45,15 @@
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
 
+        <Style x:Key="DistributionEventHiddenTextStyle" TargetType="TextBlock">
+            <Setter Property="Visibility" Value="Visible"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding CowInfo.LowestPriceTitle}" Value="분양가">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <Style TargetType="TextBlock">
             <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
             <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
@@ -69,8 +78,8 @@
             <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Foreground="Red" Background="Black" Canvas.Left="74" Canvas.Top="0" FontSize="13"/>
 
             <!-- 2행: 출하지역 / 농가명 (Y=16) -->
-            <TextBlock Canvas.Left="2" Canvas.Top="16" Foreground="{DynamicResource LocationForeground}" FontSize="13" Text="{Binding CowInfo.Location}"/>
-            <TextBlock Canvas.Left="35" Canvas.Top="16" Foreground="Cyan" FontSize="13" Text="{Binding CowInfo.OwnerName}"/>
+            <TextBlock Style="{StaticResource DistributionEventHiddenTextStyle}" Canvas.Left="2" Canvas.Top="16" Foreground="{DynamicResource LocationForeground}" FontSize="13" Text="{Binding CowInfo.Location}"/>
+            <TextBlock Style="{StaticResource DistributionEventHiddenTextStyle}" Canvas.Left="35" Canvas.Top="16" Foreground="Cyan" FontSize="13" Text="{Binding CowInfo.OwnerName}"/>
 
             <!-- 3행: 내정가 / 최저가 (Y=32) -->
             <TextBlock Canvas.Left="2" Canvas.Top="32" Foreground="lime" FontSize="13" Text="{Binding CowInfo.LowestPriceTitleShort}"/>
@@ -81,7 +90,7 @@
                 <Run Text="중량:"/>
                 <Run Text="{Binding CowInfo.Weight, Converter={StaticResource NumberFormatConverter}}" Foreground="Yellow"/>
             </TextBlock>
-            <TextBlock Canvas.Left="68" Canvas.Top="48" Foreground="lime" FontSize="13">
+            <TextBlock Style="{StaticResource DistributionEventHiddenTextStyle}" Canvas.Left="68" Canvas.Top="48" Foreground="lime" FontSize="13">
                 <Run Text="임신:"/>
                 <Run Text="{Binding CowInfo.Pregnant}" Foreground="Red"/>
             </TextBlock>

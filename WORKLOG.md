@@ -1,5 +1,65 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-08-31 — 횡성축협 분양가 행사 모드 동적 레이아웃 적용
+
+### 작업 날짜
+
+- 2026-08-31
+
+### 작업명
+
+- 횡성축협 진행·낙찰 화면 분양가 행사 모드 조건부 표시 및 일반 경매 복구
+
+### 작업 목적
+
+- `LowestPriceTitle`이 `분양가`일 때만 행사 전용 레이아웃을 적용하고, 일반 경매에서는 기존 레이아웃을 자동 복구한다.
+
+### 수정 파일
+
+- `Views/Size128_128/Running/CustomAuctionRunning1/HoengseongRun.xaml` — 행사 모드에서 출하지역·농가명·임신 영역 숨김
+- `Views/Size128_128/CustomAuctionSold/HoengseongSold.xaml` — 행사 모드에서 최저가 줄 숨김 및 후속 줄 위치 조정
+- `WORKLOG.md` — 승인된 작업 내역 기록
+
+### 수정 내용
+
+- 진행 화면에 `CowInfo.LowestPriceTitle == "분양가"` DataTrigger를 적용했다.
+- 분양가 모드에서 Location, OwnerName, Pregnant를 `Collapsed` 처리하고 일반 모드에서는 `Visible`로 복구한다.
+- 낙찰 화면에서 분양가 모드일 때 최저가 줄을 숨기고, 낙찰가·낙찰자·소/염소 개체번호를 각각 22px·40px·74px로 배치한다.
+- 일반 모드에서는 기존 22px·40px·58px·90px 레이아웃을 유지한다.
+
+### 영향 범위
+
+- 횡성축협 128×128 진행·낙찰 화면의 분양가 행사 모드 레이아웃
+- 내정가·시중가 일반 경매 모드의 기존 표시 자동 복구
+- 성별·중량 및 다른 조합·해상도·유찰 화면은 변경하지 않았다.
+
+### 빌드 결과
+
+- 대상: `CowAuctionSmall.csproj` Debug 구성
+- 명령 또는 방법: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 미수행
+- 경고·오류 또는 미수행 사유: 작업 기록 작성 후 빌드 예정
+
+### 테스트 결과
+
+- [ ] 진행 화면 분양가 모드
+- [ ] 진행 화면 일반 경매 자동 복구
+- [ ] 낙찰 화면 분양가 모드
+- [ ] 낙찰 화면 일반 경매 자동 복구
+- [ ] 소·염소 개체번호 위치
+- [ ] Debug 빌드 및 XAML 컴파일
+- 결과 및 미수행 항목: 구현 후 검증 예정
+
+### Git
+
+- 제안 commit 메시지: `fix: 횡성축협 분양가 행사 모드 동적 레이아웃 적용`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 실제 128×128 전광판에서 행사·일반 모드의 텍스트 겹침과 위치 확인이 필요하다.
+
 CowAuctionSmall C# WPF MVVM 가축 경매 전광판 프로젝트의 변경 이력을 기록한다.
 
 ## 기록 원칙
