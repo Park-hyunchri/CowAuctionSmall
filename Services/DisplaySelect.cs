@@ -1012,7 +1012,7 @@ namespace CowAuctionSmall.Services
                 state.SoldView = _displaySize switch
                 {
                     DisplaySizeParser.DisplaySize.Size128x128 =>
-                        _setCustomDisplay.CustomAuctionSold_128(_nhCode, _userInfo.Auction?.BidderName ?? string.Empty, cowInfo.Is_Nh_QQuri, cowInfo.CowDistinction, cowInfo.Nh_ability_1_num),
+                        _setCustomDisplay.CustomAuctionSold_128(_nhCode, _userInfo.Auction?.BidderName ?? string.Empty, cowInfo.Is_Nh_QQuri, cowInfo.CowDistinction, cowInfo.Nh_ability_1_num, _userInfo.Auction?.LowestPriceTitle ?? string.Empty),
 
                     DisplaySizeParser.DisplaySize.Size160x64 =>
                         new AuctionSold_160_64(),

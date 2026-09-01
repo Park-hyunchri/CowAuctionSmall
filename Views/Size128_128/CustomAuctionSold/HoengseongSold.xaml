@@ -19,45 +19,8 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
 
-        <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
-
-        <Style x:Key="DistributionEventLowestPriceStyle" TargetType="Canvas">
-            <Setter Property="Visibility" Value="Visible"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding LowestPriceTitle}" Value="분양가">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DistributionEventBidPriceStyle" TargetType="Canvas">
-            <Setter Property="Margin" Value="0,40,0,0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding LowestPriceTitle}" Value="분양가">
-                    <Setter Property="Margin" Value="0,22,0,0"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DistributionEventBidderStyle" TargetType="Canvas">
-            <Setter Property="Margin" Value="0,58,0,0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding LowestPriceTitle}" Value="분양가">
-                    <Setter Property="Margin" Value="0,40,0,0"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DistributionEventEntityNumberStyle" TargetType="Canvas">
-            <Setter Property="Margin" Value="0,90,0,0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding LowestPriceTitle}" Value="분양가">
-                    <Setter Property="Margin" Value="0,74,0,0"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
     </UserControl.Resources>
 
     <Border BorderBrush="Blue" BorderThickness="2">
@@ -68,20 +31,20 @@
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="22" Foreground="Violet" Margin="0,-1,0,0"/>
 
             <!-- 1. 내정가/시중가/최저가 라인 (시중가: / 내정가: / 최저가:) -->
-            <Canvas Style="{StaticResource DistributionEventLowestPriceStyle}" Margin="0,22,0,0">
-                <TextBlock Text="{Binding LowestPriceTitleFull}" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+            <Canvas Margin="0,22,0,0">
+                <TextBlock Text="내정가:" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Margin="55,0,0,0" Foreground="#FFA500" FontSize="14"/>
             </Canvas>
 
             <!-- 2. 낙찰가 라인 (Y=40) -->
-            <Canvas Style="{StaticResource DistributionEventBidPriceStyle}">
-                <TextBlock Text="{Binding SuccessfulBidPriceTitle}" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+            <Canvas Margin="0,40,0,0">
+                <TextBlock Text="낙찰가:" Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
                 <TextBlock Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Margin="55,0,0,0" Foreground="Yellow" FontSize="14"/>
             </Canvas>
 
             <!-- 3. 낙찰자 라인 (Y=58) -->
-            <Canvas Style="{StaticResource DistributionEventBidderStyle}">
-                <TextBlock Text="{Binding SuccessfulBidderTitle}" Foreground="Violet" Margin="2,0,0,0" FontSize="13"/>
+            <Canvas Margin="0,58,0,0">
+                <TextBlock Text="낙찰자:" Foreground="Violet" Margin="2,0,0,0" FontSize="13"/>
                 <StackPanel Orientation="Vertical" Canvas.Left="55" Canvas.Top="0">
                     <!-- 윗줄 : 낙찰자 성명 -->
                     <TextBlock x:Name="bidder" Text="{Binding BidderString}" Foreground="Silver" FontSize="13"/>
@@ -91,14 +54,14 @@
             </Canvas>
 
             <!-- 4. 개체번호 라인 (Y=90 ~ Y=107 위치 배치로 하단 비고 자막 Y=110 과 간격 확보) -->
-            <Canvas Style="{StaticResource DistributionEventEntityNumberStyle}" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
+            <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="개체:" Foreground="lime" Margin="2,0,0,0" FontSize="13" />
                 <TextBlock Text="{Binding EntityNumber}" Margin="40,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
                 <TextBlock Text="{Binding EntityNumberShort}" Margin="77,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
             </Canvas>
 
             <!-- 염소 개체번호 -->
-            <Canvas Style="{StaticResource DistributionEventEntityNumberStyle}" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
+            <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
                 <TextBlock Text="개체:" Foreground="lime" Margin="2,0,0,0" FontSize="13" />
                 <TextBlock Text="{Binding EntityNumberShort}" Margin="40,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
             </Canvas>

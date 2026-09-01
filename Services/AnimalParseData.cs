@@ -89,8 +89,8 @@ namespace CowAuctionSmall.Services
 
                     if (code == "8808990656885") //횡성
                     {
-                        // TODO: HoengseongSex 리팩토링 후에는 반환값을 gv.Sex에 반영
-                        gv.Sex = HoengseongSex(gv.CowDistinction, SafeGet(data, 39), sexCode);
+                        int.TryParse(SafeGet(data, 39), out var birthMonth);
+                        gv.Sex = HoengseongSex(gv.CowDistinction, sexCode, birthMonth);
                     }
                 }
                 else
@@ -680,51 +680,27 @@ namespace CowAuctionSmall.Services
 
 
         /// <summary>
-        /// 횡성용 등록구분, 개월령 , 성별
+        /// 횡성용 등록구분, 성별, 개월령
         /// </summary>
-        private string HoengseongSex(string cowDistinction, string birthMonth, string sex)
+        private string HoengseongSex(string cowDistinction, string sex, int month)
         {
             // 성별이 비어있으면 처리할 게 없음
             if (string.IsNullOrEmpty(sex))
                 return sex;
 
-            // 개월 수 파싱 (실패하면 0개월로 간주)
-            int month = 0;
-            int.TryParse(birthMonth, out month);
-
-            switch (cowDistinction)
+            // 횡성은 거세 및 비육우를 비육으로 표출
+            if (sex == "거세" || cowDistinction == "2")
             {
-                case "1": // 송아지
-                    /*    if (month >= 5 && sex == "수")
-                        {
-                            sex = "거세";
-                        } */   // 송아지: 서버에서 수/암/거세 전달된 값 그대로 유지
-                    break;
-
-                case "2": // 비육우
-                    if (month >= 9)
-                    {
-                        sex = "비육";
-                    }
-                    break;
-
-                case "3": // 번식우
-                    if (sex == "암" || month >= 9)
-                    {
-                        sex = "암소";
-                    }
-                    break;
-
-                case "5": // 염소
-                    if (string.IsNullOrEmpty(sex) || sex == "-")
-                    {
-                        sex = "새끼";
-                    }
-                    break;
-
-                default:
-                    break;
+                return "비육";
             }
+
+            // 암은 송아지에서 1글자, 성우/번식우에서 2글자로 표출
+            if (sex == "암")
+                return cowDistinction == "1" && month < 9 ? "암" : "암소";
+
+            // 수는 월령이나 축종 구분에 의해 암소로 변환하지 않음
+            if (sex == "수")
+                return "수";
 
             if (sex == "프리마틴" || sex == "프리")
             {

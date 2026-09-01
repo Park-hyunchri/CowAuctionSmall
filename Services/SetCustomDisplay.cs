@@ -110,7 +110,7 @@ namespace CowAuctionSmall.Services
         /// </summary>
         /// <param name="nhCode"></param>
         /// <returns></returns>
-        public UserControl CustomAuctionSold_128(string nhCode, string bidderCode, string is_QQuri, string CowDistinction, string nh_ability_1_num)
+        public UserControl CustomAuctionSold_128(string nhCode, string bidderCode, string is_QQuri, string CowDistinction, string nh_ability_1_num, string lowestPriceTitle)
         {
             // 염소/말 구분
             if (int.TryParse(CowDistinction, out int result) && result > 4)
@@ -132,7 +132,7 @@ namespace CowAuctionSmall.Services
             "8808990656106" => new HaenamJindoSold(), // 해남진도
             "8808990656915" or "8808990656229" or "8808990659701" or "8808990844220" or "8808998656496" or "8808990657196" => new MokpoMuanSinanSold(), // 목무신, 춘천, 거창, 홍천, 수원, 예산
             "8808990656717" or "8808990817675" => new QQuriSold_v3(), // 곡성, 장성
-            "8808990656885" => new HoengseongSold(), // 횡성
+            "8808990656885" => lowestPriceTitle == "행사용" ? new HoengseongBunyangSold() : new HoengseongSold(), // 횡성
             "8808990661315" => new HwasunSold(), // 화순
 
                 // "8808990657202" => new AnseongSold(), // 안성, 무진장
