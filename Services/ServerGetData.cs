@@ -134,8 +134,7 @@ namespace CowAuctionSmall.Services
 
         private bool runProcessMessageAsync = true;
         private bool _timersStoppedByNoAuction = false;
-        private bool isConnecting = false; // 중복 연결 방지용 락 변수
-        private bool isAuctionDate = false; // 경매일인지 여부
+        private readonly SemaphoreSlim _nettyConnectionGate = new SemaphoreSlim(1, 1);
         private static readonly TimeSpan DuplicateRetryCooldown = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan QcnCheckIntervalWhenExists = TimeSpan.FromHours(1);
         private static readonly TimeSpan QcnCheckIntervalWhenMissing = TimeSpan.FromMinutes(10);
@@ -197,7 +196,6 @@ namespace CowAuctionSmall.Services
                                     WeakReferenceMessenger.Default.Send(new DisplaySelectRefresh("StopTimer"));
                                     _timersStoppedByNoAuction = true;
                                 }
-                                isAuctionDate = false;
                                 await Task.Delay(GetDelayUntilNextQcnCheck());
                             }
                             else
@@ -207,7 +205,6 @@ namespace CowAuctionSmall.Services
                                     WeakReferenceMessenger.Default.Send(new DisplaySelectRefresh("Refresh"));
                                     _timersStoppedByNoAuction = false;
                                 }
-                                isAuctionDate = true;
                                 await ProcessMessageAsync();
                             }
 
@@ -265,7 +262,6 @@ namespace CowAuctionSmall.Services
                         await Task.Delay(5000);
 
                         // 상태값 리셋 (외부에서 재연결을 유도하거나 루프 조건 제어)
-                        isConnecting = false;
                     }
                 }
             });
@@ -291,8 +287,13 @@ namespace CowAuctionSmall.Services
             return string.Equals(_qcnCacheDate, date, StringComparison.Ordinal) && _cachedQcn != null;
         }
 
-        private async Task RefreshQcnStateAsync(UserInfo currentUser, string currentToken, string date)
+        private async Task RefreshQcnStateAsync(UserInfo currentUser, string currentToken, string date, bool force = false)
         {
+            if (!force && !ShouldRefreshQcn(date))
+            {
+                return;
+            }
+
             await EnsureNettyConnectionAsync(currentUser, currentToken);
 
             var qcn = await _conn.PostQcn(currentUser, currentToken, date);
@@ -329,38 +330,34 @@ namespace CowAuctionSmall.Services
             if (currentUser == null || string.IsNullOrWhiteSpace(currentToken))
                 return;
 
-            if (AuctionDelegate.getInstance().isActive())
-                return;
-
-            DateTime nowUtc = DateTime.UtcNow;
-            if (_duplicateCooldownUntilUtc != DateTime.MinValue && nowUtc >= _duplicateCooldownUntilUtc)
-            {
-                _duplicateCooldownUntilUtc = DateTime.MinValue;
-                _duplicateCooldownLogged = false;
-                logger.LogInfo("EnsureNettyConnectionAsync: duplicate cooldown 만료, 재연결 시도 재개");
-            }
-
-            if (_duplicateCooldownUntilUtc != DateTime.MinValue && nowUtc < _duplicateCooldownUntilUtc)
-            {
-                if (!_duplicateCooldownLogged)
-                {
-                    var remain = _duplicateCooldownUntilUtc - nowUtc;
-                    logger.LogWarn($"EnsureNettyConnectionAsync: duplicate cooldown active ({Math.Ceiling(remain.TotalSeconds)}초 남음)");
-                    _duplicateCooldownLogged = true;
-                }
-                return;
-            }
-
-            while (isConnecting)
-            {
-                await Task.Delay(200);
-                if (AuctionDelegate.getInstance().isActive())
-                    return;
-            }
-
-            isConnecting = true;
+            await _nettyConnectionGate.WaitAsync();
             try
             {
+                if (AuctionDelegate.getInstance().isActive())
+                    return;
+
+                DateTime nowUtc = DateTime.UtcNow;
+                if (_duplicateCooldownUntilUtc != DateTime.MinValue && nowUtc >= _duplicateCooldownUntilUtc)
+                {
+                    _duplicateCooldownUntilUtc = DateTime.MinValue;
+                    _duplicateCooldownLogged = false;
+                    logger.LogInfo("EnsureNettyConnectionAsync: duplicate cooldown 만료, 재연결 시도 재개");
+                }
+
+                if (_duplicateCooldownUntilUtc != DateTime.MinValue && nowUtc < _duplicateCooldownUntilUtc)
+                {
+                    if (!_duplicateCooldownLogged)
+                    {
+                        var remain = _duplicateCooldownUntilUtc - nowUtc;
+                        logger.LogWarn($"EnsureNettyConnectionAsync: duplicate cooldown active ({Math.Ceiling(remain.TotalSeconds)}초 남음)");
+                        _duplicateCooldownLogged = true;
+                    }
+                    return;
+                }
+
+                if (AuctionDelegate.getInstance().isActive())
+                    return;
+
                 await AuctionDelegate.getInstance().disposeClients();
                 await Task.Delay(300);
                 NettyConnectResult connResult = await _conn.NettyComm(currentUser, currentToken);
@@ -391,7 +388,7 @@ namespace CowAuctionSmall.Services
             }
             finally
             {
-                isConnecting = false;
+                _nettyConnectionGate.Release();
             }
         }
 
@@ -809,6 +806,44 @@ namespace CowAuctionSmall.Services
             }
         }
 
+        /// <summary>
+        /// 일괄 경매 종료 상태를 해제하고 결과 데이터를 재조회한다.
+        /// </summary>
+        private async Task CompleteBatchAuctionAsync(string source)
+        {
+            List<gValues> updates;
+            _batchRunningState = false;
+
+            lock (_lockObj)
+            {
+                updates = _beforeAuctionDataList?
+                    .Where(item => item != null && item.IsRunning)
+                    .ToList() ?? new List<gValues>();
+
+                foreach (var item in updates)
+                {
+                    item.IsRunning = false;
+                }
+
+                if (_latestAuctionDataList != null)
+                {
+                    foreach (var item in _latestAuctionDataList.Where(item => item != null && item.IsRunning))
+                    {
+                        item.IsRunning = false;
+                    }
+                }
+            }
+
+            if (updates.Count > 0)
+            {
+                WeakReferenceMessenger.Default.Send(new DataChangedMessage(updates));
+            }
+
+            logger.LogInfo($"batch-auction-complete source={source}, cleared-running={updates.Count}");
+            await Task.Delay(300);
+            await ProcessMessageAsync();
+        }
+
 
 
         /// <summary>
@@ -891,7 +926,7 @@ namespace CowAuctionSmall.Services
 
                                     if (message.Data[3].Equals("refresh") == false)
                                     {
-                                        var tempList = beforeList.Where(item => item.SipNumber == message.Data[2]); //경매번호만 같은거
+                                        var tempList = beforeList!.Where(item => item.SipNumber == message.Data[2]); //경매번호만 같은거
 
                                         // 해당 개체번호를 출력
                                         foreach (var cowAS in tempList)
@@ -920,15 +955,8 @@ namespace CowAuctionSmall.Services
 
                                 case "8001":
 
-                                    if (message.Data[3].Equals("refresh") && _runRunSipNumber == -1)
+                                    if (message.Data[3].Equals("refresh") && _runRunSipNumber == -1 && !_batchRunningState)
                                     {
-                                        //오늘 경매날이라면 새로고침 x
-                                        if(isAuctionDate == true)
-                                        {
-                                            Debug.WriteLine("==================================== 새로고침 신호 무시 (경매일)");
-                                            break;
-                                        }
-
                                         Debug.WriteLine("***************************************************새로고침 시작 신호***************************************************");
                                         logger.LogInfo("***************************************************새로고침 시작 신호***************************************************");
                                         
@@ -936,6 +964,22 @@ namespace CowAuctionSmall.Services
                                         WeakReferenceMessenger.Default.Send(new DataStringMessage($"{DateTime.Now} 새로고침 시작 신호 {message.Data[0]} {message.Data[1]} {message.Data[2]} {message.Data[3]}"));
                                         
                                         startRefesh = true;
+                                        _ = Task.Run(async () =>
+                                        {
+                                            var currentUser = _userInfo;
+                                            var currentToken = _token;
+                                            if (currentUser == null || string.IsNullOrWhiteSpace(currentToken))
+                                            {
+                                                logger.LogError("AS8001 refresh: _userInfo 또는 _token이 null입니다.");
+                                                return;
+                                            }
+
+                                            string date = string.IsNullOrWhiteSpace(currentUser.CurrentInfo?.Date)
+                                                ? DateTime.Today.ToString("yyyyMMdd")
+                                                : currentUser.CurrentInfo.Date;
+                                            await RefreshQcnStateAsync(currentUser, currentToken, date, force: true);
+                                            await ProcessMessageAsync();
+                                        });
                                     }
 
                                     break;
@@ -1023,28 +1067,24 @@ namespace CowAuctionSmall.Services
                 switch (code)
                 {
                     case "AS":
-                        if (message.Data[2].Equals("8004") && beforeList != null) //경매 진행상태라면
+                        if (message.Data[2].Equals("8004")) //경매 진행상태라면
                         {
-                            var tempList = beforeList.Where(item => item.AuctionResultStatus.Equals("11")); //경매 진행중인것만
-                            foreach (gValues cow in tempList)
-                            {
-                                currentSyncList.Add(cow);
-                            }
-                            WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
-                            Debug.WriteLine("\n**************\n**************\n일괄 경매 시작\n**************\n**************");
                             _batchRunningState = true;
+                            if (beforeList != null)
+                            {
+                                var tempList = beforeList.Where(item => item.AuctionResultStatus.Equals("11")); //경매 진행중인것만
+                                foreach (gValues cow in tempList)
+                                {
+                                    currentSyncList.Add(cow);
+                                }
+                                WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                            }
+                            Debug.WriteLine("\n**************\n**************\n일괄 경매 시작\n**************\n**************");
                         }
-                        else if (message.Data[2].Equals("8006") && beforeList != null)
+                        else if (message.Data[2].Equals("8006"))
                         {
                             Debug.WriteLine("\n**************\n**************\n일괄 경매 끝\n**************\n**************");
-                            _batchRunningState = false;
-
-                            // 💡 [추가] 일괄경매 종료 신호 수신 즉시 API 데이터를 재조회하여 화면을 낙찰/유찰 상태로 전환
-                            _ = Task.Run(async () =>
-                            {
-                                await Task.Delay(300); // 서버 DB 결과 반영 대기
-                                await ProcessMessageAsync(); // 최신 데이터 수신 및 화면 갱신
-                            });
+                            _ = CompleteBatchAuctionAsync("AS8006");
                         }
                         break;
                     case "SZ":
@@ -1069,42 +1109,24 @@ namespace CowAuctionSmall.Services
                         try
                         {
                             logger.LogInfo($"OnStringArrMsg(SZ): 재조회 시작 date={szDate}");
-                            var qcn = await _conn.PostQcn(currentUser, currentToken, szDate);
-                            if (qcn == null)
+                            await RefreshQcnStateAsync(currentUser, currentToken, szDate, force: true);
+                            if (!HasCachedQcn(szDate))
                             {
                                 logger.LogInfo($"OnStringArrMsg(SZ): 차수데이터 없음 date={szDate}");
                                 WeakReferenceMessenger.Default.Send(new DataStringMessage($"SZ 날짜({szDate}) 차수데이터가 없습니다."));
                                 break;
                             }
-
-                            var szRawList = await _conn.SvInfoRequest(currentUser, currentToken, szDate);
-                            if (szRawList == null || szRawList.Count == 0)
+                            var previousRefreshDate = _currentRefreshDate;
+                            _currentRefreshDate = szDate;
+                            try
                             {
-                                logger.LogInfo($"OnStringArrMsg(SZ): 조회된 데이터가 없습니다. date={szDate}");
-                                WeakReferenceMessenger.Default.Send(new DataStringMessage($"SZ 날짜({szDate}) 조회 데이터가 없습니다."));
-                                break;
+                                await ProcessMessageAsync();
                             }
-
-                            var parsedList = new List<gValues>(szRawList.Count);
-                            foreach (var raw in szRawList)
+                            finally
                             {
-                                var cow = _animParseData.Parse_PacketApi(raw, currentUser, _conn);
-                                if (cow != null)
-                                {
-                                    parsedList.Add(cow);
-                                }
+                                _currentRefreshDate = previousRefreshDate;
                             }
-
-                            if (parsedList.Count == 0)
-                            {
-                                logger.LogInfo($"OnStringArrMsg(SZ): 파싱된 데이터가 없습니다. date={szDate}");
-                                break;
-                            }
-
-                            _beforeAuctionDataList = parsedList.OrderBy(x => x.EntityNumber).ToList();
-                            WeakReferenceMessenger.Default.Send(new DisplaySelectRefresh("Refresh"));
-                            WeakReferenceMessenger.Default.Send(new DataChangedMessage(new List<gValues>(_beforeAuctionDataList)));
-                            WeakReferenceMessenger.Default.Send(new DataStringMessage($"SZ 날짜({szDate}) 재조회 완료, 총갯수 : {_beforeAuctionDataList.Count}, 변경시간 : {DateTime.Now}"));
+                            WeakReferenceMessenger.Default.Send(new DataStringMessage($"SZ 날짜({szDate}) 표준 재조회 완료, 변경시간 : {DateTime.Now}"));
                         }
                         catch (Exception ex)
                         {
@@ -1192,6 +1214,10 @@ namespace CowAuctionSmall.Services
                     break;
                 case "SD":
                     Debug.WriteLine("SD 온 값 : " + msg.ToString);
+                    if (msg.Length >= 3 && string.Equals(msg[2], "F", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _ = CompleteBatchAuctionAsync("SDF");
+                    }
                     break;
 
                 default:
@@ -1293,6 +1319,13 @@ namespace CowAuctionSmall.Services
                     _beforeAuctionDataList.Remove(_beforeAuctionDataList.FirstOrDefault(cow => cow.SipNumber.Equals(bidderCow.SipNumber)));
                     _beforeAuctionDataList.Add(bidderCow);
                     _beforeAuctionDataList = _beforeAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
+
+                    if (_latestAuctionDataList != null)
+                    {
+                        _latestAuctionDataList.Remove(_latestAuctionDataList.FirstOrDefault(cow => cow.SipNumber.Equals(bidderCow.SipNumber)));
+                        _latestAuctionDataList.Add(bidderCow);
+                        _latestAuctionDataList = _latestAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
+                    }
                 }
 
                 if (bidderCow.Bidder.Equals("-"))

@@ -229,7 +229,11 @@ namespace CowAuctionSmall.Services
             }
             else // 일괄 경매 방식
             {
-
+                if (countCode == "F")
+                {
+                    // 일괄 경매 마감 신호도 ServerGetData에 전달하여 진행 상태와 화면을 즉시 정리한다.
+                    WeakReferenceMessenger.Default.Send(new DataToServerGetAF_SD(data));
+                }
             }
 
         }

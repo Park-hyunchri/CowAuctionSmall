@@ -483,7 +483,7 @@ namespace CowAuctionSmall.Services
 
         private static bool IsAuctionInProgress()
         {
-            return ServerGetData._runRunSipNumber != -1;
+            return ServerGetData._runRunSipNumber != -1 || ServerGetData._batchRunningState;
         }
 
         private bool ShouldFreezeRunningRotation()
@@ -1235,6 +1235,14 @@ namespace CowAuctionSmall.Services
             }
 
             state.RunningKey = null;
+            if (state.RunningPages != null)
+            {
+                foreach (var page in state.RunningPages)
+                {
+                    page.DataContext = null;
+                }
+                state.RunningPages.Clear();
+            }
             state.RunningPages = null;
             state.UseRunningNoteHost = false;
             state.UpdateSignature = null;
