@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Web;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CowAuctionSmall.Services
 {
@@ -181,6 +182,8 @@ namespace CowAuctionSmall.Services
                         gv.PaternityMatch = "-";
                         break;
                 }
+
+               
 
                 // user.xml 설정값(IsPaternityMatch)이 "N"인 경우 친자일치 값을 강제로 비활성화("-")
                 if (showPaternity == "N")
@@ -479,7 +482,9 @@ namespace CowAuctionSmall.Services
                         {
                             gv.Bidder = bidderSource.Length > 3 ? bidderSource.Substring(0, 3) : bidderSource;
                         }
-                        if (gv.Is_Nh_QQuri =="Y" || gv.Nh_ability_1_num.Length>2)
+                        if (string.Equals(userInfo.Auction.AuctionHouseCode, "8808990817675", StringComparison.Ordinal)
+                            || gv.Is_Nh_QQuri == "Y"
+                            || gv.Nh_ability_1_num.Length > 2)
                         {
                             gv.Bidder = bidderSource;
                         }
@@ -621,6 +626,71 @@ namespace CowAuctionSmall.Services
                     gv.Note = gv.Note.Trim().Trim(',');
                 }
             }
+
+            //260902 임시 장성
+            if (string.Equals(code, "8808990817675", StringComparison.Ordinal))
+            {
+                string[] keywords = { "친자", "으뜸", "혈통" };
+                var firstMatch = keywords
+                    .Select(keyword => new
+                    {
+                        Keyword = keyword,
+                        Index = gv.Note.IndexOf(keyword, StringComparison.Ordinal)
+                    })
+                    .Where(match => match.Index >= 0)
+                    .OrderBy(match => match.Index)
+                    .FirstOrDefault();
+
+                switch (firstMatch?.Keyword)
+                {
+                    case "친자":
+                        gv.FrontNoteWord = "친자";
+                        gv.PaternityMatch = "친자일치";
+                        gv.FrontNoteWordBrush = "Lime";
+                        break;
+                    case "으뜸":
+                        gv.FrontNoteWord = "으뜸";
+                        gv.PaternityMatch = "친자일치";
+                        gv.FrontNoteWordBrush = "Aqua";
+                        break;
+                    case "혈통":
+                        gv.FrontNoteWord = "혈통";
+                        gv.PaternityMatch = "친자일치";
+                        gv.FrontNoteWordBrush = "Yellow";
+                        break;
+                    default:
+                        gv.FrontNoteWord = string.Empty;
+                        gv.PaternityMatch = string.Empty;
+                        break;
+                }
+
+                if (firstMatch != null)
+                {
+                    gv.Note = gv.Note
+                        .Remove(firstMatch.Index, firstMatch.Keyword.Length)
+                        .Trim(' ', ',');
+                }
+            }
+            else
+            {
+                switch (gv.PaternityMatch)
+                {
+                    case "친자일치":
+                        gv.FrontNoteWord = "친자";
+                        gv.FrontNoteWordBrush = "Yellow";
+                        break;
+                    default:
+                        gv.FrontNoteWord = string.Empty;
+                        break;
+                }
+            }
+            if (gv.FrontNoteWord.Contains("친자"))
+            {
+                string aa = gv.FrontNoteWord;
+            }
+            // 260902 너무 급해서 임시용 비고 부분에 해당 글자가 있으면 앞에 쓰기로 정정원 책임이 다음주에 추가 정보 공유 예정
+
+
 
             return gv;
         }

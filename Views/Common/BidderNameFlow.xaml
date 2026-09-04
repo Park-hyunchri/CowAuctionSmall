@@ -1,0 +1,34 @@
+<UserControl x:Class="CowAuctionSmall.Views.Common.BidderNameFlow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             x:Name="root"
+             FontFamily="굴림"
+             FontSize="13"
+             Foreground="Yellow"
+             HorizontalContentAlignment="Stretch"
+             VerticalContentAlignment="Stretch"
+             IsHitTestVisible="False"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d"
+             d:DesignHeight="20"
+             d:DesignWidth="70">
+
+    <Canvas x:Name="flowCanvas"
+            Background="Transparent"
+            ClipToBounds="True">
+        <TextBlock x:Name="flowText"
+                   Canvas.Left="0"
+                   Canvas.Top="1"
+                   Text="{Binding Text, ElementName=root}"
+                   Foreground="{Binding Foreground, ElementName=root}"
+                   FontFamily="{Binding FontFamily, ElementName=root}"
+                   FontSize="{Binding FontSize, ElementName=root}"
+                   FontWeight="{Binding FontWeight, ElementName=root}"
+                   TextWrapping="NoWrap"
+                   RenderOptions.ClearTypeHint="Enabled"
+                   TextOptions.TextRenderingMode="Aliased"
+                   TextOptions.TextFormattingMode="Display"/>
+    </Canvas>
+</UserControl>

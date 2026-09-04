@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.RunningNoteHost128"
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.RunningNoteHost128_Running"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,7 +24,7 @@
             <Border x:Name="borderPaternityMatch"
                     Canvas.Left="2" Canvas.Top="108"
                     Width="28" Height="18"
-                    BorderBrush="{Binding FrontNoteWordBrush}"
+                    BorderBrush="{Binding CowInfo.FrontNoteWordBrush}"
                     BorderThickness="1"
                     CornerRadius="3"
                     Padding="1"
@@ -32,8 +32,8 @@
                     IsHitTestVisible="False"
                     Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed, TargetNullValue=Collapsed}">
 
-                <TextBlock Text="{Binding FrontNoteWord}" 
-                           Foreground="{Binding FrontNoteWordBrush}" 
+                <TextBlock Text="{Binding CowInfo.FrontNoteWord}" 
+                           Foreground="{Binding CowInfo.FrontNoteWordBrush}" 
                            FontSize="11" 
                            FontWeight="Bold"
                            HorizontalAlignment="Center" 

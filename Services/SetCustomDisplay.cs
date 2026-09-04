@@ -4,6 +4,7 @@ using CowAuctionSmall.Views.SIze_160_64.Running;
 using CowAuctionSmall.Views.Size_320_64.Running;
 using CowAuctionSmall.Views.Size128_128;
 using CowAuctionSmall.Views.Size128_128.CustomAuctionSold;
+using CowAuctionSmall.Views.Size128_128.CustomAuctionUnSold;
 using CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold;
 using CowAuctionSmall.Views.Size128_128.Running;
 using CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1;
@@ -37,6 +38,7 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990656885") return new HoengseongRun(); // 횡성
             if (nhCode == "8808990661315") return new Hwasun(); // 화순
             if (nhCode == "8808990656441") return new GimjeRun(); // 김제
+            if (nhCode == "8808990817675") return new Jangseong(); // 장성
 
             // if (nhCode == "8808990643625" || nhCode == "8808990657202") return new YangpyeongRun(); // 양평, 무진장
 
@@ -126,7 +128,8 @@ namespace CowAuctionSmall.Services
             "8808990837314" or "8808990227207" or "8808990683973" or "8808990659787" or "8808990656427" or "8808990844220" or "8808990227283" or "8808990656458" or "8808990795874" or "8808990657639" or "8808990659268" or "8808990657615" or "8808990679549" or "8808990671086" => new AnseongSold(),
             // 안성, 남원, 음성, 파주연천, 문경, 이천, 익산군산, 고성, 평택, 상주, 논산계룡, 구미칠곡, 포항, 옥천
                 "8808990660783" => new QQuriSold_Weight(), // 임실
-    
+
+            "8808990817675" => new JangseongSold(), // 장성 260902 추가
             "8808990643625" => new YangpyeongSold(), // 양평
             "8808990656557" => new YecheonSold(), // 예천
             "8808990656106" => new HaenamJindoSold(), // 해남진도
@@ -134,8 +137,7 @@ namespace CowAuctionSmall.Services
             "8808990656717" or "8808990817675" => new QQuriSold_v3(), // 곡성, 장성
             "8808990656885" => lowestPriceTitle == "행사용" ? new HoengseongBunyangSold() : new HoengseongSold(), // 횡성
             "8808990661315" => new HwasunSold(), // 화순
-
-                // "8808990657202" => new AnseongSold(), // 안성, 무진장
+             // "8808990657202" => new AnseongSold(), // 안성, 무진장
 
                 // 뿌리농가 미적용("X") 구분이 필요할 경우 아래 주석 해제 후 사용
                 _ => string.Equals(is_QQuri, "X", StringComparison.OrdinalIgnoreCase)
@@ -177,8 +179,9 @@ namespace CowAuctionSmall.Services
             if (nhCode == "8808990844220") return new OutLineUnSold_2(); // 홍천
 
             if (nhCode == "8808990643625") return new YangpyeongUnSold();      // 양평
-            
-            
+            if (nhCode == "8808990817675") return new JangseongUnSold(); // 장성
+
+
 
             // if (nhCode == "8808990657202") return new AnseongUnSold(); // 무진장
 

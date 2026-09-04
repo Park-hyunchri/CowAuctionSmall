@@ -44,8 +44,8 @@ namespace CowAuctionSmall.Models.Converter
         private static readonly SolidColorBrush BrushDarkRed = CreateBrush("#D60053");
         private static readonly SolidColorBrush BrushBlack = Brushes.Black;
 
-        private static readonly Thickness DefaultMargin = new Thickness(74, 4, 0, 0);
-        private static readonly Thickness WideMargin = new Thickness(90, 0, 0, 0);
+        private static readonly Thickness DefaultMargin = new Thickness(76, 4, 0, 0);
+        private static readonly Thickness WideMargin = new Thickness(90, -2, 0, 0);
 
         private static readonly Dictionary<string, Style> CachedStyles = new();
         private static readonly Style DefaultStyle;

@@ -12,7 +12,7 @@ using System.Windows.Media.Animation;
 public class FlowTextAnimation
 {
     private const string SharedNoteKey = "__shared_note__";
-    private const int MinScrollTextLength = 8;
+    private const int DefaultMinScrollTextLength = 8;
 
     private readonly TextBlock _textBlock;
     private readonly Canvas _canvas;
@@ -21,6 +21,8 @@ public class FlowTextAnimation
     private readonly bool _useViewModel;
     private readonly bool _useRenderTransform;
     private readonly string? _pageKey;
+    private readonly int _minScrollTextLength;
+    private readonly bool _forceScrollWhenLengthExceeded;
     private TranslateTransform? _translate;
 
     private double _notePosition;
@@ -40,7 +42,7 @@ public class FlowTextAnimation
     /// <summary>
     /// 뷰모델 연동형 마퀴 애니메이션을 생성한다.
     /// </summary>
-    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, AuctionContPanelViewModel viewModel, double speed = 15, bool useRenderTransform = true, string? pageKey = null)
+    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, AuctionContPanelViewModel viewModel, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false)
     {
         _textBlock = textBlock;
         _canvas = canvas;
@@ -49,12 +51,14 @@ public class FlowTextAnimation
         _useViewModel = true;
         _useRenderTransform = useRenderTransform;
         _pageKey = pageKey;
+        _minScrollTextLength = Math.Max(0, minScrollTextLength);
+        _forceScrollWhenLengthExceeded = forceScrollWhenLengthExceeded;
     }
 
     /// <summary>
     /// 뷰모델 없이 동작하는 마퀴 애니메이션을 생성한다.
     /// </summary>
-    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, double speed = 15, bool useRenderTransform = true, string? pageKey = null)
+    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false)
     {
         _textBlock = textBlock;
         _canvas = canvas;
@@ -62,6 +66,8 @@ public class FlowTextAnimation
         _useViewModel = false;
         _useRenderTransform = useRenderTransform;
         _pageKey = pageKey;
+        _minScrollTextLength = Math.Max(0, minScrollTextLength);
+        _forceScrollWhenLengthExceeded = forceScrollWhenLengthExceeded;
     }
 
     /// <summary>
@@ -341,7 +347,7 @@ public class FlowTextAnimation
             _notePosition = _viewportWidth;
         }
 
-        if (currentText.Length <= MinScrollTextLength || _viewportWidth <= 0)
+        if (currentText.Length <= _minScrollTextLength || _viewportWidth <= 0)
         {
             _shouldScroll = false;
             ApplyPosition(0); // Reset position when text is too short to scroll
@@ -352,7 +358,9 @@ public class FlowTextAnimation
         _textBlock.Arrange(new Rect(new Size(_textBlock.DesiredSize.Width, _textBlock.DesiredSize.Height)));
 
         _textWidth = _textBlock.ActualWidth > 0 ? _textBlock.ActualWidth : _textBlock.DesiredSize.Width;
-        _shouldScroll = _textWidth > _viewportWidth && _textWidth > 0 && _viewportWidth > 0;
+        _shouldScroll = _textWidth > 0
+            && _viewportWidth > 0
+            && (_forceScrollWhenLengthExceeded || _textWidth > _viewportWidth);
 
         if (!_shouldScroll)
         {

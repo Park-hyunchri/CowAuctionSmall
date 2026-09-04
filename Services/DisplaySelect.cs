@@ -41,6 +41,7 @@ namespace CowAuctionSmall.Services
             public string? RunningKey;
             public List<UserControl>? RunningPages;
             public RunningNoteHost128? RunningNoteHost;
+            public RunningNoteHost128_Running? RunningNoteHost_Running;
             public bool UseRunningNoteHost;
             public UserControl? SoldView;
             public string? SoldKey;
@@ -942,7 +943,7 @@ namespace CowAuctionSmall.Services
 
             if (useHostForPage)
             {
-                var host = state.RunningNoteHost ??= new RunningNoteHost128();
+                var host = state.RunningNoteHost_Running ??= new RunningNoteHost128_Running();
                 host.Width = panel.Width;
                 host.Height = panel.Height;
 

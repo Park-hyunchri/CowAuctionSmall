@@ -237,6 +237,12 @@ namespace CowAuctionSmall.Models.Structures
 
         public string PaternityMatch { get; set; } = string.Empty; //친자검사결과여부
         public bool HasPaternityMatch => !string.IsNullOrWhiteSpace(PaternityMatch) && PaternityMatch != "-";
+
+        //260902 임시 , 장성때문에 임시
+        public string FrontNoteWord { get; set; } = "";
+        public string FrontNoteWordBrush { get; set; } = "Yellow";
+        //
+
         public int ProcessStatus { get; set; } = 8001;              //경매 진행 상태
         public string Bidder { get; set; } = "-";                   //낙찰자 번호
         public string BidderNum { get; set; } = "";           //낙찰번호
@@ -428,6 +434,9 @@ namespace CowAuctionSmall.Models.Structures
             sb.AppendLine(Nh_ability_Str);
             sb.AppendLine(Is_Nh_QQuri);
 
+            sb.AppendLine(FrontNoteWord);
+            sb.AppendLine(FrontNoteWordBrush);
+
             return sb.ToString();
         }
 
@@ -508,7 +517,10 @@ namespace CowAuctionSmall.Models.Structures
                 Is_Mother_Ｎh_Excellent = Is_Mother_Ｎh_Excellent,
                 Is_Ｎh_ability = Is_Ｎh_ability,
                 Nh_ability_Str = Nh_ability_Str,
-                Is_Nh_QQuri = Is_Nh_QQuri
+                Is_Nh_QQuri = Is_Nh_QQuri,
+
+                FrontNoteWord = FrontNoteWord,
+                FrontNoteWordBrush = FrontNoteWordBrush
             };
 
             return clone;
@@ -674,6 +686,8 @@ namespace CowAuctionSmall.Models.Structures
             hash.Add(Is_Nh_QQuri);
             hash.Add(Reproduction_Imsin_Sujung_Date);
             hash.Add(Reproduction_Sujung_KPN);
+            hash.Add(FrontNoteWord);
+            hash.Add(FrontNoteWordBrush);
             return hash.ToHashCode();
         }
     }

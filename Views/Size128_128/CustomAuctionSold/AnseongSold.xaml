@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAuctionSold"
              xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             xmlns:common="clr-namespace:CowAuctionSmall.Views.Common"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
@@ -183,29 +184,26 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Y : 사람 이름만 (2줄/줄바꿈) -->
-                <TextBlock x:Name="tbBidderNameOnly" Text="{Binding Bidder}" Foreground="Yellow" TextWrapping="Wrap" TextAlignment="Center"  VerticalAlignment="Center">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
+                <!-- Y : 사람 이름만 (5글자 초과 시 한 줄 흐름) -->
+                <common:BidderNameFlow Text="{Binding Bidder}"
+                                       FontWeight="Bold"
+                                       Height="20"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center">
+                    <common:BidderNameFlow.Style>
+                        <Style TargetType="{x:Type common:BidderNameFlow}">
                             <Setter Property="Visibility" Value="Collapsed"/>
-                            <Setter Property="FontSize" Value="18"/>
                             <Style.Triggers>
-                                <!-- 1) Y일 때만 보이게 -->
                                 <DataTrigger Binding="{Binding BidderName}" Value="Y">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
-
-                                <!-- 2) 2줄짜리 이름이면 폰트 14 -->
-                                <DataTrigger Binding="{Binding IsTwoLineName}" Value="True">
-                                    <Setter Property="FontSize" Value="14"/>
-                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBlock.Style>
-                </TextBlock>
+                    </common:BidderNameFlow.Style>
+                </common:BidderNameFlow>
 
-                <!-- B : 윗줄 숫자, 아랫줄 이름 -->
-                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!-- B : 윗줄 이름, 아랫줄 숫자 -->
+                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -217,13 +215,16 @@
                         </Style>
                     </StackPanel.Style>
 
-                    <!-- 윗줄 : 숫자 -->
-                    <TextBlock  Foreground="Yellow" FontSize="20"  TextAlignment="Center" FontWeight="Bold" >
+                    <!-- 윗줄 : 이름 (5글자 초과 시 한 줄 흐름) -->
+                    <common:BidderNameFlow Text="{Binding BidderString}"
+                                           FontSize="11.5"
+                                           Height="14"
+                                           HorizontalAlignment="Stretch"/>
+
+                    <!-- 아랫줄 : 숫자 -->
+                    <TextBlock Foreground="Yellow" FontSize="20" TextAlignment="Center" FontWeight="Bold">
                         <Run Text="{Binding BidderNum}" />
                     </TextBlock>
-
-                    <!-- 아랫줄 : 이름 (2줄 허용) -->
-                    <TextBlock Text="{Binding BidderString}" Foreground="Yellow" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="80" TextWrapping="NoWrap" FontSize="11.5" />
                 </StackPanel>
             </Grid>
         </Grid>
