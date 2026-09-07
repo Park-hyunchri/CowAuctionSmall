@@ -1,5 +1,6 @@
 # CowAuctionSmall 작업 기록
 
+
 ## 2026-09-04 — 해남진도 통신 안정화 및 일괄/단일 경매 표출 보완
 
 ### 작업 날짜
@@ -70,6 +71,16 @@
 
 - 제안 commit 메시지: `fix: 해남진도 경매 통신 및 표출 상태 안정화`
 - Commit hash: 미생성
+
+## 2026-09-08 유찰 후 동일 출품번호 재경매 전광판 갱신 수정
+
+- 수정 파일: `Services/ServerGetData.cs`, `WORKLOG.md`
+- 재경매 시 이전 낙찰·응찰 정보를 초기화하고 진행 상태로 전환
+- 변경된 최저가를 반영하고 `DataChangedMessage`로 진행 화면 갱신
+- 정상 재경매 동기화 1회에 한해 실행 중 개체 차단 예외 적용
+- `dotnet build --no-restore`: 미수행
+- 실제 통신·전광판 수동 검증: 미수행
+- Git commit hash: 미생성 / Git push: 미수행
 - Push 여부: 미수행
 
 ### 추가 확인사항

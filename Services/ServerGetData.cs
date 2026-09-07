@@ -43,6 +43,7 @@ namespace CowAuctionSmall.Services
 
         public static int _runRunSipNumber = -1; // 현재 진행중인 경매 번호 (경매진행중일때 는 다른화면으로 전환 x 하려고) -1을 초기값으로 한 이유는 개발서버에서 0번 경매도 생성가능해서
         public static bool _batchRunningState = false; // 일괄 경매 진행중인지 여부
+        private string? _allowRunningEntitySyncSipNumber;
 
         private AnimalParseData _animParseData; //데이터 파싱용, 여러군데 써서 따로 빼둠
         //
@@ -720,11 +721,12 @@ namespace CowAuctionSmall.Services
             }
 
             string runningSip = _runRunSipNumber.ToString();
+            bool isReAuctionSync = string.Equals(_allowRunningEntitySyncSipNumber, runningSip, StringComparison.Ordinal);
             var blocked = source
                 .Where(item => item != null && string.Equals(item.SipNumber, runningSip, StringComparison.Ordinal))
                 .ToList();
 
-            if (blocked.Count > 0)
+            if (blocked.Count > 0 && !isReAuctionSync)
             {
                 string blockedEntityNumbers = string.Join(",",
                     blocked
@@ -737,6 +739,13 @@ namespace CowAuctionSmall.Services
                     $"blocked-running-entity-change reason={reason}, sip={runningSip}, count={blocked.Count}, entities={blockedEntityNumbers}";
                 Debug.WriteLine(logMsg);
                 logger.LogInfo(logMsg);
+            }
+
+            if (isReAuctionSync)
+            {
+                _allowRunningEntitySyncSipNumber = null;
+                logger.LogInfo($"allow-running-entity-change reason={reason}, sip={runningSip}");
+                return source;
             }
 
             return source
@@ -931,25 +940,46 @@ namespace CowAuctionSmall.Services
                                         // 해당 개체번호를 출력
                                         foreach (var cowAS in tempList)
                                         {
-                                            if (cowAS.LowestPrice.Equals(message.Data[3]))
+                                            bool isPriceChanged = !cowAS.LowestPrice.Equals(message.Data[3]);
+                                            if (isPriceChanged || !cowAS.AuctionResultStatus.Equals("11"))
                                             {
-                                                cowAS.AuctionResultStatus = !cowAS.AuctionResultStatus.Equals("11") ? "11" : cowAS.AuctionResultStatus;
-                                                _runRunSipNumber = int.Parse(cowAS.SipNumber);
-                                                cowAS.IsRunning = true;
-                                            }
-                                            else
-                                            {
-                                                Debug.WriteLine("가격이 다름\n" + cowAS.toString() + "\n" + message.Data[3]);
-                                                logger.LogInfo("가격이 다름\n" + cowAS.toString() + "\n" + message.Data[3]);
-                                                cowAS.IsRunning = false;
+                                                Debug.WriteLine("재경매 상태 초기화\n" + cowAS.toString() + "\n" + message.Data[3]);
+                                                logger.LogInfo("재경매 상태 초기화\n" + cowAS.toString() + "\n" + message.Data[3]);
+                                                cowAS.BidPrice = "-";
+                                                cowAS.Bidder = "-";
+                                                cowAS.BidderNum = "";
+                                                cowAS.BidderString = "";
                                             }
 
+                                            if (isPriceChanged)
+                                            {
+                                                cowAS.LowestPrice = message.Data[3];
+                                            }
+
+                                            cowAS.AuctionResultStatus = "11";
+                                            cowAS.IsRunning = true;
                                             _runRunSipNumber = int.Parse(cowAS.SipNumber);
+                                            _allowRunningEntitySyncSipNumber = cowAS.SipNumber;
                                             currentSyncList.Add(cowAS);
                                         }
 
                                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
                                         currentSyncList.Clear();
+                                    }
+                                    break;
+
+                                case "8002":
+                                case "8003":
+                                    foreach (var cowAS in beforeList!.Where(item => item.SipNumber == message.Data[2]))
+                                    {
+                                        cowAS.BidPrice = "-";
+                                        cowAS.Bidder = "-";
+                                        cowAS.BidderNum = "";
+                                        cowAS.BidderString = "";
+                                        cowAS.AuctionResultStatus = "11";
+                                        cowAS.IsRunning = true;
+                                        _runRunSipNumber = int.Parse(cowAS.SipNumber);
+                                        _allowRunningEntitySyncSipNumber = cowAS.SipNumber;
                                     }
                                     break;
 
