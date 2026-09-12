@@ -17,7 +17,7 @@ public sealed class ControlWindowViewModel : INotifyPropertyChanged
     private readonly Action _showNumbers;
     private readonly Action _showPages;
     private readonly Action<Color> _color;
-    private int _brightness = 255;
+    private int _brightness = 170;
     private Color _baseColor = Colors.Black;
     public int Brightness { get => _brightness; set { _brightness = Math.Clamp(value, 0, 255); OnPropertyChanged(); _color(EffectiveColor); } }
     public ICommand Numbers { get; }

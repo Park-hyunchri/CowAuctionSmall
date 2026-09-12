@@ -9,6 +9,7 @@ using CowAuctionSmall.Models.Structures;
 using CowAuctionSmall.Services;
 using GAMSTest.Models;
 using GAMSTest.Views;
+using GAMSTest.ViewModels;
 
 namespace GAMSTest.Services;
 
@@ -82,7 +83,7 @@ public sealed class DisplayTestController
                 TesterDisplayState.UnSold => selector.CustomAuctionUnSold_128(auction?.AuctionHouseCode ?? "", auction?.IsShowQQuri ?? "", data.CowDistinction, data.Nh_ability_1_num),
                 _ => selector.CustomAuctionSold_128(auction?.AuctionHouseCode ?? "", auction?.BidderName ?? "", auction?.IsShowQQuri ?? "", data.CowDistinction, data.Nh_ability_1_num, data.LowestPriceTitle)
             };
-            view.Width = 128; view.Height = 128; view.DataContext = data; pair.Value.Children.Add(view);
+            view.Width = 128; view.Height = 128; view.DataContext = new MockPanelViewModel(data); pair.Value.Children.Add(view);
         }
     }
 }

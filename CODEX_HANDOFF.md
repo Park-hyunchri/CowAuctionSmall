@@ -1,5 +1,15 @@
 # CODEX HANDOFF
 
+## 2026-09-12 GAMSTest MockDataFactory 보강
+
+- 패널 번호 `% 4` 기반 성별(암/수/거세/암소) 및 축종 순환 적용
+- 진행·유전·유찰·낙찰 공통 비고 `테스트 데이터 입니다`, 최저가·중량·개체번호 매핑
+- EPD 수치·등급(A, B, C, D) 및 농협 우량·뿌리농가 플래그 설정
+- 낙찰가·낙찰자 정보 보강으로 화면 공백 제거
+- 빌드: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공 / 오류 0개 / 경고 1개
+- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
+
 ## 2026-09-12 GAMSTest 운영 프로그램 실행 기능
 
 - ControlWindow에 `CowAuctionSmall.exe` 실행 및 Bring to Front 버튼 추가

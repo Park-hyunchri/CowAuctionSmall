@@ -1,5 +1,19 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-12 GAMSTest MockDataFactory 가상 데이터 보강
+
+### 작업 내용
+- 패널 번호 `% 4` 기반 성별(암/수/거세/암소) 및 축종 순환
+- 진행·유전·유찰·낙찰 공통 비고 `테스트 데이터 입니다` 설정
+- 최저가, 중량, 개체번호, 출하주, 지역, 생년월일 등 표시 데이터 매핑
+- EPD 수치와 등급(A, B, C, D) 및 농협 우량·뿌리농가 플래그 설정
+- 낙찰가 및 낙찰자 정보 보강으로 화면 공백 제거
+
+### 검증
+- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 경고 1개
+- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
+
 ## 2026-09-12 GAMSTest 운영 프로그램 실행 버튼 추가
 
 ### 작업 내용
