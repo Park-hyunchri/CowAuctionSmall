@@ -1,5 +1,28 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-12 GAMSTest 단독 테스트 실행 및 빌드 검증
+
+### 작업 내용
+- ControlWindow 버튼을 [번호], [뷰 페이지] 구조로 통합
+- [뷰 페이지] 클릭 시 진행, 유전능력, 유찰, 낙찰 화면을 5초 주기로 순환
+- 번호 또는 RGB 버튼 클릭 시 순환 타이머 중지
+- RGB 실행 시 패널 자식 요소 제거 후 단색 표시
+- SetCustomDisplay 기반 128x128 View 생성
+- users.XML의 AuctionHouseCode, LowestPriceTitle, BidderName 반영
+- Mock gValues를 각 View의 DataContext로 주입
+- 기존 운영 DLL 참조로 기존 View와 서비스 재사용
+- ProjectReference 대신 DLL 참조 방식으로 구성하여 GAMSTest 중복 포함 문제 방지
+
+### 검증
+- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 경고 1개
+- 경고: `GAMSTest/ViewModels/ControlWindowViewModel.cs(46)` CS0067 `ActionCommand.CanExecuteChanged` 이벤트 미사용
+- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음
+
+### Git
+- Commit: 미생성
+- Push: 미수행
+
 
 ## 2026-09-04 — 해남진도 통신 안정화 및 일괄/단일 경매 표출 보완
 

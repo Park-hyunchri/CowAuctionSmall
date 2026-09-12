@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType><TargetFramework>net9.0-windows</TargetFramework><Nullable>enable</Nullable><UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CowAuctionSmall"><HintPath>..\bin\Debug\net9.0-windows\CowAuctionSmall.dll</HintPath></Reference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" /><PackageReference Include="NLog" Version="6.0.6" /><PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+    <None Include="..\Config\Board.XML" Link="Config\Board.XML" CopyToOutputDirectory="PreserveNewest" /><None Include="..\Config\users.XML" Link="Config\users.XML" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
