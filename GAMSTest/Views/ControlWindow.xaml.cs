@@ -1,10 +1,16 @@
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 using CowAuctionSmall.Models.XMLParser;
 using GAMSTest.ViewModels;
 namespace GAMSTest.Views;
 public partial class ControlWindow : Window
 {
+    private const int SW_RESTORE = 9;
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")] private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
     private readonly DisplayWindow _display;
     private bool _isClosing;
     public ControlWindow()
@@ -14,6 +20,17 @@ public partial class ControlWindow : Window
         _display = new DisplayWindow(user); DataContext = new ControlWindowViewModel(_display.Controller.ShowNumbers, _display.Controller.StartPageCycle, _display.Controller.ShowState, _display.Controller.Fill); _display.Show(); _display.Controller.ShowNumbers();
     }
     private void OpenDisplay(object sender, RoutedEventArgs e) { if (!_display.IsVisible) _display.Show(); _display.Activate(); }
+    private void LaunchCowAuction(object sender, RoutedEventArgs e)
+    {
+        foreach (var process in Process.GetProcessesByName("CowAuctionSmall"))
+        {
+            if (process.MainWindowHandle == IntPtr.Zero) continue;
+            ShowWindowAsync(process.MainWindowHandle, SW_RESTORE); SetForegroundWindow(process.MainWindowHandle); return;
+        }
+        var candidates = new[] { Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CowAuctionSmall.exe"), Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "CowAuctionSmall", "bin", "Debug", "net9.0-windows", "CowAuctionSmall.exe")) };
+        var exePath = Array.Find(candidates, File.Exists);
+        if (exePath != null) Process.Start(new ProcessStartInfo { FileName = exePath, WorkingDirectory = Path.GetDirectoryName(exePath)! });
+    }
     protected override void OnClosed(EventArgs e)
     {
         if (_isClosing)

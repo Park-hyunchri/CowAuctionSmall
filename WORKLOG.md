@@ -1,5 +1,22 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-12 GAMSTest 운영 프로그램 실행 버튼 추가
+
+### 작업 내용
+- GAMSTest ControlWindow에 `CowAuctionSmall.exe` 실행 및 창 활성화(Bring to Front) 버튼 추가
+- `user32.dll`의 `ShowWindowAsync(SW_RESTORE)`, `SetForegroundWindow` 적용
+- 실행 중인 프로세스는 최소화 해제 후 전면 활성화
+- 미실행 시 배포 경로와 개발 빌드 경로를 탐색하고 `WorkingDirectory`를 유지하여 실행
+
+### 검증
+- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 경고 1개
+- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
+
+### Git
+- Commit: 미수행
+- Push: 미수행
+
 ## 2026-09-12 GAMSTest 단독 테스트 실행 및 빌드 검증
 
 ### 작업 내용
