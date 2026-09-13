@@ -26,6 +26,12 @@ public sealed class ControlWindowViewModel : INotifyPropertyChanged
     public ICommand Sold { get; }
     public ICommand UnSold { get; }
     public ICommand Pages { get; }
+    public ICommand StartCycleCommand { get; }
+    public ICommand ShowBoardNumberCommand { get; }
+    public ICommand ShowRun1Command { get; }
+    public ICommand ShowRun2Command { get; }
+    public ICommand ShowUnsoldCommand { get; }
+    public ICommand ShowSoldCommand { get; }
     public ICommand Red { get; }
     public ICommand Green { get; }
     public ICommand Blue { get; }
@@ -36,11 +42,25 @@ public sealed class ControlWindowViewModel : INotifyPropertyChanged
     {
         _showNumbers = onShowNumbers; _showPages = onShowPages; _state = state; _color = color;
         Numbers = Command(() => _showNumbers()); Running = Command(() => _state(TesterDisplayState.Running)); Epd = Command(() => _state(TesterDisplayState.Epd)); Sold = Command(() => _state(TesterDisplayState.Sold)); UnSold = Command(() => _state(TesterDisplayState.UnSold));
-        Pages = Command(() => _showPages());
+        Pages = Command(() => ExecuteSafely(_showPages, "뷰 페이지"));
+        StartCycleCommand = Pages;
+        ShowBoardNumberCommand = Numbers;
+        ShowRun1Command = Command(() => ExecuteSafely(() => _state(TesterDisplayState.Running), "진행"));
+        ShowRun2Command = Command(() => ExecuteSafely(() => _state(TesterDisplayState.Epd), "유전"));
+        ShowUnsoldCommand = Command(() => ExecuteSafely(() => _state(TesterDisplayState.UnSold), "유찰"));
+        ShowSoldCommand = Command(() => ExecuteSafely(() => _state(TesterDisplayState.Sold), "낙찰"));
         Red = ColorCommand(Colors.Red); Green = ColorCommand(Colors.Green); Blue = ColorCommand(Colors.Blue); White = ColorCommand(Colors.White); Black = ColorCommand(Colors.Black);
     }
     private ICommand ColorCommand(Color color) => Command(() => { _baseColor = color; _color(EffectiveColor); });
     private static ICommand Command(Action action) => new ActionCommand(action);
+    private static void ExecuteSafely(Action action, string operation)
+    {
+        try { action(); }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"{operation} 시작 중 오류 발생:\n{ex.Message}\n\n위치:\n{ex.StackTrace}", $"{operation} 오류", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+    }
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new(name));
     private sealed class ActionCommand(Action action) : ICommand { public event EventHandler? CanExecuteChanged; public bool CanExecute(object? p) => true; public void Execute(object? p) => action(); }

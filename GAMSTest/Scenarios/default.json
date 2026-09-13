@@ -1,0 +1,23 @@
+[
+  {
+    "CowDistinction": "1", "Sex": "수", "EntityNumber": "2189 4245 9", "EntityNumberShort": "4245",
+    "Location": "관내", "OwnerName": "홍길동", "LowestPrice": "360", "Weight": "0", "Birth": "25.12.20(7개월21일)",
+    "Blood": "5", "KPN": "1620", "CalvingNumber": "1", "Note": "앞다리확인", "bodyWeightInColdString": "A",
+    "longestMuscleCrossSectionString": "A", "fatThicknessOnBackString": "A", "intramuscularFatContentString": "D",
+    "BidPrice": "410", "Bidder": "김낙찰", "BidderNum": "101"
+  },
+  {
+    "CowDistinction": "2", "Sex": "수", "EntityNumber": "2157 4512 3", "EntityNumberShort": "4512",
+    "Location": "관내", "OwnerName": "홍길동", "LowestPrice": "470", "Weight": "0", "Birth": "25.10.27(9개월14일)",
+    "Blood": "2", "KPN": "1203", "CalvingNumber": "2", "Note": "-", "bodyWeightInColdString": "D",
+    "longestMuscleCrossSectionString": "D", "fatThicknessOnBackString": "C", "intramuscularFatContentString": "A",
+    "BidPrice": "520", "Bidder": "이낙찰", "BidderNum": "205"
+  },
+  {
+    "CowDistinction": "3", "Sex": "암", "EntityNumber": "1585 1701 9", "EntityNumberShort": "1701",
+    "Location": "관내", "OwnerName": "홍길동", "LowestPrice": "480", "Weight": "530", "Birth": "21.03.20(64개월7일)",
+    "Blood": "5", "KPN": "901", "CalvingNumber": "6", "Pregnant": "7", "Note": "드가", "bodyWeightInColdString": "B",
+    "longestMuscleCrossSectionString": "B", "fatThicknessOnBackString": "B", "intramuscularFatContentString": "D",
+    "BidPrice": "550", "Bidder": "박낙찰", "BidderNum": "308"
+  }
+]
