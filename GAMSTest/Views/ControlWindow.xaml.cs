@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using CowAuctionSmall.Models.XMLParser;
+using GAMSTest.Services;
 using GAMSTest.ViewModels;
 namespace GAMSTest.Views;
 public partial class ControlWindow : Window
@@ -12,12 +13,26 @@ public partial class ControlWindow : Window
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
     [DllImport("user32.dll")] private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
     private readonly DisplayWindow _display;
+    private readonly NamedPipeCommandServer _commandServer;
     private bool _isClosing;
     public ControlWindow()
     {
         InitializeComponent(); Loaded += (_, _) => { Left = 10; Top = SystemParameters.WorkArea.Bottom - ActualHeight - 10; };
         var user = new UserXmlParser().ParseXml(System.IO.Path.Combine(AppContext.BaseDirectory, "Config", "users.XML"));
         _display = new DisplayWindow(user); DataContext = new ControlWindowViewModel(_display.Controller.ShowNumbers, _display.Controller.StartPageCycle, _display.Controller.ShowState, _display.Controller.Fill); _display.Show(); _display.Controller.ShowNumbers();
+        _commandServer = new NamedPipeCommandServer(command =>
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                if (_isClosing) return;
+
+                if (string.Equals(command, "STOP", StringComparison.OrdinalIgnoreCase))
+                {
+                    Close();
+                    return;
+                }
+
+                _display.Controller.HandleExternalCommand(command);
+            })));
     }
     private void OpenDisplay(object sender, RoutedEventArgs e) { if (!_display.IsVisible) _display.Show(); _display.Activate(); }
     private void LaunchCowAuction(object sender, RoutedEventArgs e)
@@ -40,6 +55,7 @@ public partial class ControlWindow : Window
         }
 
         _isClosing = true;
+        _commandServer.Dispose();
         _display.Controller.ShowNumbers();
         if (_display.IsVisible)
         {

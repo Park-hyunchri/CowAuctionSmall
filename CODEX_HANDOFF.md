@@ -1,5 +1,28 @@
 # CODEX HANDOFF
 
+## 2026-09-13 GAMSTest STOP 외부 명령 종료 처리
+
+- `GAMSTest/Views/ControlWindow.xaml.cs`의 수신 콜백에 `Dispatcher.BeginInvoke`, `_isClosing` 확인 및 대소문자 무관 STOP 분기 적용
+- STOP은 `Close()`로 기존 서버 취소·타이머 중지·표출창 닫기·애플리케이션 종료 경로를 호출한다. 출하 AMS 실행 함수는 호출하지 않는다.
+- 기존 NUMBER/RED/GREEN/BLUE 처리와 단독 실행 시 번호 자동 시작은 유지한다.
+- 빌드: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore` 성공, 오류 0개 / 경고 1개(CS0067, `ControlWindowViewModel.cs(66,95)`)
+- 이전 사용자 확인 Release/win-x64 빌드·게시 성공 및 자체 동작 정상은 수정 전 결과이며, 해당 Release 경고 개수는 미확인이다.
+- 사용자 확인: STOP 수신 시 제어창·표출창·GAMSTest 프로세스 종료 정상, 출하 AMS 실행 상태 유지
+- 사용자 확인: 재실행 시 번호 자동 표시와 Named Pipe 재연결 후 NUMBER/RED/GREEN/BLUE 전환 정상
+- STOP 종료 및 Named Pipe 외부 연동 확인 완료. 기존 종료 경로의 번호 재표시로 종료 직전 번호 화면이 잠깐 보일 수 있다.
+- 이번 수정 파일: `GAMSTest/Views/ControlWindow.xaml.cs`, `WORKLOG.md`, `CODEX_HANDOFF.md`. 기존 다른 소스 변경은 보존했다.
+- 실행 중인 GAMSTest 명령 전송 및 Git commit/push: 미수행
+
+## 2026-09-13 GAMSTest Release/win-x64 검증 결과
+
+- 사용자가 확인한 `GAMSTest` Release/win-x64 빌드 성공
+- 사용자가 확인한 Release/win-x64 게시 성공
+- 사용자가 수행한 GAMSTest 자체 동작 테스트 정상
+- 경고 개수: 미확인
+- Named Pipe 외부 연동 테스트 여부: 정상(사용자 확인, STOP 및 NUMBER/RED/GREEN/BLUE)
+- 이번 반영 범위: `WORKLOG.md`, `CODEX_HANDOFF.md` 기록만 갱신
+- 소스 수정 및 Git commit/push: 미수행
+
 ## 2026-09-12 GAMSTest MockDataFactory 보강
 
 - 패널 번호 `% 4` 기반 성별(암/수/거세/암소) 및 축종 순환 적용

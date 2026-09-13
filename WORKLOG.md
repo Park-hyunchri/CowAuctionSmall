@@ -1,5 +1,108 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-13 GAMSTest STOP 외부 명령 종료 처리
+
+### 작업 날짜
+
+- 2026-09-13
+
+### 작업명
+
+- Named Pipe STOP 수신 시 기존 창 종료 경로 호출
+
+### 작업 목적
+
+- 외부 STOP 명령으로 GAMSTest를 종료할 수 있도록 한다.
+
+### 문제 현상
+
+- 기존 수신 콜백이 모든 명령을 표출 함수로 전달하여 STOP을 무시했다.
+
+### 원인
+
+- `DisplayTestController.HandleExternalCommand()`에는 NUMBER/RED/GREEN/BLUE 분기만 있으며 창 종료 분기는 없다.
+
+### 수정 파일
+
+- `GAMSTest/Views/ControlWindow.xaml.cs`: 수신 콜백에 STOP 분기와 비동기 UI 호출 적용
+- `WORKLOG.md`: 구현 및 검증 결과 기록
+- `CODEX_HANDOFF.md`: STOP 처리와 후속 확인 항목 인계
+
+### 수정 내용
+
+- `Dispatcher.BeginInvoke`로 UI 처리를 예약하고 `_isClosing`이면 반환한다.
+- 대소문자 구분 없이 STOP을 받으면 `Close()`를 호출하고, 나머지 명령은 기존 표출 함수에 전달한다.
+- 기존 `OnClosed()`의 서버 취소, 페이지 타이머 중지·번호 표시, 표출창 닫기 및 애플리케이션 종료 경로를 재사용한다.
+
+### 영향 범위
+
+- GAMSTest의 외부 명령 수신 및 종료 경로에 한정하며, C#/WPF/MVVM 구조를 유지한다.
+- 기존 NUMBER/RED/GREEN/BLUE 처리와 단독 실행 시 번호 자동 시작을 유지한다.
+- 출하 AMS 실행 함수와 운영 프로젝트는 변경하지 않는다. 빌드 대상은 GAMSTest 프로젝트 하나다.
+- 기존 종료 시 번호 재표시로 종료 직전에 번호 화면이 잠깐 보일 수 있다.
+
+### 빌드 결과
+
+- 대상: `GAMSTest/GAMSTest.csproj`, Debug
+- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 경고 1개
+- 경고: `ControlWindowViewModel.cs(66,95)` CS0067, `ActionCommand.CanExecuteChanged` 이벤트 미사용
+- 이전 사용자 확인 Release/win-x64 빌드·게시 성공 및 자체 동작 정상 기록은 유지하며, 해당 Release 경고 개수는 미확인이다.
+
+### 테스트 결과
+
+- 정적 확인: STOP 분기, 종료 중 명령 무시, 기존 명령 전달 및 기존 종료 경로 재사용 확인
+- 사용자 확인: STOP 수신 시 제어창·표출창·GAMSTest 프로세스 종료 정상
+- 사용자 확인: 종료 후 출하 AMS 실행 상태 유지
+- 사용자 확인: GAMSTest 재실행 시 번호 자동 표시 정상
+- 사용자 확인: 재실행 후 Named Pipe 재연결 및 NUMBER/RED/GREEN/BLUE 전환 정상
+
+### Git
+
+- 제안 commit 메시지: `fix: GAMSTest STOP 명령 종료 처리`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
+### 추가 확인사항
+
+- 이번 STOP 종료 및 Named Pipe 외부 연동 확인 항목은 사용자 확인으로 완료했다.
+
+## 2026-09-13 GAMSTest Release/win-x64 빌드·게시 및 자체 동작 확인
+
+### 작업 내용
+- 사용자가 확인한 `GAMSTest` Release/win-x64 빌드 및 게시 성공 결과 반영
+- 사용자가 수행한 GAMSTest 자체 동작 테스트 정상 결과 반영
+
+### 검증
+- Release/win-x64 빌드: 성공(사용자 확인)
+- Release/win-x64 게시: 성공(사용자 확인)
+- 자체 동작 테스트: 정상(사용자 확인)
+- 경고 개수: 미확인
+- Named Pipe 외부 연동 테스트: 정상(사용자 확인, STOP 및 NUMBER/RED/GREEN/BLUE)
+
+### Git
+- 소스 수정: 없음
+- Commit: 미수행
+- Push: 미수행
+
+## 2026-09-13 GAMSTest Named Pipe 외부 테스트 명령 수신 추가
+
+### 작업 내용
+- `GAMSTest/Services/NamedPipeCommandServer.cs`에 `GAMSTest.DisplayCommand` Named Pipe 수신 서버 추가
+- `GAMSTest/Views/ControlWindow.xaml.cs`에서 서버를 시작하고 UI Dispatcher를 통해 명령 처리
+- `GAMSTest/Services/DisplayTestController.cs`에 `NUMBER`, `RED`, `GREEN`, `BLUE` 외부 명령 처리 추가
+- 인자 없이 실행할 때 번호 테스트가 자동 시작되는 기존 동작 유지
+- `전광판제어` 프로젝트와 기존 운영 UDP 코드는 수정하지 않음
+
+### 검증
+- 명령: `dotnet build GAMSTest\\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 미완료. 저장소 내 `GAMSTest\\bin`·`obj` 디렉터리 생성 권한 제한 및 `project.assets.json` 부재로 빌드 실패
+- 소스 diff 및 변경 파일 범위 확인 완료
+
+### Git
+- Commit: 미생성
+- Push: 미수행
+
 ## 2026-09-13 버전 1.0.1.23 반영
 
 ### 작업 내용

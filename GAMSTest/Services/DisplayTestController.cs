@@ -107,6 +107,25 @@ public sealed class DisplayTestController
         }
     }
 
+    public void HandleExternalCommand(string command)
+    {
+        switch (command.Trim().ToUpperInvariant())
+        {
+            case "NUMBER":
+                ShowNumbers();
+                break;
+            case "RED":
+                Fill(Colors.Red);
+                break;
+            case "GREEN":
+                Fill(Colors.Green);
+                break;
+            case "BLUE":
+                Fill(Colors.Blue);
+                break;
+        }
+    }
+
     public void ShowState(TesterDisplayState state)
     {
         if (state == TesterDisplayState.BoardNumber)
