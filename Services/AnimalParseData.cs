@@ -758,15 +758,12 @@ namespace CowAuctionSmall.Services
             if (string.IsNullOrEmpty(sex))
                 return sex;
 
-            // 횡성은 거세 및 비육우를 비육으로 표출
-            if (sex == "거세" || cowDistinction == "2")
-            {
-                return "비육";
-            }
+            // 횡성은 9개월 이하와 초과를 구분하여 거세 및 암을 표출
+            if (sex == "거세")
+                return month <= 9 ? "거세" : "비육";
 
-            // 암은 송아지에서 1글자, 성우/번식우에서 2글자로 표출
             if (sex == "암")
-                return cowDistinction == "1" && month < 9 ? "암" : "암소";
+                return month <= 9 ? "암" : "암소";
 
             // 수는 월령이나 축종 구분에 의해 암소로 변환하지 않음
             if (sex == "수")

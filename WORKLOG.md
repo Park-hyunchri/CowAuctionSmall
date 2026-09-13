@@ -1,5 +1,21 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-13 횡성축협 전광판 성별 표출 월령 기준 수정
+
+### 작업 내용
+- `Services/AnimalParseData.cs`의 횡성축협 전용 `HoengseongSex`에서 거세·암 성별을 `month <= 9` 기준으로 표출하도록 수정
+- 9개월 이하: 거세는 "거세", 암은 "암"으로 표출
+- 9개월 초과: 거세는 "비육", 암은 "암소"로 표출
+- 수·프리마틴/프리 및 기타 성별 처리와 타 축협 로직은 유지
+
+### 검증
+- 명령: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 컴파일 오류 0개(기존 경고 존재)
+
+### Git
+- Commit: 미생성
+- Push: 미수행
+
 ## 2026-09-12 GAMSTest MockDataFactory 가상 데이터 보강
 
 ### 작업 내용
