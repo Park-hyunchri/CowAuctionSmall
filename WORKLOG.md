@@ -27,6 +27,12 @@
 - 결과: 성공, 오류 0개, 경고 1개
 - 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
 
+## 2026-09-13 횡성축협 유찰/낙찰 개체번호 좌표 보정
+
+- 유찰 `EntityNumberShort` Margin을 `74`로 조정
+- 일반 낙찰 및 분양 낙찰 `EntityNumberShort` Margin을 `72`로 조정
+- Git commit/push: 미수행
+
 ### Git
 - Commit: 미수행
 - Push: 미수행
