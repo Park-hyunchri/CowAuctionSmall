@@ -1,5 +1,18 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-13 버전 1.0.1.23 반영
+
+### 작업 내용
+- `CowAuctionSmall.csproj`의 애플리케이션 버전을 `1.0.1.23`으로 변경한 내용 기록
+
+### 검증
+- 명령: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 컴파일 오류 0개(기존 경고 존재)
+
+### Git
+- Commit: 미생성
+- Push: 미수행
+
 ## 2026-09-13 횡성축협 전광판 성별 표출 월령 기준 수정
 
 ### 작업 내용

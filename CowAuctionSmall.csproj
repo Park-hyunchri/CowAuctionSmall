@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>livestock.ico</ApplicationIcon>
-    <Version>1.0.1.22</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
+    <Version>1.0.1.23</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
   </PropertyGroup>
   <ItemGroup>
 	  <Compile Remove="GAMSTest\**" />
