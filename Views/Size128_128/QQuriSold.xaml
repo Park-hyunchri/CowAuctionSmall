@@ -57,7 +57,7 @@
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="22,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Bold" />
 
             <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"  VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4,0,0"/>
-            <TextBlock  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" Margin="7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" Margin="7,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <!-- 기본: 중량 안 보일 때(2,3,5 이외) => 크게 -->
@@ -87,7 +87,7 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4,0,0"/>
 
             <!-- 낙찰가 : 값 -->
-            <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" Margin="7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" Margin="7,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <!-- 기본: 중량 안 보일 때(2,3,5 이외) => 크게 -->

@@ -1,5 +1,31 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-15 - Jeongeup auction sold amount alignment
+
+### 작업 내용
+
+- `Views/Size128_128/QQuriSold.xaml`에서 최저가와 낙찰가 금액 바인딩의 상단 여백을 4px로 맞추어 라벨과 세로 위치를 정렬했다.
+
+### 영향 범위
+
+- 정읍을 포함해 공통 `QQuriSold.xaml`을 사용하는 낙찰 화면의 두 금액 줄만 영향받는다.
+
+### 빌드 결과
+
+- 명령: `dotnet build .\\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 기존 경고 100개
+
+### 테스트 결과
+
+- 정적 확인: 두 금액 바인딩의 상단 여백이 라벨의 4px과 일치함을 확인.
+- 실제 전광판 수동 확인: 미수행
+
+### Git
+
+- 제안 commit 메시지: `fix: 정읍 낙찰 금액 줄 정렬`
+- Commit hash: 미생성
+- Push 여부: 미수행
+
 ## 2026-09-14 단일 경매 재경매 화면 유찰 복귀 및 점멸 중단 수정
 
 ### 작업 날짜
