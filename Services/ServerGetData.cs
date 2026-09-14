@@ -43,7 +43,6 @@ namespace CowAuctionSmall.Services
 
         public static int _runRunSipNumber = -1; // 현재 진행중인 경매 번호 (경매진행중일때 는 다른화면으로 전환 x 하려고) -1을 초기값으로 한 이유는 개발서버에서 0번 경매도 생성가능해서
         public static bool _batchRunningState = false; // 일괄 경매 진행중인지 여부
-        private string? _allowRunningEntitySyncSipNumber;
 
         private AnimalParseData _animParseData; //데이터 파싱용, 여러군데 써서 따로 빼둠
         //
@@ -720,13 +719,25 @@ namespace CowAuctionSmall.Services
                 return source;
             }
 
-            string runningSip = _runRunSipNumber.ToString();
-            bool isReAuctionSync = string.Equals(_allowRunningEntitySyncSipNumber, runningSip, StringComparison.Ordinal);
+            var runningSipNumbers = new HashSet<string>(StringComparer.Ordinal);
+            if (_runRunSipNumber != -1)
+            {
+                runningSipNumbers.Add(_runRunSipNumber.ToString());
+            }
+
+            if (_beforeAuctionDataList != null)
+            {
+                foreach (var runningItem in _beforeAuctionDataList.Where(item => item != null && item.IsRunning))
+                {
+                    runningSipNumbers.Add(runningItem.SipNumber);
+                }
+            }
+
             var blocked = source
-                .Where(item => item != null && string.Equals(item.SipNumber, runningSip, StringComparison.Ordinal))
+                .Where(item => item != null && runningSipNumbers.Contains(item.SipNumber))
                 .ToList();
 
-            if (blocked.Count > 0 && !isReAuctionSync)
+            if (blocked.Count > 0)
             {
                 string blockedEntityNumbers = string.Join(",",
                     blocked
@@ -735,21 +746,15 @@ namespace CowAuctionSmall.Services
                         .Distinct()
                         .Take(5));
 
+                string blockedRunningSips = string.Join(",", runningSipNumbers);
                 string logMsg =
-                    $"blocked-running-entity-change reason={reason}, sip={runningSip}, count={blocked.Count}, entities={blockedEntityNumbers}";
+                    $"blocked-running-entity-change reason={reason}, sip={blockedRunningSips}, count={blocked.Count}, entities={blockedEntityNumbers}";
                 Debug.WriteLine(logMsg);
                 logger.LogInfo(logMsg);
             }
 
-            if (isReAuctionSync)
-            {
-                _allowRunningEntitySyncSipNumber = null;
-                logger.LogInfo($"allow-running-entity-change reason={reason}, sip={runningSip}");
-                return source;
-            }
-
             return source
-                .Where(item => item != null && item.SipNumber != runningSip)
+                .Where(item => item != null && !runningSipNumbers.Contains(item.SipNumber))
                 .ToList();
         }
 
@@ -959,7 +964,6 @@ namespace CowAuctionSmall.Services
                                             cowAS.AuctionResultStatus = "11";
                                             cowAS.IsRunning = true;
                                             _runRunSipNumber = int.Parse(cowAS.SipNumber);
-                                            _allowRunningEntitySyncSipNumber = cowAS.SipNumber;
                                             currentSyncList.Add(cowAS);
                                         }
 
@@ -972,6 +976,10 @@ namespace CowAuctionSmall.Services
                                 case "8003":
                                     foreach (var cowAS in beforeList!.Where(item => item.SipNumber == message.Data[2]))
                                     {
+                                        if (message.Data[3].Equals("refresh") == false)
+                                        {
+                                            cowAS.LowestPrice = message.Data[3];
+                                        }
                                         cowAS.BidPrice = "-";
                                         cowAS.Bidder = "-";
                                         cowAS.BidderNum = "";
@@ -979,7 +987,13 @@ namespace CowAuctionSmall.Services
                                         cowAS.AuctionResultStatus = "11";
                                         cowAS.IsRunning = true;
                                         _runRunSipNumber = int.Parse(cowAS.SipNumber);
-                                        _allowRunningEntitySyncSipNumber = cowAS.SipNumber;
+                                        currentSyncList.Add(cowAS);
+                                    }
+
+                                    if (currentSyncList.Count > 0)
+                                    {
+                                        WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                                        currentSyncList.Clear();
                                     }
                                     break;
 
@@ -1244,7 +1258,17 @@ namespace CowAuctionSmall.Services
                     break;
                 case "SD":
                     Debug.WriteLine("SD 온 값 : " + msg.ToString);
-                    if (msg.Length >= 3 && string.Equals(msg[2], "F", StringComparison.OrdinalIgnoreCase))
+                    if (msg.Length >= 5 &&
+                        string.Equals(msg[2], "F", StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(msg[3], "-1", StringComparison.Ordinal) &&
+                        string.Equals(msg[4], "20", StringComparison.Ordinal))
+                    {
+                        if (_runRunSipNumber != -1)
+                        {
+                            CompleteSingleAuction(_runRunSipNumber.ToString(), "24", "SDFCancel", updateResultStatus: false);
+                        }
+                    }
+                    else if (msg.Length >= 3 && string.Equals(msg[2], "F", StringComparison.OrdinalIgnoreCase))
                     {
                         _ = CompleteBatchAuctionAsync("SDF");
                     }

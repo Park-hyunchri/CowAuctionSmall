@@ -166,7 +166,8 @@ namespace CowAuctionSmall.Services
             }
             else // 단일 경매인경우
             {
-                if (data.Length >= 7 && runningState == AS.PROGRESS || runningState == AS.COMPLETED ) // Check if data has at least 7 elements
+                if (data.Length >= 7 &&
+                    (runningState == AS.READY || runningState == AS.START || runningState == AS.PROGRESS || runningState == AS.COMPLETED)) // Check if data has at least 7 elements
                 {
                     string[] msg = new string[] { _auctionmethod.ToString(), data[0], data[2], data[4], data[6] };// 경매방식, 코드 , 경매번호, 현재가격 , 경매상태
                     // Use the msg array here
@@ -221,7 +222,11 @@ namespace CowAuctionSmall.Services
                     case "C": //경매 카운트
                         break;
                     case "F":// 경매도중 종료
-                        WeakReferenceMessenger.Default.Send(new DataToServerGetAF_SD(data));
+                        if (data.Length > 3 && data[3] == "-1")
+                        {
+                            string[] msg = new string[] { data[0], data[1], data[2], data[3], _auctionmethod.ToString() };
+                            WeakReferenceMessenger.Default.Send(new DataToServerGetAF_SD(msg));
+                        }
                         break;
                     default:
                         break;
