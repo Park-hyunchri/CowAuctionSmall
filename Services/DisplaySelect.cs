@@ -1178,6 +1178,7 @@ namespace CowAuctionSmall.Services
             }
 
             int auctionStatus = int.Parse(gv.AuctionResultStatus);
+            var state = GetPanelState(panel);
             switch (auctionStatus)
             {
                 case 11:
@@ -1194,6 +1195,16 @@ namespace CowAuctionSmall.Services
                     DisplayLogo(panel);
                     break;
             }
+
+            var selectedView = state.Mode switch
+            {
+                PanelDisplayMode.Running => state.RunningPages?.FirstOrDefault()?.GetType().Name ?? "-",
+                PanelDisplayMode.Sold => state.SoldView?.GetType().Name ?? "-",
+                PanelDisplayMode.UnSold => state.UnSoldView?.GetType().Name ?? "-",
+                PanelDisplayMode.Logo => state.LogoView?.GetType().Name ?? "-",
+                _ => "-"
+            };
+            logger.LogInfo($"[TestUI] panel={panel.Name}, sip={gv.SipNumber}, status={gv.AuctionResultStatus}, running={gv.IsRunning}, selected={state.Mode}, view={selectedView}, page={(_rotationIndex + 1)}, blink-expected={(auctionStatus == 11 ? "on" : "off")}");
         }
 
         /// <summary>

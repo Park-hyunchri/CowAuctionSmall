@@ -780,6 +780,9 @@ namespace CowAuctionSmall.Services
                         .ToList();
                 }
 
+                var previousStatus = updates.FirstOrDefault()?.AuctionResultStatus ?? "-";
+                var wasRunning = updates.Any(item => item.IsRunning);
+
                 if (_latestAuctionDataList != null)
                 {
                     foreach (var latestItem in _latestAuctionDataList.Where(item => item != null && item.SipNumber == sipNumber))
@@ -808,6 +811,8 @@ namespace CowAuctionSmall.Services
 
                 logger.LogInfo(
                     $"single-auction-complete source={source}, sip={sipNumber}, result={resultCode ?? "-"}, updates={updates.Count}, clear-running={_runRunSipNumber == -1}");
+                logger.LogInfo(
+                    $"[TestAuctionState] source={source}, sip={sipNumber}, status={previousStatus}->{resultCode ?? "-"}, running={wasRunning}->false, updates={updates.Count}");
 
                 if (updates.Count > 0)
                 {
@@ -854,6 +859,11 @@ namespace CowAuctionSmall.Services
             }
 
             logger.LogInfo($"batch-auction-complete source={source}, cleared-running={updates.Count}");
+            logger.LogInfo($"[TestBatchState] source={source}, phase=complete, cleared-running={updates.Count}");
+            foreach (var item in updates)
+            {
+                logger.LogInfo($"[TestBatchItem] phase=complete, sip={item.SipNumber}, type={item.StrCowDistinction}, status={item.AuctionResultStatus}, running=true->false, panel={item.SpaceIndex}");
+            }
             await Task.Delay(300);
             await ProcessMessageAsync();
         }
@@ -945,6 +955,8 @@ namespace CowAuctionSmall.Services
                                         // 해당 개체번호를 출력
                                         foreach (var cowAS in tempList)
                                         {
+                                            var previousStatus = cowAS.AuctionResultStatus;
+                                            var wasRunning = cowAS.IsRunning;
                                             bool isPriceChanged = !cowAS.LowestPrice.Equals(message.Data[3]);
                                             if (isPriceChanged || !cowAS.AuctionResultStatus.Equals("11"))
                                             {
@@ -965,6 +977,7 @@ namespace CowAuctionSmall.Services
                                             cowAS.IsRunning = true;
                                             _runRunSipNumber = int.Parse(cowAS.SipNumber);
                                             currentSyncList.Add(cowAS);
+                                            logger.LogInfo($"[TestAuctionState] source=AS8004, sip={cowAS.SipNumber}, status={previousStatus}->11, running={wasRunning}->true, price={cowAS.LowestPrice}, reauction={previousStatus == "23"}");
                                         }
 
                                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
@@ -976,6 +989,8 @@ namespace CowAuctionSmall.Services
                                 case "8003":
                                     foreach (var cowAS in beforeList!.Where(item => item.SipNumber == message.Data[2]))
                                     {
+                                        var previousStatus = cowAS.AuctionResultStatus;
+                                        var wasRunning = cowAS.IsRunning;
                                         if (message.Data[3].Equals("refresh") == false)
                                         {
                                             cowAS.LowestPrice = message.Data[3];
@@ -988,6 +1003,7 @@ namespace CowAuctionSmall.Services
                                         cowAS.IsRunning = true;
                                         _runRunSipNumber = int.Parse(cowAS.SipNumber);
                                         currentSyncList.Add(cowAS);
+                                        logger.LogInfo($"[TestAuctionState] source=AS{autctionState}, sip={cowAS.SipNumber}, status={previousStatus}->11, running={wasRunning}->true, price={cowAS.LowestPrice}, reauction={previousStatus == "23"}");
                                     }
 
                                     if (currentSyncList.Count > 0)
@@ -1122,6 +1138,11 @@ namespace CowAuctionSmall.Services
                                     currentSyncList.Add(cow);
                                 }
                                 WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
+                                logger.LogInfo($"[TestBatchState] source=AS8004, phase=start, running-count={currentSyncList.Count}");
+                                foreach (var cow in currentSyncList)
+                                {
+                                    logger.LogInfo($"[TestBatchItem] phase=start, sip={cow.SipNumber}, type={cow.StrCowDistinction}, status={cow.AuctionResultStatus}, running={cow.IsRunning}, panel={cow.SpaceIndex}");
+                                }
                             }
                             Debug.WriteLine("\n**************\n**************\n일괄 경매 시작\n**************\n**************");
                         }
@@ -1338,6 +1359,7 @@ namespace CowAuctionSmall.Services
 
             //AF|8808990656458|32|22|2160|16|379
             //
+            var batchRunning = _batchRunningState;
             Debug.WriteLine("****************************************************************************************************************************");
             await Task.Delay(100);
             if (_userInfo == null || string.IsNullOrWhiteSpace(_token))
@@ -1381,6 +1403,8 @@ namespace CowAuctionSmall.Services
                         _latestAuctionDataList = _latestAuctionDataList.OrderBy(x => x.EntityNumber).ToList();
                     }
                 }
+
+                logger.LogInfo($"[TestResult] source={data[0]}, sip={bidderCow.SipNumber}, type={bidderCow.StrCowDistinction}, status={bidderCow.AuctionResultStatus}, running={bidderCow.IsRunning}, batch-running={batchRunning}, panel={bidderCow.SpaceIndex}");
 
                 if (bidderCow.Bidder.Equals("-"))
                 {

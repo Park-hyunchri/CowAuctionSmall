@@ -1,5 +1,92 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-15 - 테스트용 일괄경매 상태 및 결과 로그 추가
+
+### 작업 날짜
+
+- 2026-09-15
+
+### 작업 목적
+
+- 일괄경매 로그만으로 송아지, 비육우, 번식우별 진행 시작·종료와 낙찰/유찰 결과 화면 반영 흐름을 검증할 수 있도록 테스트 전용 로그를 추가했다.
+
+### 원인
+
+- 기존 일괄경매 로그에는 시작·종료 Debug 출력만 있고, 대상 개체의 축종·패널·진행 상태 및 결과 재조회 값을 출품번호별로 대조할 정보가 부족했다.
+
+### 수정 파일
+
+- `Services/ServerGetData.cs`: 일괄 `AS8004` 시작과 `AS8006`/`SD F` 종료 시 대상 개체를 `[TestBatchState]`, `[TestBatchItem]`으로 기록하고, 결과 재조회 시 `[TestResult]`를 기록한다.
+- `WORKLOG.md`: 작업 및 검증 결과를 기록한다.
+
+### 영향 범위
+
+- 경매 상태 판정, API 재조회, 화면 선택, 타이머 및 통신 동작은 변경하지 않았다.
+- 테스트 중 로그량만 증가한다. 테스트 종료 후 `[TestBatchState]`, `[TestBatchItem]`, `[TestResult]` 접두사를 검색해 추가한 로그 블록을 제거할 수 있다.
+- 기존 `[TestUI]` 로그의 `selected`와 `view`를 같은 `sip`의 `[TestResult]`와 대조해 실제 낙찰/유찰 View 선택을 확인한다.
+
+### 빌드 결과
+
+- 명령: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 기존 경고 100개.
+
+### 테스트 결과
+
+- 정적 확인: `git diff --check` 통과.
+- 현장 일괄경매 메시지 및 실제 화면 동작 확인: 미수행.
+- 수동 확인 항목: 송아지·비육우·번식우 각 1건 이상에 대해 `[TestBatchItem] phase=start` → `[TestResult] status=22 또는 23` → `[TestUI] selected=Sold 또는 UnSold` 순서와 `sip`, `type`, `panel` 일치 여부를 확인한다.
+
+### Git
+
+- 변경 파일: `Services/ServerGetData.cs`, `Services/DisplaySelect.cs`, `WORKLOG.md`.
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `test: log batch auction state and result flow`
+
+## 2026-09-15 - 테스트용 경매 상태 및 UI 선택 로그 추가
+
+### 작업 날짜
+
+- 2026-09-15
+
+### 작업 목적
+
+- 현장 테스트 로그만으로 출품번호별 유찰, 재경매 진행, 낙찰/유찰 전환과 실제 선택된 화면을 판정할 수 있도록 테스트 전용 로그를 추가했다.
+
+### 원인
+
+- 기존 로그에는 일부 경매 종료 및 재경매 초기화 정보만 있고, 상태 전환과 패널별 최종 View 선택 결과가 공통 식별자로 연결되어 있지 않았다.
+
+### 수정 파일
+
+- `Services/ServerGetData.cs`: 단일경매 `AS8002`/`AS8003`/`AS8004` 및 종료 처리에서 이전/이후 상태, 진행 플래그, 가격, 재경매 여부를 `[TestAuctionState]`로 기록한다.
+- `Services/DisplaySelect.cs`: 패널별 상태 코드, 선택 모드, 실제 View 클래스, 페이지, Blink 기대 상태를 `[TestUI]`로 기록한다.
+- `WORKLOG.md`: 작업 및 검증 결과를 기록한다.
+
+### 영향 범위
+
+- 경매 상태 판정, View 선택, 통신, 페이지 타이머 및 XAML Storyboard 동작은 변경하지 않았다.
+- 테스트 중 로그량만 증가한다. 테스트 종료 후 `[TestAuctionState]`, `[TestUI]` 접두사를 검색해 추가한 로그 블록을 제거할 수 있다.
+- `blink-expected`는 Running View 선택에 따른 기대 상태이며, 실제 Storyboard 프레임 동작을 측정한 값은 아니다.
+
+### 빌드 결과
+
+- 명령: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 기존 경고 100개.
+
+### 테스트 결과
+
+- 정적 확인: `git diff --check` 통과.
+- 현장 경매 메시지 및 실제 화면 동작 확인: 미수행.
+- 수동 확인 항목: 동일 출품번호의 진행 → 유찰 → 재경매 진행 → 낙찰/유찰 순서에서 `[TestAuctionState]`와 `[TestUI]`의 `sip`, `status`, `selected`, `view`, `blink-expected`가 시간순으로 일치하는지 확인한다.
+
+### Git
+
+- 변경 파일: `Services/ServerGetData.cs`, `Services/DisplaySelect.cs`, `WORKLOG.md`.
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `test: add auction state UI verification logs`
+
 ## 2026-09-15 GAMSTest 빌드 파일 버전 자동 변경
 
 ### 작업 일자
