@@ -1,5 +1,48 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-15 GAMSTest 빌드 파일 버전 자동 변경
+
+### 작업 일자
+
+- 2026-09-15
+
+### 작업 목적
+
+- 동일한 파일 버전으로 인한 GAMSTest 배포 파일 식별 혼선을 줄이기 위해, 빌드 시 파일 버전을 자동 변경한다.
+
+### 원인
+
+- `GAMSTest/GAMSTest.csproj`에 `FileVersion` 설정이 없어 .NET SDK 기본 파일 버전 `1.0.0.0`이 적용됐다.
+
+### 수정 파일
+
+- `GAMSTest/GAMSTest.csproj`: 2000-01-01 이후 경과 일수와 하루 중 2초 단위 시간을 사용해 `FileVersion`과 `InformationalVersion`을 빌드 시 자동 설정한다.
+- `WORKLOG.md`: 작업 및 검증 결과 기록.
+
+### 영향 범위
+
+- GAMSTest 빌드 출력의 EXE/DLL 파일 속성 버전만 변경된다.
+- Windows 버전 구성요소 제한을 지키기 위해 버전은 `1.0.<2000-01-01 이후 경과 일수>.<하루 중 2초 단위 시간>` 형식이다.
+- 2초 이내에 연속 빌드하면 같은 파일 버전이 될 수 있다.
+
+### 빌드 결과
+
+- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
+- 결과: 성공, 오류 0개, 경고 1개.
+- 기존 경고: `GAMSTest/ViewModels/ControlWindowViewModel.cs(66,95)` CS0067 `ControlWindowViewModel.ActionCommand.CanExecuteChanged` 이벤트 미사용.
+
+### 테스트 결과
+
+- 파일 속성 확인: `GAMSTest/bin/Debug/net9.0-windows/GAMSTest.exe`의 파일 버전 `1.0.9754.16186` 확인.
+- 실제 화면 동작 확인: 미수행.
+
+### Git
+
+- 변경 파일: `GAMSTest/GAMSTest.csproj`, `WORKLOG.md`.
+- Commit hash: 미생성.
+- Push 여부: 미수행.
+- 제안 commit 메시지: `build: GAMSTest 파일 버전 자동 변경`
+
 ## 2026-09-15 - Jeongeup auction sold amount alignment
 
 ### 작업 내용

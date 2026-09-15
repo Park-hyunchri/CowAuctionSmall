@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net9.0-windows</TargetFramework><Nullable>enable</Nullable><UseWPF>true</UseWPF><ApplicationIcon>app.ico</ApplicationIcon>
+    <BuildDate>$([System.DateTime]::Now.Subtract($([System.DateTime]::Parse('2000-01-01'))).Days)</BuildDate>
+    <BuildTime>$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds), 2))))</BuildTime>
+    <FileVersion>1.0.$(BuildDate).$(BuildTime)</FileVersion>
+    <InformationalVersion>1.0.$(BuildDate).$(BuildTime)</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CowAuctionSmall"><HintPath>..\bin\Debug\net9.0-windows\CowAuctionSmall.dll</HintPath></Reference>
