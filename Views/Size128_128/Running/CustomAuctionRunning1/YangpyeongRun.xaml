@@ -100,9 +100,13 @@
                     <Style TargetType="StackPanel">
                         <Setter Property="Visibility" Value="Collapsed"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding CowInfo.CowDistinction}" Value="1">
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding CowInfo.CowDistinction}" Value="1"/>
+                                    <Condition Binding="{Binding CowInfo.SelectShowWeight_EPD}" Value="N"/>
+                                </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
@@ -125,6 +129,13 @@
                             <DataTrigger Binding="{Binding CowInfo.CowDistinction}" Value="3">
                                 <Setter Property="Visibility" Value="Visible"/>
                             </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding CowInfo.CowDistinction}" Value="1"/>
+                                    <Condition Binding="{Binding CowInfo.SelectShowWeight_EPD}" Value="Y"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
