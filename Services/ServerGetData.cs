@@ -957,6 +957,11 @@ namespace CowAuctionSmall.Services
                                         {
                                             var previousStatus = cowAS.AuctionResultStatus;
                                             var wasRunning = cowAS.IsRunning;
+                                            if (previousStatus == "22" && !wasRunning)
+                                            {
+                                                logger.LogWarn($"ignore-post-sold-running source=AS8004, sip={cowAS.SipNumber}, status={previousStatus}, running={wasRunning}");
+                                                continue;
+                                            }
                                             bool isPriceChanged = !cowAS.LowestPrice.Equals(message.Data[3]);
                                             if (isPriceChanged || !cowAS.AuctionResultStatus.Equals("11"))
                                             {
@@ -991,6 +996,11 @@ namespace CowAuctionSmall.Services
                                     {
                                         var previousStatus = cowAS.AuctionResultStatus;
                                         var wasRunning = cowAS.IsRunning;
+                                        if (previousStatus == "22" && !wasRunning)
+                                        {
+                                            logger.LogWarn($"ignore-post-sold-running source=AS{autctionState}, sip={cowAS.SipNumber}, status={previousStatus}, running={wasRunning}");
+                                            continue;
+                                        }
                                         if (message.Data[3].Equals("refresh") == false)
                                         {
                                             cowAS.LowestPrice = message.Data[3];
