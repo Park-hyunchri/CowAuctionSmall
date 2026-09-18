@@ -25,7 +25,9 @@
 - 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Release --no-restore` 성공.
 - 결과: 오류 0개, 경고 102개.
 - 버전 확인: `bin\Release\net9.0-windows\CowAuctionSmall.dll`의 어셈블리 버전 `1.0.9757.23949` 확인.
-- 게시: `dotnet publish .\CowAuctionSmall.csproj --configuration Release --no-restore -p:PublishProfile=FolderProfile` 실행 시 `win-x64` 대상 복원 정보 부재로 `NETSDK1047` 발생. 런타임 복원 별도 승인 후 재시도 필요.
+- 런타임 복원: `dotnet restore .\CowAuctionSmall.csproj --runtime win-x64` 성공.
+- 게시: `dotnet publish .\CowAuctionSmall.csproj --configuration Release --no-restore -p:PublishProfile=FolderProfile` 성공.
+- 게시 산출물: `bin\AMS_Server\CowAuctionSmall.exe` 파일 버전 `1.0.9757.24047` 확인.
 
 ### Git
 
