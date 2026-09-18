@@ -5,7 +5,12 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>livestock.ico</ApplicationIcon>
-    <Version>1.0.1.23</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
+    <BuildDate>$([System.DateTime]::Now.Subtract($([System.DateTime]::Parse('2000-01-01'))).Days)</BuildDate>
+    <BuildTime>$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds), 2))))</BuildTime>
+    <Version>1.0.$(BuildDate).$(BuildTime)</Version> <!-- 🔺 여기를 원하는 버전으로 수정 -->
+    <AssemblyVersion>1.0.$(BuildDate).$(BuildTime)</AssemblyVersion>
+    <FileVersion>1.0.$(BuildDate).$(BuildTime)</FileVersion>
+    <InformationalVersion>1.0.$(BuildDate).$(BuildTime)</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
 	  <Compile Remove="GAMSTest\**" />

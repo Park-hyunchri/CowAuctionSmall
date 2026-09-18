@@ -1,5 +1,82 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-18 - 빌드·게시 자동 버전 설정
+
+### 작업 일자
+
+- 2026-09-18
+
+### 작업 목적
+
+- 빌드와 폴더 게시 시점마다 실행 파일과 화면 표시용 어셈블리 버전을 자동으로 갱신한다.
+
+### 수정 파일
+
+- `CowAuctionSmall.csproj`: 2000-01-01 기준 일수와 2초 단위 시간을 이용한 4자리 버전을 `Version`, `AssemblyVersion`, `FileVersion`, `InformationalVersion`에 공통 적용한다.
+- `WORKLOG.md`: 작업 및 검증 결과를 기록한다.
+
+### 영향 범위
+
+- 빌드·게시 산출물의 파일/어셈블리 버전과 `MainWindowViewModel.VersionShow()`에서 표시하는 버전이 매 빌드 시점 기준으로 변경된다.
+- 소스 동작, 통신 프로토콜, 화면 레이아웃 및 사업장별 표시 규칙은 변경하지 않는다.
+
+### 빌드 및 테스트 결과
+
+- 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Release --no-restore` 성공.
+- 결과: 오류 0개, 경고 102개.
+- 버전 확인: `bin\Release\net9.0-windows\CowAuctionSmall.dll`의 어셈블리 버전 `1.0.9757.23949` 확인.
+- 게시: `dotnet publish .\CowAuctionSmall.csproj --configuration Release --no-restore -p:PublishProfile=FolderProfile` 실행 시 `win-x64` 대상 복원 정보 부재로 `NETSDK1047` 발생. 런타임 복원 별도 승인 후 재시도 필요.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `chore: 장성 친자 추적 로그와 자동 버전 설정`
+
+## 2026-09-18 - 장성 친자 배지 원인 추적 로그 추가
+
+### 작업 일자
+
+- 2026-09-18
+
+### 작업 목적
+
+- 장성축협 친자 배지 미표출 시 서버 원본 친자값, 비고 분류, 최종 파싱값, 배지 표시값을 개체 단위로 대조할 수 있게 한다.
+
+### 원인
+
+- 기존 로그에는 친자 원본 필드와 파싱 후 배지 관련 값이 기록되지 않아, 데이터 수신·파싱·화면 바인딩 중 누락 지점을 구분할 수 없었다.
+
+### 수정 파일
+
+- `Services/AnimalParseData.cs`: 장성 코드(`8808990817675`)에 한해 원본 친자값이 `1`이거나 원본 비고에 `친자일치`가 있는 개체의 추적 로그를 추가했다.
+- `WORKLOG.md`: 작업 및 검증 결과를 기록했다.
+
+### 수정 내용
+
+- 원본 비고를 파싱 전 상태로 보관해 `contains-친자일치`, `empty`, `other`로 분류한다.
+- `[JangseongPaternityTrace]` 로그에 출품번호, 계류대, 원본 친자값, 비고 분류, 최종 친자값, 배지 문구·색상만 기록한다.
+- 동일 출품번호·계류대의 동일 추적 상태는 한 번만 기록해 API 폴링에 따른 로그 반복을 막는다.
+- 농가명, 개체관리번호, 원본 비고 전문은 기록하지 않는다.
+
+### 영향 범위
+
+- 장성축협 데이터 파싱 시에만 임시 추적 로그가 추가된다.
+- 친자 판정값, 비고 내용, 화면 바인딩 및 다른 조합의 표시 로직은 변경하지 않는다.
+
+### 빌드 및 테스트 결과
+
+- 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` 성공.
+- 결과: 오류 0개, 경고 102개.
+- 정적 확인: 장성·원본 친자값 `1`, 비고 `친자일치`, 비고 없음+원본 친자값 `1` 조건에서만 추적 로그가 남도록 확인했다.
+- 현장 확인: 미수행. 신버전 배포 후 `[JangseongPaternityTrace]` 값과 실제 배지 표시를 대조해야 한다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `chore: 장성 친자 배지 추적 로그 추가`
+
 ## 2026-09-16 - 양평 진행 1페이지 중량/육종 설정 반영
 
 ### 작업 일자

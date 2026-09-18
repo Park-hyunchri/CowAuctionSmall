@@ -2,6 +2,7 @@
 using CowAuctionSmall.Models;
 using CowAuctionSmall.Models.Structures;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Web;
@@ -19,6 +20,8 @@ namespace CowAuctionSmall.Services
     public class AnimalParseData
     {
         private NLogger logger;
+        private readonly object _jangseongPaternityTraceLock = new object();
+        private readonly Dictionary<string, string> _jangseongPaternityTraceSnapshots = new Dictionary<string, string>(StringComparer.Ordinal);
         /// <summary>
         /// 파서에서 사용할 로거를 초기화한다.
         /// </summary>
@@ -526,9 +529,11 @@ namespace CowAuctionSmall.Services
                 gv.BidPrice = data[31];                         //낙찰가격 ","표시
 
 
+            var originalNote = string.Empty;
             if (!string.IsNullOrEmpty(data[28]))
             {
-                gv.Note = UrlDecode(data[28]);                     //비고
+                originalNote = UrlDecode(data[28]);
+                gv.Note = originalNote;                     //비고
             }
             //gv.ModifiedPrice = data[27];                    //수정 최저가
 
@@ -688,11 +693,49 @@ namespace CowAuctionSmall.Services
             {
                 string aa = gv.FrontNoteWord;
             }
+            if (string.Equals(code, "8808990817675", StringComparison.Ordinal))
+            {
+                LogJangseongPaternityTrace(gv, data[23], originalNote);
+            }
             // 260902 너무 급해서 임시용 비고 부분에 해당 글자가 있으면 앞에 쓰기로 정정원 책임이 다음주에 추가 정보 공유 예정
 
 
 
             return gv;
+        }
+
+        private void LogJangseongPaternityTrace(gValues gv, string rawPaternity, string originalNote)
+        {
+            var isRawPaternityMatch = string.Equals(rawPaternity, "1", StringComparison.Ordinal);
+            var hasPaternityNote = originalNote.Contains("친자일치", StringComparison.Ordinal);
+
+            if (!isRawPaternityMatch && !hasPaternityNote)
+            {
+                return;
+            }
+
+            var noteCase = hasPaternityNote
+                ? "contains-친자일치"
+                : string.IsNullOrWhiteSpace(originalNote) || originalNote == "-"
+                    ? "empty"
+                    : "other";
+            var traceKey = $"{gv.SipNumber}|{gv.SpaceIndex}";
+            var traceSnapshot = $"raw-paternity={rawPaternity}, note-case={noteCase}, final-paternity={gv.PaternityMatch}, badge-word={gv.FrontNoteWord}, badge-color={gv.FrontNoteWordBrush}";
+            var shouldLog = false;
+
+            lock (_jangseongPaternityTraceLock)
+            {
+                if (!_jangseongPaternityTraceSnapshots.TryGetValue(traceKey, out var previousSnapshot) || previousSnapshot != traceSnapshot)
+                {
+                    _jangseongPaternityTraceSnapshots[traceKey] = traceSnapshot;
+                    shouldLog = true;
+                }
+            }
+
+            if (shouldLog)
+            {
+                logger.LogInfo($"[JangseongPaternityTrace] sip={gv.SipNumber}, panel={gv.SpaceIndex}, {traceSnapshot}");
+            }
         }
 
         /// <summary>
