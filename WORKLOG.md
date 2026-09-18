@@ -1,5 +1,40 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-18 - .NET CLI 임시 폴더 제외
+
+### 작업 일자
+
+- 2026-09-18
+
+### 작업 목적
+
+- 빌드 검증 중 생성된 저장소 내부 .NET CLI 임시 캐시를 제거하고 향후 Git 변경 목록에서 제외한다.
+
+### 수정 파일
+
+- `.gitignore`: `.dotnet-home-*/` 제외 패턴을 추가한다.
+- `WORKLOG.md`: 작업 및 검증 결과를 기록한다.
+
+### 삭제 대상
+
+- `.dotnet-home-paternity-trace`
+- `.dotnet-home-versioning`
+
+### 영향 범위
+
+- 소스 코드, 프로젝트 설정, 게시 산출물에는 영향이 없다.
+- 저장소 루트에서 생성되는 동일 형식의 로컬 .NET CLI 캐시만 Git 미추적 항목에서 제외된다.
+
+### 테스트 결과
+
+- 삭제 후 `git status --short`에서 두 임시 폴더가 표시되지 않음을 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `chore: .NET CLI 임시 폴더 제외`
+
 ## 2026-09-18 - 빌드·게시 자동 버전 설정
 
 ### 작업 일자
