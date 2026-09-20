@@ -1,5 +1,94 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-20 - 개발 문서 폴더 상위 이동
+
+### 작업 일자
+
+- 2026-09-20
+
+### 작업 목적
+
+- DeveloperKit 적용으로 생성된 `Docs`와 기존 `소스 설명` 폴더를 프로젝트 폴더 밖의 저장소 상위로 이동한다.
+
+### 원인
+
+- 실행 프로젝트에 포함되지 않는 개발·참고 문서가 `CowAuctionSmall` 프로젝트 폴더 안에 배치되어 프로젝트 소스와 문서의 경계가 명확하지 않았다.
+
+### 변경 파일 및 폴더
+
+- `CowAuctionSmall/Docs`를 저장소 상위의 `Docs`로 이동했다.
+- `CowAuctionSmall/소스 설명`을 저장소 상위의 `소스 설명`으로 이동했다.
+- `WORKLOG.md`: 폴더 이동과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- C# 소스, XAML, 프로젝트와 솔루션 설정은 변경하지 않았다.
+- 빌드 및 런타임 동작에는 영향이 없다.
+- `Docs` 내부의 `Docs/...` 문서 경로는 저장소 루트 기준으로 일치한다.
+
+### 테스트 결과
+
+- `Docs`: 상위 이동 후 파일 15개 확인.
+- `소스 설명`: 상위 이동 후 파일 5개 확인.
+- Git 추적 파일 279개를 새 구조에 대조해 누락 0개를 확인했다.
+- `dotnet sln .\CowAuctionSmall.sln list`: `CowAuctionSmall\CowAuctionSmall.csproj` 참조 확인.
+- `dotnet sln .\GAMSTest.sln list`: `GAMSTest\GAMSTest.csproj` 참조 확인.
+- 코드 및 프로젝트 설정 변경이 없어 빌드는 수행하지 않았다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `chore: 개발 문서 폴더를 저장소 상위로 이동`
+
+## 2026-09-20 - AMS 서버 솔루션 폴더 구조 정리
+
+### 작업 일자
+
+- 2026-09-20
+
+### 작업 목적
+
+- 저장소 상위 폴더를 `AMS_Server`로 변경하고, 메인 애플리케이션과 테스트 도구를 각각 `CowAuctionSmall`, `GAMSTest` 형제 폴더로 분리한다.
+- `CowAuctionSmall.sln`과 `GAMSTest.sln`은 두 프로젝트의 상위 폴더에 유지한다.
+
+### 원인
+
+- 기존 저장소 루트에 메인 프로젝트 파일과 `GAMSTest` 폴더가 혼재해 두 프로젝트의 경계가 폴더 구조에 명확히 드러나지 않았다.
+- 프로젝트 이동 후 솔루션, 테스트용 DLL 참조와 공통 설정 파일의 상대경로를 새 구조에 맞게 변경해야 했다.
+
+### 변경 파일 및 폴더
+
+- 저장소 폴더: `CowAuctionSmall`에서 `AMS_Server`로 이름을 변경한다.
+- `CowAuctionSmall/`: 기존 메인 프로젝트 소스, 설정, 리소스와 `CowAuctionSmall.csproj`를 하위 폴더로 이동했다.
+- `CowAuctionSmall.sln`: 메인 프로젝트 경로를 `CowAuctionSmall\CowAuctionSmall.csproj`로 변경했다.
+- `GAMSTest/GAMSTest.csproj`: 메인 DLL 참조와 `Board.XML`, `users.XML` 참조를 `CowAuctionSmall` 하위 경로로 변경했다.
+- `WORKLOG.md`: 폴더 구조 변경과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- C# 소스, WPF 화면, MVVM 책임 구조와 런타임 동작은 변경하지 않았다.
+- Visual Studio에서는 변경된 상위 경로의 솔루션 파일을 다시 열어야 한다.
+- Git에서는 메인 프로젝트 파일이 `CowAuctionSmall/` 아래로 이동한 것으로 표시된다.
+- 기존 `bin`, `obj`, `.vs`는 직접 이동하거나 삭제하지 않고 저장소 상위에 유지했다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet sln .\CowAuctionSmall.sln list`: 성공, `CowAuctionSmall\CowAuctionSmall.csproj` 참조 확인.
+- `dotnet sln .\GAMSTest.sln list`: 성공, `GAMSTest\GAMSTest.csproj` 참조 확인.
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore`: 실패. 새 프로젝트 위치에 `obj\project.assets.json`이 없어 `NETSDK1004`가 발생했다.
+- 기존 루트의 자산 파일을 중간경로로 지정한 비복원 빌드도 기존 자산 파일이 삭제된 `.dotnet-home-versioning` 패키지 경로를 가리켜 `NETSDK1064`로 실패했다.
+- `dotnet build .\GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`: 실패. 메인 프로젝트 DLL을 생성하지 못해 참조 어셈블리와 관련 형식을 찾지 못했다.
+- 프로젝트 규칙에 따라 NuGet 패키지 복원은 수행하지 않았다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `chore: AMS 서버 솔루션 폴더 구조 정리`
+
 ## 2026-09-18 - .NET CLI 임시 폴더 제외
 
 ### 작업 일자
