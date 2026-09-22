@@ -1000,6 +1000,7 @@ namespace CowAuctionSmall.Services
 
                                 case "8002":
                                 case "8003":
+                                    bool isAuctionStarted = autctionState == "8003";
                                     foreach (var cowAS in beforeList!.Where(item => item.SipNumber == message.Data[2]))
                                     {
                                         var previousStatus = cowAS.AuctionResultStatus;
@@ -1018,10 +1019,10 @@ namespace CowAuctionSmall.Services
                                         cowAS.BidderNum = "";
                                         cowAS.BidderString = "";
                                         cowAS.AuctionResultStatus = "11";
-                                        cowAS.IsRunning = true;
+                                        cowAS.IsRunning = isAuctionStarted;
                                         _runRunSipNumber = int.Parse(cowAS.SipNumber);
                                         currentSyncList.Add(cowAS);
-                                        logger.LogInfo($"[TestAuctionState] source=AS{autctionState}, sip={cowAS.SipNumber}, status={previousStatus}->11, running={wasRunning}->true, price={cowAS.LowestPrice}, reauction={previousStatus == "23"}");
+                                        logger.LogInfo($"[TestAuctionState] source=AS{autctionState}, sip={cowAS.SipNumber}, status={previousStatus}->11, running={wasRunning}->{isAuctionStarted}, price={cowAS.LowestPrice}, reauction={previousStatus == "23"}");
                                     }
 
                                     if (currentSyncList.Count > 0)
