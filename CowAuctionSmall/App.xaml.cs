@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -31,6 +32,7 @@ namespace CowAuctionSmall
         {
             // NLog 초기화
             InitializeLogging();
+            DeleteExpiredLogs();
 
             // 전역 예외 핸들러 등록
             RegisterGlobalExceptionHandlers();
@@ -51,6 +53,54 @@ namespace CowAuctionSmall
 
             // NLog의 현재 설정으로 적용
             LogManager.Configuration = xmlLoggingConfiguration;
+        }
+
+        private static void DeleteExpiredLogs()
+        {
+            string logsDirectory = Path.Combine(AppContext.BaseDirectory, "Logs");
+            if (!Directory.Exists(logsDirectory))
+            {
+                return;
+            }
+
+            DateTime cutoffDate = DateTime.Today.AddMonths(-1);
+
+            try
+            {
+                foreach (string directory in Directory.EnumerateDirectories(logsDirectory))
+                {
+                    var directoryInfo = new DirectoryInfo(directory);
+                    if ((directoryInfo.Attributes & FileAttributes.ReparsePoint) != 0)
+                    {
+                        Logger.Warn($"로그 자동 삭제 제외: 재분석 지점 path={directoryInfo.FullName}");
+                        continue;
+                    }
+
+                    if (!DateTime.TryParseExact(
+                        directoryInfo.Name,
+                        "yyyy-MM-dd",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out DateTime logDate) || logDate >= cutoffDate)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        Directory.Delete(directoryInfo.FullName, true);
+                        Logger.Info($"1개월 경과 로그 자동 삭제: {directoryInfo.Name}");
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+                    {
+                        Logger.Warn(ex, $"1개월 경과 로그 자동 삭제 실패: {directoryInfo.FullName}");
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                Logger.Warn(ex, $"로그 디렉터리 검사 실패: {logsDirectory}");
+            }
         }
 
 

@@ -41,13 +41,28 @@ namespace CowAuctionSmall.ViewModels
         private string? _mainWindowTextBox; // null 허용으로 변경
 
         [ObservableProperty]
-        private string _pageIndicatorRoleText = "모드: -";
+        private string _pageIndicatorRoleText = "모드 확인 중";
 
         [ObservableProperty]
-        private string _pageIndicatorSyncText = "연결상태: -";
+        private Brush _pageIndicatorRoleBrush = Brushes.DimGray;
 
         [ObservableProperty]
-        private Visibility _pageIndicatorVisibility = Visibility.Collapsed;
+        private Visibility _pageIndicatorVisibility = Visibility.Visible;
+
+        [ObservableProperty]
+        private Brush _auctionServerStatusBrush = Brushes.DimGray;
+
+        [ObservableProperty]
+        private string _auctionStatusText = "경매방식 확인 중";
+
+        [ObservableProperty]
+        private string _rootFarmStatusText = "뿌리농가 -";
+
+        [ObservableProperty]
+        private string _currentPageStatusText = "페이지 1";
+
+        [ObservableProperty]
+        private string _versionStatusText = "버전: -";
 
         [ObservableProperty]
         private double _mainPositionX;
@@ -84,6 +99,8 @@ namespace CowAuctionSmall.ViewModels
             _messengerStringMsg = WeakReferenceMessenger.Default;
             _messengerStringMsg.Register<DataStringMessage>(this, OnDataStringMsg);
             _messengerStringMsg.Register<PageIndicatorStateMessage>(this, OnPageIndicatorStateMsg);
+            _messengerStringMsg.Register<NettyConnectionResultMessage>(this, OnNettyConnectionResultMsg);
+            _messengerStringMsg.Register<AuctionDisplayStateMessage>(this, OnAuctionDisplayStateMsg);
 
             this._serverGetData = serverGetData;
 
@@ -102,11 +119,18 @@ namespace CowAuctionSmall.ViewModels
 
             InitializeBoardSize(r.board);
             InitializeUserInfo(r.userInfo);
+            RootFarmStatusText = $"뿌리농가 {NormalizeRootFarmSetting(r.userInfo.Auction?.IsShowQQuri)}";
 
             _displaySelect = new DisplaySelect(r.userInfo, r.board);
             InitCreateStackPanel(r.board);
 
             MainWindowTextBox += "뿌리농가 적용 버전" + "\n";
+        }
+
+        private static string NormalizeRootFarmSetting(string? value)
+        {
+            var normalized = value?.Trim().ToUpperInvariant();
+            return normalized is "Y" or "N" or "X" ? normalized : "-";
         }
 
         private void WarnDuplicateBoardIndices(BoardList boardInfo)
@@ -439,8 +463,37 @@ namespace CowAuctionSmall.ViewModels
             if (int.TryParse(message.Data, out int method))
             {
                 _auctionmethod = method;
+                if (method == 10 || method == 20)
+                {
+                    _dispatcher.Invoke(() => AuctionStatusText = method == 10 ? "일괄경매" : "단일경매");
+                }
             }
 
+        }
+
+        private void OnNettyConnectionResultMsg(object recipient, NettyConnectionResultMessage message)
+        {
+            _dispatcher.Invoke(() =>
+            {
+                AuctionServerStatusBrush = message.ResultCode == "2000" ? Brushes.LimeGreen : Brushes.DimGray;
+            });
+        }
+
+        private void OnAuctionDisplayStateMsg(object recipient, AuctionDisplayStateMessage message)
+        {
+            _dispatcher.Invoke(() =>
+            {
+                if (message.AuctionMethod == 20)
+                {
+                    AuctionStatusText = message.IsRunning && !string.IsNullOrWhiteSpace(message.SpaceIndex)
+                        ? $"단일경매 - {message.SpaceIndex}번"
+                        : "단일경매";
+                }
+                else if (message.AuctionMethod == 10)
+                {
+                    AuctionStatusText = message.IsRunning ? "일괄경매 - 시작" : "일괄경매 - 종료";
+                }
+            });
         }
 
         private void OnPageIndicatorStateMsg(object recipient, PageIndicatorStateMessage message)
@@ -449,16 +502,14 @@ namespace CowAuctionSmall.ViewModels
             {
                 var totalPages = Math.Clamp(message.TotalPages, 1, 4);
                 var currentPage = Math.Clamp(message.CurrentPage, 1, totalPages);
-                var syncText = message.IsFrozen
-                    ? "연결상태: 1페이지 고정"
-                    : (message.IsSubFallbackActive ? "연결상태: 로컬 복구" : "연결상태: 연결 중");
                 var activeBrush = message.IsFrozen
                     ? Brushes.Gold
                     : (message.IsSubFallbackActive ? Brushes.DeepSkyBlue : Brushes.LimeGreen);
 
-                PageIndicatorRoleText = message.IsMaster ? "모드: 마스터 모드" : "모드: 서브 모드";
-                PageIndicatorSyncText = syncText;
-                PageIndicatorVisibility = totalPages > 1 ? Visibility.Visible : Visibility.Collapsed;
+                PageIndicatorRoleText = message.IsMaster ? "마스터 모드" : "서브 모드";
+                PageIndicatorRoleBrush = Brushes.LimeGreen;
+                CurrentPageStatusText = $"페이지 {totalPages}";
+                PageIndicatorVisibility = Visibility.Visible;
 
                 PageIndicatorDots.Clear();
                 for (int i = 1; i <= totalPages; i++)
@@ -490,6 +541,7 @@ namespace CowAuctionSmall.ViewModels
 
             // 포맷: Version : 1.0.0.0 / Build : 2026-08-03
             string msg = $"Version : {version} / Build : {buildDate:yyyy-MM-dd}";
+            VersionStatusText = $"버전: {version}";
             MainWindowTextBox += msg + "\n";
             return msg;
         }
@@ -502,6 +554,8 @@ namespace CowAuctionSmall.ViewModels
             _messenger.Unregister<DataChangedMessage>(this);
             _messengerStringMsg.Unregister<DataStringMessage>(this);
             _messengerStringMsg.Unregister<PageIndicatorStateMessage>(this);
+            _messengerStringMsg.Unregister<NettyConnectionResultMessage>(this);
+            _messengerStringMsg.Unregister<AuctionDisplayStateMessage>(this);
             _displaySelect?.Dispose();
             _displaySelect = null;
             GC.SuppressFinalize(this);

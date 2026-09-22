@@ -124,6 +124,20 @@ namespace CowAuctionSmall.Models
         }
     }
 
+    public class AuctionDisplayStateMessage
+    {
+        public int AuctionMethod { get; }
+        public bool IsRunning { get; }
+        public string? SpaceIndex { get; }
+
+        public AuctionDisplayStateMessage(int auctionMethod, bool isRunning, string? spaceIndex = null)
+        {
+            AuctionMethod = auctionMethod;
+            IsRunning = isRunning;
+            SpaceIndex = spaceIndex;
+        }
+    }
+
     public class RefreshAuctionSV_Message
     {
         public string Data { get; }

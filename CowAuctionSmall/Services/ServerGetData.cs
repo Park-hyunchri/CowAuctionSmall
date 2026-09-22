@@ -822,6 +822,8 @@ namespace CowAuctionSmall.Services
                 {
                     logger.LogWarn($"CompleteSingleAuction: 종료 대상이 없습니다. source={source}, sip={sipNumber}, result={resultCode ?? "-"}");
                 }
+
+                WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(20, false));
             }
         }
 
@@ -832,6 +834,7 @@ namespace CowAuctionSmall.Services
         {
             List<gValues> updates;
             _batchRunningState = false;
+            WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(10, false));
 
             lock (_lockObj)
             {
@@ -985,6 +988,11 @@ namespace CowAuctionSmall.Services
                                             logger.LogInfo($"[TestAuctionState] source=AS8004, sip={cowAS.SipNumber}, status={previousStatus}->11, running={wasRunning}->true, price={cowAS.LowestPrice}, reauction={previousStatus == "23"}");
                                         }
 
+                                        var runningSpaceIndex = currentSyncList.FirstOrDefault()?.SpaceIndex;
+                                        if (!string.IsNullOrWhiteSpace(runningSpaceIndex))
+                                        {
+                                            WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(20, true, runningSpaceIndex));
+                                        }
                                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
                                         currentSyncList.Clear();
                                     }
@@ -1018,6 +1026,8 @@ namespace CowAuctionSmall.Services
 
                                     if (currentSyncList.Count > 0)
                                     {
+                                        var runningSpaceIndex = currentSyncList[0].SpaceIndex;
+                                        WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(20, true, runningSpaceIndex));
                                         WeakReferenceMessenger.Default.Send(new DataChangedMessage(currentSyncList));
                                         currentSyncList.Clear();
                                     }
@@ -1140,6 +1150,7 @@ namespace CowAuctionSmall.Services
                         if (message.Data[2].Equals("8004")) //경매 진행상태라면
                         {
                             _batchRunningState = true;
+                            WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(10, true));
                             if (beforeList != null)
                             {
                                 var tempList = beforeList.Where(item => item.AuctionResultStatus.Equals("11")); //경매 진행중인것만
@@ -1231,6 +1242,7 @@ namespace CowAuctionSmall.Services
             if (message.Data.Equals("F"))
             {
                 _runRunSipNumber = -1;
+                WeakReferenceMessenger.Default.Send(new AuctionDisplayStateMessage(20, false));
                 return;
             }
         }

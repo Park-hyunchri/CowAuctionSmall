@@ -1,5 +1,134 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-22 - 상태표시창에 설정된 총 페이지 수 표시
+
+### 작업 일자
+
+- 2026-09-22
+
+### 작업 목적
+
+- 상태표시창의 `페이지 N` 문구를 현재 회전 페이지가 아니라 `users.xml`의 `BoardPage` 총 설정값으로 고정 표시한다.
+
+### 원인
+
+- 기존 상태표시창이 `PageIndicatorStateMessage.CurrentPage`를 사용해 진행 페이지에서는 `페이지 1`, 유전 페이지에서는 `페이지 2`처럼 화면 전환에 따라 변경됐다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/ViewModels/MainWindowViewModel.cs`: 상태 문구에 현재 페이지 대신 1~4 범위로 보정된 전체 페이지 수를 사용하도록 변경했다.
+- `WORKLOG.md`: 작업 내용과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 상태표시창의 `페이지 N` 문구에만 영향이 있다.
+- 실제 페이지 전환, 마스터·서브 동기화, 경매 화면과 `users.xml` 설정은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore`: 성공, 오류 0개 / 경고 102개.
+- 표시 매핑 확인: `BoardPage=1 → 페이지 1`, `BoardPage=2 → 페이지 2`, `BoardPage=4 → 페이지 4`.
+- 실제 페이지 회전 중 문구 고정 여부 수동 확인: 미수행.
+- `git diff --check`: 공백 오류 없음. Git 줄바꿈 변환 안내만 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 상태표시창에 설정된 총 페이지 수 표시`
+
+## 2026-09-22 - 1개월 경과 로그 정리 및 자정 정상 종료
+
+### 작업 일자
+
+- 2026-09-22
+
+### 작업 목적
+
+- 프로그램 시작 시 한 달이 지난 날짜별 로그 폴더를 자동 삭제한다.
+- 실행 중인 프로그램을 다음 자정에 기존 창 종료 흐름으로 정상 종료한다.
+
+### 원인
+
+- `Logs/yyyy-MM-dd/yyyy-MM-dd.log` 구조로 로그가 계속 누적되지만 기존 보관 기간이나 삭제 처리가 없었다.
+- 기존 자동 종료 타이머는 약 200초마다 검사해 밤 11시부터 새벽 1시 사이 임의 시점에 `Application.Shutdown()`을 직접 호출했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/App.xaml.cs`: NLog 초기화 후 `DateTime.Today.AddMonths(-1)`보다 오래된 `yyyy-MM-dd` 형식 로그 폴더를 삭제하도록 했다. 형식이 다른 폴더와 재분석 지점은 제외하고 입출력·권한 오류는 경고 로그로 남긴다.
+- `CowAuctionSmall/Views/MainWindow.xaml.cs`: 다음 자정까지의 시간을 한 번 예약하고, 자정 도달 시 ESC와 공통 정상 종료 메서드를 호출하도록 했다. 공통 종료 경로는 중복 요청을 막고 Netty 종료를 기다린 뒤 메인 창을 닫는다.
+- `WORKLOG.md`: 작업 내용과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 실행 파일의 `Logs` 바로 아래 날짜형 폴더 중 한 달 기준일보다 오래된 폴더와 내부 로그는 프로그램 시작 시 삭제되며 복구할 수 없다.
+- 날짜 형식이 아닌 폴더, 기준일 당일과 이후 로그는 유지된다.
+- 프로그램이 자정까지 실행 중이면 창 닫기와 `App.OnExit` 자원 정리 경로로 종료된다. 자동 재실행은 포함하지 않았다.
+- 전광판, 경매 처리, 통신 패킷과 프로젝트 설정은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore`: 성공, 오류 0개 / 경고 102개.
+- 2026-09-22 기준 경계 계산 확인: `2026-08-21` 삭제 대상, `2026-08-22`와 이후 날짜 유지.
+- `manual`처럼 날짜 형식이 아닌 폴더명 제외 확인.
+- 다음 자정 계산 결과가 현재 시각보다 크고 24시간 이내인지 확인.
+- `git diff --check`: 공백 오류 없음. Git 줄바꿈 변환 안내만 확인했다.
+- 실제 운영 로그 삭제 및 실제 자정 도달 종료: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `feat: 오래된 로그 정리와 자정 정상 종료 추가`
+
+## 2026-09-22 - 출하AMS 하단 상태표시창 상시 표시
+
+### 작업 일자
+
+- 2026-09-22
+
+### 작업 목적
+
+- 전광판 표출 화면 바로 아래에 응찰서버, 페이지 동기화 모드, 경매 상태, 뿌리농가 설정, 현재 페이지와 버전을 한 줄로 보여주는 상태표시창을 상시 표시한다.
+- 기존 로그 내용창은 상태표시창 아래에 유지한다.
+
+### 원인
+
+- 기존 페이지 상태표시창은 설정된 페이지가 2개 이상일 때만 표시됐다.
+- 응찰서버 연결, 단일·일괄 경매 진행 상태, 뿌리농가 설정과 버전 정보가 하나의 상태표시창으로 구성되어 있지 않았다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/MainWindow.xaml`: 하단 배치를 `전광판 화면 → 상태표시창 → 로그 내용창` 순서로 변경하고 상태 항목을 가로로 배치했다.
+- `CowAuctionSmall/ViewModels/MainWindowViewModel.cs`: 상태 바인딩 속성과 메시지 구독을 추가하고 뿌리농가·페이지·버전·응찰서버·경매 상태를 갱신하도록 했다.
+- `CowAuctionSmall/Models/DataChangedMessage.cs`: 단일·일괄 경매 표시 상태 전달용 `AuctionDisplayStateMessage`를 추가했다.
+- `CowAuctionSmall/Services/ServerGetData.cs`: 단일경매 진행 계류대 번호와 단일 종료, 일괄 시작·종료 상태를 전달하도록 했다.
+- `CowAuctionSmall/NetProto/netty/NettyControllable.cs`: 응찰서버 채널 해제 시 연결 실패 상태 메시지를 전달하도록 했다.
+- `WORKLOG.md`: 작업 내용과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 메인 창 하단 상태표시와 로그 창의 표시 순서에 영향이 있다.
+- 단일경매 READY·START·PROGRESS와 종료, 일괄경매 시작·종료 신호가 상태표시창에 반영된다.
+- 전광판 진행·낙찰·유찰 View, 통신 패킷 형식, 마스터 선출 방식과 프로젝트 설정은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore`: 실패. `CowAuctionSmall/obj/project.assets.json`이 없어 `NETSDK1004`가 발생했다.
+- 프로젝트 규칙에 따라 패키지 복원은 수행하지 않았다.
+- `MainWindow.xaml` XML 구문 분석: 성공.
+- `git diff --check`: 공백 오류 없음. Git 줄바꿈 변환 안내만 확인했다.
+- 응찰서버 실제 연결·해제, 마스터/서브 복수 실행, 단일·일괄 경매 신호와 1~4페이지 화면 수동 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `feat: 출하AMS 하단 상태표시창 상시 표시`
+
 ## 2026-09-20 - 개발 문서 폴더 상위 이동
 
 ### 작업 일자

@@ -28,7 +28,7 @@ namespace CowAuctionSmall
             logger = NLogger.Instance;
             IsLicense();
             CheckMemoryUsageTimer(); // 메모리 사용량 체크 타이머 추가
-            SetupShutdownTimer(); // 타이머 설정 추가 (밤11:30 ~ 새벽1시에는 무조건 프로그램 종료)
+            SetupShutdownTimer(); // 다음 자정에 정상 종료
             
             InitializeComponent();
             Mouse.OverrideCursor = Cursors.None;
@@ -63,23 +63,28 @@ namespace CowAuctionSmall
             Application.Current.Shutdown();
         }
 
-        // 프로그램 종료 타이머 설정, 밤11시 30분 부터 새벽 2시까지 인 경우  
+        // 다음 자정에 프로그램이 정상 종료되도록 타이머를 설정한다.
         private void SetupShutdownTimer()
         {
-            _shutdownTimer = new Timer(200000); // 20분마다 체크
+            DateTime now = DateTime.Now;
+            DateTime nextMidnight = now.Date.AddDays(1);
+            double interval = Math.Max(1, (nextMidnight - now).TotalMilliseconds);
+
+            _shutdownTimer = new Timer(interval)
+            {
+                AutoReset = false
+            };
             _shutdownTimer.Elapsed += ShutdownTimer_Tick;
             _shutdownTimer.Start();
+            logger.LogInfo($"자정 자동 종료 예약: {nextMidnight:yyyy-MM-dd HH:mm:ss}");
         }
 
         // 타이머 틱 이벤트 핸들러
         private void ShutdownTimer_Tick(object? sender, ElapsedEventArgs e)
         {
-            DateTime now = DateTime.Now;
-            if (now.Hour >= 23 || now.Hour < 1) // 밤 11시부터 새벽 1시까지 
-            {
-                logger.LogInfo("프로그램 종료 : 자동 종료 시간 도달");
-                Application.Current.Dispatcher.Invoke(Application.Current.Shutdown);
-            }
+            _shutdownTimer?.Stop();
+            Application.Current.Dispatcher.BeginInvoke(
+                new Action(() => _ = ShutdownApplicationAsync("자정 자동 종료")));
         }
 
         // 메모리 사용량 체크 타이머 추가
@@ -149,29 +154,34 @@ namespace CowAuctionSmall
         {
             if (e.Key == Key.Escape)
             {
-                if (System.Threading.Interlocked.Exchange(ref _shutdownRequested, 1) == 1)
-                {
-                    return;
-                }
-
                 e.Handled = true;
-                logger.LogInfo("프로그램 종료 : ESC 키 입력");
-
-                try
-                {
-                    var nettyDisposeTask = AuctionDelegate.getInstance().disposeClients();
-                    if (await Task.WhenAny(nettyDisposeTask, Task.Delay(1500)) != nettyDisposeTask)
-                    {
-                        logger.LogWarn("ESC 종료: Netty 종료 제한시간 초과");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError($"ESC 종료: Netty 종료 실패 - {ex.Message}");
-                }
-
-                Application.Current.Shutdown();
+                await ShutdownApplicationAsync("ESC 키 입력");
             }
+        }
+
+        private async Task ShutdownApplicationAsync(string reason)
+        {
+            if (System.Threading.Interlocked.Exchange(ref _shutdownRequested, 1) == 1)
+            {
+                return;
+            }
+
+            logger.LogInfo($"프로그램 종료 : {reason}");
+
+            try
+            {
+                var nettyDisposeTask = AuctionDelegate.getInstance().disposeClients();
+                if (await Task.WhenAny(nettyDisposeTask, Task.Delay(1500)) != nettyDisposeTask)
+                {
+                    logger.LogWarn($"{reason}: Netty 종료 제한시간 초과");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"{reason}: Netty 종료 실패 - {ex.Message}");
+            }
+
+            Close();
         }
         private void MsgTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {

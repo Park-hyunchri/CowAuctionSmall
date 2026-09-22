@@ -49,6 +49,7 @@ namespace CowAuctionSmall.NetProto.netty
             //throw new NotImplementedException();
             Debug.WriteLine("## NETTY  DISCONNECT !! ");
             logger.LogError("## NETTY  DISCONNECT !! ");
+            WeakReferenceMessenger.Default.Send(new NettyConnectionResultMessage("2001"));
         }
 
         public void onCheckSession(IChannelHandlerContext ctx, AuctionCheckSession auctionCheckSession)
