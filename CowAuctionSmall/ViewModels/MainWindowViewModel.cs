@@ -62,6 +62,12 @@ namespace CowAuctionSmall.ViewModels
         private string _currentPageStatusText = "페이지 1";
 
         [ObservableProperty]
+        private string _pageRotationStatusText = "페이지전환";
+
+        [ObservableProperty]
+        private Visibility _pageRotationStatusVisibility = Visibility.Collapsed;
+
+        [ObservableProperty]
         private string _versionStatusText = "버전: -";
 
         [ObservableProperty]
@@ -509,6 +515,8 @@ namespace CowAuctionSmall.ViewModels
                 PageIndicatorRoleText = message.IsMaster ? "마스터 모드" : "서브 모드";
                 PageIndicatorRoleBrush = Brushes.LimeGreen;
                 CurrentPageStatusText = $"페이지 {totalPages}";
+                PageRotationStatusText = message.IsFrozen ? "페이지고정" : "페이지전환";
+                PageRotationStatusVisibility = totalPages >= 2 ? Visibility.Visible : Visibility.Collapsed;
                 PageIndicatorVisibility = Visibility.Visible;
 
                 PageIndicatorDots.Clear();

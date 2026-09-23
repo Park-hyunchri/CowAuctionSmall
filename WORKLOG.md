@@ -1,5 +1,45 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-23 - 상태표시창에 페이지 전환 상태 추가
+
+### 작업 일자
+
+- 2026-09-23
+
+### 작업 목적
+
+- 출하AMS 하단 상태표시창에서 페이지 회전 여부를 `페이지전환` 또는 `페이지고정`으로 확인할 수 있게 한다.
+- 설정된 진행 페이지가 1개인 경우에는 페이지 전환 상태 항목을 표시하지 않는다.
+
+### 원인
+
+- 기존 상태표시창은 설정된 총 페이지 수만 표시하고 실제 페이지 회전 가능 상태와 경매 진행 등에 따른 첫 페이지 고정 상태를 구분해 표시하지 않았다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/MainWindow.xaml`: 페이지 수와 버전 사이에 페이지 전환 상태 표시 영역을 추가했다.
+- `CowAuctionSmall/ViewModels/MainWindowViewModel.cs`: `PageIndicatorStateMessage.IsFrozen`에 따라 `페이지전환` 또는 `페이지고정`을 표시하고, 총 페이지가 2개 이상일 때만 해당 영역을 표시하도록 했다.
+- `WORKLOG.md`: 작업 내용과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 출하AMS 하단 상태표시창의 페이지 전환 상태 문구와 표시 여부에만 영향이 있다.
+- 실제 페이지 회전, 경매 진행 중 첫 페이지 고정, 마스터·서브 동기화 및 전광판 화면 구성은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore`: 성공, 오류 0개 / 경고 102개.
+- 표시 매핑 확인: `BoardPage=1 → 항목 숨김`, `BoardPage=2~4 + IsFrozen=false → 페이지전환`, `BoardPage=2~4 + IsFrozen=true → 페이지고정`.
+- `git diff --check`: 공백 오류 없음. Git 줄바꿈 변환 안내만 확인했다.
+- 실제 장비에서 페이지 회전·고정 상태 전환 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `feat: 상태표시창에 페이지 전환 상태 추가`
+
 ## 2026-09-23 - 단일경매 준비 상태 테두리 점멸 방지
 
 ### 작업 일자

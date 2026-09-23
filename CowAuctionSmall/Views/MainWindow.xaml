@@ -26,6 +26,7 @@
                         <ColumnDefinition Width="160"/>
                         <ColumnDefinition Width="105"/>
                         <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -55,7 +56,11 @@
                         <TextBlock Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding CurrentPageStatusText}"/>
                     </Border>
 
-                    <TextBlock Grid.Column="5" Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding VersionStatusText}"/>
+                    <Border Grid.Column="5" Width="85" BorderBrush="#404040" BorderThickness="0,0,1,0" Visibility="{Binding PageRotationStatusVisibility}">
+                        <TextBlock Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding PageRotationStatusText}"/>
+                    </Border>
+
+                    <TextBlock Grid.Column="6" Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding VersionStatusText}"/>
                 </Grid>
             </Border>
 
