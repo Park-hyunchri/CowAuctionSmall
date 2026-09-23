@@ -63,6 +63,22 @@ namespace CowAuctionSmall.ViewModels
             }
         }
 
+        private bool _isBatchGoatBorderHighlighted;
+        public bool IsBatchGoatBorderHighlighted
+        {
+            get { return _isBatchGoatBorderHighlighted; }
+            set
+            {
+                if (_isBatchGoatBorderHighlighted == value)
+                {
+                    return;
+                }
+
+                _isBatchGoatBorderHighlighted = value;
+                OnPropertyChanged(nameof(IsBatchGoatBorderHighlighted));
+            }
+        }
+
         public String? Note
         {
             get { return _cowInfo?.Note; }

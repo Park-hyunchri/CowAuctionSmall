@@ -14,8 +14,12 @@
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
             <Setter Property="BorderBrush" Value="black"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                    <DataTrigger.EnterActions>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsRunning}" Value="True"/>
+                        <Condition Binding="{Binding IsBatchGoatBorderHighlighted}" Value="False"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
                         <BeginStoryboard x:Name="BlinkStoryboard">
                             <Storyboard RepeatBehavior="Forever">
                                 <ObjectAnimationUsingKeyFrames
@@ -37,10 +41,13 @@
                                 </ObjectAnimationUsingKeyFrames>
                             </Storyboard>
                         </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                    <DataTrigger.ExitActions>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
                         <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
-                    </DataTrigger.ExitActions>
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsBatchGoatBorderHighlighted}" Value="True">
+                    <Setter Property="BorderBrush" Value="#FFA500"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>

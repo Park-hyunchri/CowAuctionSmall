@@ -25,6 +25,8 @@ namespace CowAuctionSmall.Services
     
     public class DisplaySelect : IDisposable
     {
+        private const string YeongcheonAuctionHouseCode = "8808990656687";
+
         private enum PanelDisplayMode
         {
             None,
@@ -130,6 +132,7 @@ namespace CowAuctionSmall.Services
 
             var auction = _userInfo.Auction ??= new Auction();
             _nhCode = auction.AuctionHouseCode ?? string.Empty;
+            _msgRefreshString.Register<AuctionDisplayStateMessage>(this, OnAuctionDisplayStateMsg);
 
             _setCustomDisplay = new SetCustomDisplay();
 
@@ -699,6 +702,9 @@ namespace CowAuctionSmall.Services
                 }
             }
 
+            state.RunningViewModel!.IsBatchGoatBorderHighlighted =
+                ShouldHighlightBatchGoatBorder(cowInfo, auctionmethod);
+
             DisplayRunningPageNum(panel, cowInfo, 1);
 
             // 염소 경매인 경우
@@ -722,6 +728,39 @@ namespace CowAuctionSmall.Services
                     break;
                 default:
                     break;
+            }
+        }
+
+        private bool ShouldHighlightBatchGoatBorder(gValues cowInfo, int auctionmethod)
+        {
+            return _nhCode == YeongcheonAuctionHouseCode &&
+                   auctionmethod == 10 &&
+                   ServerGetData._batchRunningState &&
+                   cowInfo.CowDistinction == "5" &&
+                   cowInfo.AuctionResultStatus == "11";
+        }
+
+        private void OnAuctionDisplayStateMsg(object recipient, AuctionDisplayStateMessage message)
+        {
+            if (_nhCode != YeongcheonAuctionHouseCode)
+            {
+                return;
+            }
+
+            var dispatcher = Application.Current?.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+            {
+                dispatcher.BeginInvoke(() => OnAuctionDisplayStateMsg(recipient, message));
+                return;
+            }
+
+            var isBatchRunning = message.AuctionMethod == 10 && message.IsRunning;
+            foreach (var viewModel in TodayAuctionItems.ToList())
+            {
+                viewModel.IsBatchGoatBorderHighlighted =
+                    isBatchRunning &&
+                    viewModel.CowInfo.CowDistinction == "5" &&
+                    viewModel.CowInfo.AuctionResultStatus == "11";
             }
         }
         /// <summary>
@@ -1454,6 +1493,7 @@ namespace CowAuctionSmall.Services
             _isDisposed = true;
 
             _msgRefreshString.Unregister<DisplaySelectRefresh>(this);
+            _msgRefreshString.Unregister<AuctionDisplayStateMessage>(this);
 
             if (_timer != null)
             {
