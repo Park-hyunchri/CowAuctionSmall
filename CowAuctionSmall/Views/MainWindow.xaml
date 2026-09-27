@@ -56,8 +56,11 @@
                         <TextBlock Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding CurrentPageStatusText}"/>
                     </Border>
 
-                    <Border Grid.Column="5" Width="85" BorderBrush="#404040" BorderThickness="0,0,1,0" Visibility="{Binding PageRotationStatusVisibility}">
-                        <TextBlock Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding PageRotationStatusText}"/>
+                    <Border Grid.Column="5" Width="100" BorderBrush="#404040" BorderThickness="0,0,1,0" Visibility="{Binding PageRotationStatusVisibility}">
+                        <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                            <TextBlock Foreground="#DADADA" FontSize="12" VerticalAlignment="Center" Text="{Binding PageRotationStatusText}"/>
+                            <Ellipse Width="9" Height="9" Fill="LimeGreen" Margin="4,0,0,0" Stroke="#55000000" StrokeThickness="1" Visibility="{Binding PageRotationActiveVisibility}"/>
+                        </StackPanel>
                     </Border>
 
                     <TextBlock Grid.Column="6" Foreground="#DADADA" FontSize="12" Margin="8,0" VerticalAlignment="Center" Text="{Binding VersionStatusText}"/>

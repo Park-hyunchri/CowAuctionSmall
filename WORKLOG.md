@@ -1,5 +1,44 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 페이지 전환 동작 상태 초록색 표시 추가
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 출하AMS 하단 상태표시창에서 페이지 전환 동작 여부를 초록색 원으로 즉시 확인할 수 있게 한다.
+
+### 원인
+
+- 기존 상태표시창은 페이지 전환 동작 중일 때 `페이지전환` 문구만 표시해 동작 상태를 시각적으로 구분하는 표시가 없었다.
+- `PageIndicatorStateMessage.IsFrozen`으로 전환과 고정 상태를 이미 구분하고 있으므로 별도의 전환 로직 변경 없이 표시 상태만 추가할 수 있다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/MainWindow.xaml`: 페이지 전환 상태 영역을 가로 StackPanel로 변경하고 `페이지전환` 문구 뒤에 9px 초록색 원을 추가했다. 원 추가 시 잘림을 방지하도록 영역 폭을 `85`에서 `100`으로 조정했다.
+- `CowAuctionSmall/ViewModels/MainWindowViewModel.cs`: 총 페이지가 2개 이상이고 `IsFrozen=false`일 때만 초록색 원을 표시하는 `PageRotationActiveVisibility` 상태를 추가했다.
+- `WORKLOG.md`: 원인, 변경 내용, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 출하AMS 하단 상태표시창의 페이지 전환 상태 문구와 초록색 원 표시에만 영향이 있다.
+- 실제 페이지 전환 타이머, 마스터·서브 동기화, 경매 화면과 `users.xml` 설정은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 표시 매핑 확인: `BoardPage=1 → 항목 숨김`, `BoardPage=2~4 + IsFrozen=false → 페이지전환 + 초록색 원`, `BoardPage=2~4 + IsFrozen=true → 페이지고정 + 원 숨김`: 코드 확인 완료.
+- 실제 출하AMS 상태표시창 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `feat: 페이지 전환 동작 상태 표시 추가`
+
 ## 2026-09-27 - 정읍축협 진행 화면 개체번호 간격 복원
 
 ### 작업 일자
