@@ -1,5 +1,49 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 횡성축협 진행·낙찰 화면 개체번호 정렬 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 횡성축협 `HoengseongRun` 진행 화면과 일반 `HoengseongSold` 낙찰 화면의 전체 개체번호와 가운데 네 자리 단축번호를 동일한 기준으로 정렬한다.
+
+### 원인
+
+- 낙찰 화면은 전체번호 Margin.Left `40`, 단축번호 Margin.Left `77`을 사용해 두 시작점 간격이 37px이었다.
+- 진행 화면 `HoengseongRun`은 전체번호 X=42, 단축번호 X=74로 32px 간격을 사용하고 있어 화면 간 번호 배치가 달랐다.
+- 두 번호가 Canvas 안에서 Margin으로 배치되고 왼쪽 정렬이 명시되지 않아 이후 위치 조정 기준도 불명확했다.
+- 낙찰 화면의 현장 보정 결과에 맞춰 진행 화면 단축번호도 X=76으로 통일할 필요가 있었다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/HoengseongSold.xaml`: 전체번호를 `Canvas.Left=42`로 변경하고, 현장 화면 확인에 따라 단축번호를 `Canvas.Left=76`으로 최종 조정했다.
+- 두 TextBlock에 `Canvas.Top=0`과 `HorizontalAlignment=Left`를 명시하고 기존 Margin 좌표를 제거했다.
+- `CowAuctionSmall/Views/Size128_128/Running/CustomAuctionRunning1/HoengseongRun.xaml`: 전체번호 X=42를 유지하고 현장 화면 확인에 따라 단축번호를 X=72로 최종 조정했으며 두 항목에 왼쪽 정렬을 명시했다.
+- FontSize `13`, 진행 화면 단축번호의 빨간색·검은 배경, 낙찰 화면의 동적 전경·배경과 기존 굵기는 유지했다.
+- `WORKLOG.md`: 원인, 수정값, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 횡성축협 코드 `8808990656885`의 `HoengseongRun` 진행 화면과 일반 `HoengseongSold` 128×128 낙찰 화면 개체번호 행에 적용된다.
+- 유전 `HoengseongRun2`, 유찰 `HoengseongUnSold` 및 행사용 `HoengseongBunyangSold` 화면은 변경하지 않았다.
+- 가격, 낙찰자, 화면 분기와 데이터 바인딩은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 진행 화면 전체번호 X=42/단축번호 X=72, 낙찰 화면 전체번호 X=42/단축번호 X=76 및 두 항목의 왼쪽 정렬 확인: 코드 확인 완료.
+- 실제 횡성축협 128×128 전광판에서 진행 `2205 3978 6`과 낙찰 `1980 7802 9`, `2139 4913 0` 간격 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 횡성 진행·낙찰 화면 개체번호 정렬 보정`
+
 ## 2026-09-27 - 제천단양·보령 낙찰 화면 개체번호·금액 정렬 보정
 
 ### 작업 일자
