@@ -1,5 +1,47 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 순창축협 진행 화면 1행 개체번호 정렬 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 순창축협 128×128 진행 1페이지에서 송아지, 혈통, 전체 개체번호와 가운데 네 자리 단축번호가 겹치거나 붙지 않도록 정렬한다.
+
+### 원인
+
+- `IsShowQQuri=Y` 조건에서 사용하는 공통 `StandardQQuri_Run1`만 기존 `굴림` 글꼴과 암시적 글자 크기, Grid 기본 정렬을 유지하고 있었다.
+- 혈통 X=37, 전체번호 X=60, 단축번호 X=80 및 Width=30 조합으로 인해 4-4-1 개체번호의 공백과 단축번호 오버레이 위치가 불안정했다.
+- `BidderName=N`은 낙찰자 표시 방식이며 진행 화면 View 선택에는 영향을 주지 않는다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Running/StandardQQuri_Run1.xaml`: 1행 네 TextBlock에 `굴림체`, FontSize `11`, `HorizontalAlignment=Left`를 적용했다.
+- 혈통 X를 `37`에서 `35`, 전체번호 X를 `60`에서 `58`, 단축번호 X를 `80`에서 `86`으로 조정하고 단축번호 Width를 `30`에서 `22`로 변경했다.
+- 단축번호에 `FontWeight=Normal`, `Panel.ZIndex=150`을 적용하고 `SnapsToDevicePixels=True`를 추가했다.
+- 다른 공통 진행 화면에서 정상 확인된 1행 배치 규격과 동일하게 맞췄다.
+- `WORKLOG.md`: 원인, 변경 내용, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 순창축협을 포함해 전용 진행 View가 없고 `IsShowQQuri=Y` 또는 어미 으뜸 값 조건으로 `StandardQQuri_Run1`을 사용하는 128×128 진행 1페이지에 적용된다.
+- 진행 2페이지, 낙찰·유찰 화면, 전용 진행 View, C# 분기와 설정 파일에는 적용되지 않는다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 1행 좌표와 글꼴, 정렬, 단축번호 폭 및 ZIndex 확인: 코드 확인 완료.
+- 실제 순창축협 128×128 전광판에서 송아지·혈통·4-4-1 개체번호가 잘리거나 겹치지 않고 일정한 간격으로 표시되는 것을 사용자 제공 화면으로 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 순창 진행 화면 개체번호 정렬 보정`
+
 ## 2026-09-27 - 페이지 전환 동작 상태 초록색 표시 추가
 
 ### 작업 일자
