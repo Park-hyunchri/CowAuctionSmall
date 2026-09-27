@@ -60,8 +60,8 @@
             <!-- 6. 축종 및 개체번호 (소/염소 구분) -->
             <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="{Binding StrCowDistinction}" Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" FontSize="13" Margin="2,0,0,0" x:Name="StrCowDistinction"/>
-                <TextBlock Text="{Binding EntityNumber}" Margin="45,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="77,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
+                <TextBlock Text="{Binding EntityNumber}" Margin="45,0,0,0" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
+                <TextBlock Text="{Binding EntityNumberShort}" Margin="75,0,0,0" Width="28" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Normal"/>
             </Canvas>
             <Canvas Margin="0,90,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">
                 <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
