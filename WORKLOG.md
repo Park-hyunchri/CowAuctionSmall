@@ -1,5 +1,42 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 공통 낙찰 화면 단축번호 굵기 조정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 전주축협 김제·고산 가축시장을 포함해 공통 `QQuriSold`를 사용하는 128×128 낙찰 화면에서 단축번호의 과도한 굵기를 제거하고 위치 보정 전 기준 화면을 확보한다.
+
+### 원인
+
+- 단축번호에 `FontWeight="Bold"`가 적용돼 전체 개체번호와 글자 폭·굵기가 달라 오버레이 정렬을 판단하기 어려웠다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/QQuriSold.xaml`: `EntityNumberShort`의 FontWeight를 `Bold`에서 `Normal`로 변경했다. Margin `22`, FontSize `13`, 가운데 정렬, 전경·배경과 바인딩은 유지했다.
+- `WORKLOG.md`: 공통 낙찰 화면 단축번호 굵기 변경과 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 전주축협 김제·고산 가축시장과 공통 `QQuriSold`를 사용하는 다른 축협의 128×128 낙찰 화면 단축번호에 적용된다.
+- 전체 개체번호 위치, 낙찰 화면의 다른 항목, 진행·유찰 화면, 전용 낙찰 화면 및 C# 소스는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 단축번호 FontWeight `Normal`과 기존 Margin `22`, FontSize `13`, 색상·배경·바인딩이 유지된 것을 확인했다.
+- 실제 128×128 전광판에서 단축번호 일반 굵기와 전체 개체번호 오버레이 위치가 정상임을 사용자가 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 공통 낙찰 화면 단축번호 굵기 조정`
+
 ## 2026-09-27 - 전주축협 단축번호 오버레이 시작점 보정
 
 ### 작업 일자
