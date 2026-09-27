@@ -1,5 +1,49 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 거창축협 진행·낙찰 화면 개체번호 정렬 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 거창축협 128×128 진행 및 낙찰 화면에서 전체 개체번호와 가운데 네 자리 단축번호의 간격과 오버레이 위치를 안정화한다.
+
+### 원인
+
+- 거창 사업장 코드 `8808990659701`은 뿌리농가 `X` 조건에서 진행 화면으로 공통 `Standard_non_X_Run1`, 낙찰 화면으로 `MokpoMuanSinanSold`를 사용한다.
+- 진행 화면은 전체번호와 단축번호가 모두 X=40에 있고 단축번호 Width가 30이며 왼쪽 정렬이 명시되지 않아 오버레이 위치가 불안정했다.
+- 낙찰 화면은 전체번호 X=44, 단축번호 X=72로 배치돼 현장 화면에서 가운데 네 자리 단축번호의 미세 보정이 필요했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Running/Standard_non_X_Run1.xaml`: 전체번호를 X=44, 단축번호를 X=74로 변경하고 두 항목에 `HorizontalAlignment=Left`를 적용했다.
+- 진행 화면 단축번호 Width를 `30`에서 `26`으로 줄이고 `FontWeight=Normal`을 명시했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/MokpoMuanSinanSold.xaml`: 전체번호 X=44를 유지하면서 왼쪽 정렬을 명시하고, 단축번호를 X=72에서 X=74로 이동했다.
+- 낙찰 화면 단축번호 Width `26`, `HorizontalAlignment=Left`, `FontWeight=Normal`을 적용했다.
+- 동적 전경·배경, 축종과 나머지 진행·낙찰 정보 배치는 유지했다.
+- `WORKLOG.md`: 분기 근거, 수정값, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- `Standard_non_X_Run1`을 사용하는 전용 진행 View가 없는 뿌리농가 `X` 조합의 128×128 진행 1페이지에 적용된다.
+- `MokpoMuanSinanSold`를 사용하는 목무신, 춘천, 거창, 홍천, 수원, 예산 계열 128×128 낙찰 화면에 적용된다.
+- 진행 2페이지, 유찰 화면, 다른 전용 View, C# 분기와 파싱에는 적용되지 않는다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 진행·낙찰 전체번호 X=44, 단축번호 X=74/Width=26, 왼쪽 정렬과 일반 굵기 확인: 코드 확인 완료.
+- 실제 거창축협 128×128 전광판에서 `9999 0000 6`, `2173 6073 7` 간격 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 거창 진행·낙찰 화면 개체번호 정렬 보정`
+
 ## 2026-09-27 - 이천 계열 낙찰 화면 단축번호 우측 위치 보정
 
 ### 작업 일자
