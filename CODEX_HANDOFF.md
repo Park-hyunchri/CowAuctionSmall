@@ -1,5 +1,19 @@
 # CODEX HANDOFF
 
+## 2026-09-27 전주축협 128×128 진행 1행 개체번호 정렬
+
+- 적용 대상: 전주축협 사업장 코드 `8808990656441`, 고산·김제 가축시장 공용 진행 1페이지 `CowAuctionSmall/Views/Size128_128/Running/GimjeRun.xaml`
+- C#의 `EntityNumber` 4-4-1 파싱은 변경하지 않고 XAML만 보정했다.
+- UserControl에 `UseLayoutRounding="True"`, `SnapsToDevicePixels="True"`를 적용했다.
+- 1행 축종·혈통·전체 번호·단축번호에 `FontFamily="굴림체"`, `FontSize="11"`, `HorizontalAlignment="Left"`를 명시했다.
+- 최종 좌표: 축종 `Margin="0,0,0,110"`, 혈통 `Margin="35,0,0,110"`, 전체 번호 `Margin="58,0,0,108"`, 단축번호 `Margin="86,0,0,110" Width="22"`.
+- 단축번호는 `FontWeight="Normal"`, `Panel.ZIndex="150"`, `EntityNumberShortForeground`와 `EntityNumberShortBackground` 동적 리소스를 유지한다.
+- 굴림체 11px에서 전체 번호 X=58과 앞 네 자리+공백 폭 약 27.5px을 기준으로 단축번호 시작점을 X=86에 맞췄다.
+- 사용자 현장 확인 결과 `송아지 혈통 2168 5501 7`이 겹침·잘림 없이 표시되고, 가운데 네 자리 강조도 정상이다.
+- 다른 축협 뷰에 적용할 때는 전역 `AnimalParseData.cs` 포맷을 바꾸지 말고 해당 XAML의 1행에만 우선 적용한다. 화면 폭, 테두리 두께, 기존 시작 좌표가 다를 수 있으므로 X=86을 그대로 복사하지 말고 `전체 번호 시작점 + 해당 폰트의 앞 4자리와 공백 폭`으로 단축번호 위치를 다시 계산한다.
+- 검증: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` 성공, 오류 0개 / 기존 경고 102개.
+- 관련 기록: 프로젝트 루트 `WORKLOG.md`의 2026-09-27 전주축협 개체번호 정렬 작업 항목.
+
 ## 2026-09-13 GAMSTest STOP 외부 명령 종료 처리
 
 - `GAMSTest/Views/ControlWindow.xaml.cs`의 수신 콜백에 `Dispatcher.BeginInvoke`, `_isClosing` 확인 및 대소문자 무관 STOP 분기 적용
