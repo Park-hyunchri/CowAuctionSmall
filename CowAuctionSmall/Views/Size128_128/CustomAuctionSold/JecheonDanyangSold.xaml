@@ -52,8 +52,8 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="18" Foreground="Violet" FontWeight="Bold"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center"  Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="11" Margin="0,-2,0,0"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" Margin="0,0,0,0" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" />
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="5,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="12" FontWeight="Normal" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="30,0,0,0" Width="26" Background="{DynamicResource EntityNumberShortBackground}" FontSize="12" FontWeight="Normal" />
 
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
@@ -64,13 +64,13 @@
             </TextBlock>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"/>
-            <TextBlock  Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" FontSize="12"/>
+            <TextBlock  Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0"/>
 
             <!-- 낙찰가 : 라벨 -->
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="13" />
 
             <!-- 낙찰가 : 값 -->
-            <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" VerticalAlignment="Center" FontSize="14" Margin="10,0,0,0"/>
+            <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Margin="7,0,0,0"/>
 
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰자" Foreground="Violet" FontSize="13" VerticalAlignment="Center"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text=":" Foreground="Violet" FontSize="12" Margin="41,0,0,0" VerticalAlignment="Center"/>
