@@ -66,13 +66,13 @@
             </TextBlock>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"/>
-            <TextBlock  Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0"/>
+            <TextBlock  Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,0"/>
 
             <!-- 낙찰가 : 라벨 -->
             <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="13" VerticalAlignment="Center" />
 
             <!-- 낙찰가 : 값 -->
-            <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="13" Margin="7,0,0,0"/>
+            <TextBlock Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding BidPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="WhiteSmoke" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="13" Margin="0,0,0,0"/>
 
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text="낙찰자" Foreground="Violet" FontSize="13" VerticalAlignment="Center"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Text=":" Foreground="Violet" FontSize="12" Margin="41,0,0,0" VerticalAlignment="Center"/>
