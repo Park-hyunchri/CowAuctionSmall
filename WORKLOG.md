@@ -1,5 +1,45 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 해남진도축협 낙찰 화면 개체번호 정렬 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 해남진도축협 `HaenamJindoSold` 128×128 낙찰 화면에서 전체 개체번호와 가운데 네 자리 단축번호의 상대 위치를 안정화한다.
+
+### 원인
+
+- 전체 개체번호는 X=44, 단축번호는 X=72에 배치됐지만 두 항목의 왼쪽 정렬이 명시되지 않았다.
+- 단축번호의 표시 폭도 고정되지 않아 전체번호의 가운데 네 자리와 일관된 위치로 겹치기 어려웠다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/HaenamJindoSold.xaml`: 전체번호 X=44를 유지하고 `HorizontalAlignment=Left`를 적용했다.
+- 단축번호를 X=72에서 X=74로 이동하고 Width `26`, `HorizontalAlignment=Left`, `FontWeight=Normal`을 적용했다.
+- 기존 글자 크기, 동적 전경·배경과 나머지 낙찰 화면 배치는 유지했다.
+- `WORKLOG.md`: 원인, 수정값, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 해남진도축협 코드 `8808990656106`의 `HaenamJindoSold` 128×128 낙찰 화면 개체번호 행에 적용된다.
+- 진행 `HaenamJindo`, 유찰 `OutLineUnSold`, 가격·낙찰자 및 다른 사업장 View에는 적용되지 않는다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 전체번호 X=44, 단축번호 X=74/Width=26 및 두 항목의 왼쪽 정렬 확인: 코드 확인 완료.
+- 실제 해남진도축협 128×128 전광판에서 `1775 4190 5`, `1944 8431 1` 간격 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 해남진도 낙찰 화면 개체번호 정렬 보정`
+
 ## 2026-09-27 - 횡성축협 진행·낙찰 화면 개체번호 정렬 보정
 
 ### 작업 일자
