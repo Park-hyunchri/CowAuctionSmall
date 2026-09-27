@@ -100,7 +100,7 @@
                 <!-- 전체 개체관리번호 (users.xml 동적 색상 적용) -->
                 <TextBlock Panel.ZIndex="100" Margin="58,0,0,108" FontFamily="굴림체" FontSize="11" HorizontalAlignment="Left" Text="{Binding CowInfo.EntityNumber}"  Foreground="{DynamicResource EntityNumberForeground}" />
                 <!-- 4자리 단축 번호 강조 박스 (users.xml 동적 색상 적용) -->
-                <TextBlock Panel.ZIndex="150" Margin="86,0,0,110" Width="22" FontFamily="굴림체" FontSize="11" HorizontalAlignment="Left" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal" />
+                <TextBlock Panel.ZIndex="150" Margin="87,0,0,110" Width="25" FontFamily="굴림체" FontSize="11" HorizontalAlignment="Left" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal" />
                 <!-- ======================================================================================================================================================================= -->
                 
                 <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->
