@@ -133,7 +133,7 @@ namespace CowAuctionSmall.Services
             "8808990643625" => new YangpyeongSold(), // 양평
             "8808990656557" => new YecheonSold(), // 예천
             "8808990656106" => new HaenamJindoSold(), // 해남진도
-            "8808990656915" or "8808990656229" or "8808990659701" or "8808990674605" or "8808998656496" or "8808990657196" => new MokpoMuanSinanSold(), // 목무신, 춘천, 거창, 홍천, 수원, 예산
+            "8808990656915" or "8808990656229" or "8808990659701" or "8808990674605" or "8808990656496" or "8808990657196" => new MokpoMuanSinanSold(), // 목무신, 춘천, 거창, 홍천, 수원, 예산
             "8808990656717" or "8808990817675" => new QQuriSold_v3(), // 곡성, 장성
             "8808990656885" => lowestPriceTitle == "행사용" ? new HoengseongBunyangSold() : new HoengseongSold(), // 횡성
             "8808990661315" => new HwasunSold(), // 화순

@@ -1,5 +1,86 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 뿌리농가 미적용 낙찰 화면 개체번호 정렬 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 공통 `Standard_non_X_Sold` 128×128 낙찰 화면에서 전체 개체번호와 가운데 네 자리 단축번호의 상대 위치를 안정화한다.
+
+### 원인
+
+- 전체 개체번호는 Grid 영역의 시작점에서 표시됐지만 왼쪽 정렬이 명시되지 않았다.
+- 단축번호는 같은 Grid 영역에서 `HorizontalAlignment=Center`와 Margin.Left `5`를 함께 사용해 숫자 렌더링 폭에 따라 전체번호와 기준점이 달라질 수 있었다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Standard_non_X_Sold.xaml`: 전체 개체번호에 `HorizontalAlignment=Left`를 명시하고 기존 시작 위치를 유지했다.
+- 단축번호를 왼쪽 정렬로 변경하고 Margin.Left `30`, Width `26`으로 고정했다.
+- FontSize `12`, FontWeight `Normal`, 동적 전경·배경과 나머지 낙찰 화면 배치는 유지했다.
+- `WORKLOG.md`: 원인, 수정값, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- `Standard_non_X_Sold`를 사용하는 128×128 일반 소 낙찰 화면의 개체번호 1행에 적용된다.
+- 낙찰가, 중량, 낙찰자, 진행·유찰 화면과 다른 낙찰 View에는 적용되지 않는다.
+- 앞서 승인된 수원축협 사업장 코드 수정은 그대로 유지했다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 전체번호 왼쪽 정렬, 단축번호 왼쪽 정렬 및 Margin.Left `30`/Width `26` 확인: 코드 확인 완료.
+- 실제 128×128 전광판에서 `2171 7559 6`, `1859 7369 4` 간격 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 뿌리농가 미적용 낙찰 개체번호 정렬 보정`
+
+## 2026-09-27 - 수원축협 낙찰 화면 사업장 코드 수정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 수원축협 사업장 코드 `8808990656496`에서 지정된 128×128 낙찰 화면이 선택되도록 코드 오타를 바로잡는다.
+
+### 원인
+
+- `MokpoMuanSinanSold` 분기의 수원 코드가 `8808998656496`으로 등록돼 실제 코드 `8808990656496`과 일치하지 않았다.
+- 이 불일치로 수원축협의 뿌리농가 `X` 낙찰 화면은 전용 분기 대신 기본 `Standard_non_X_Sold`로 선택됐다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Services/SetCustomDisplay.cs`: `MokpoMuanSinanSold` 분기의 수원 코드를 `8808998656496`에서 `8808990656496`으로 수정했다.
+- 진행 화면, 유찰 화면, XAML과 다른 사업장 코드는 변경하지 않았다.
+- `WORKLOG.md`: 원인, 변경 내용, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 수원축협 코드 `8808990656496`의 일반 소 128×128 낙찰 화면은 `MokpoMuanSinanSold`를 사용한다.
+- 뿌리농가 `X` 조건의 진행 화면은 기존 기본 분기에 따라 `Standard_non_X_Run1`을 계속 사용한다.
+- 목무신, 춘천, 거창, 홍천, 예산 등 같은 낙찰 View를 공유하는 다른 사업장 분기는 유지된다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 정확한 수원 코드가 `MokpoMuanSinanSold`에 연결되고 오타 코드가 제거됐는지 확인: 코드 확인 완료.
+- 실제 수원축협 128×128 전광판에서 진행·낙찰 화면 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 수원 낙찰 화면 사업장 코드 수정`
+
 ## 2026-09-27 - 홍천축협 낙찰·유찰 화면 분기 수정
 
 ### 작업 일자
