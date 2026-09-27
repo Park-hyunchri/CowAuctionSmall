@@ -53,7 +53,7 @@
 
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"  Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="15" Margin="-2,-2,0,0"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" />
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="22,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Bold" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="22,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Normal" />
 
             <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBlock  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" Margin="7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">

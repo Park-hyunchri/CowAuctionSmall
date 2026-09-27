@@ -1,5 +1,90 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 뿌리농가 미적용 진행 화면 1행 정렬 안정화
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 안성축협을 포함해 `qquri=N`일 때 사용하는 128×128 진행 1페이지에서 축종, 혈통, 전체 개체번호와 단축번호를 전주축협에서 현장 검증된 글꼴·간격으로 표시한다.
+
+### 원인
+
+- 공통 `Standard_non_QQuri_Run1`의 1행은 비례폭 굴림 기본 글꼴과 기존 좌표를 사용해 `번식우 + 혈통 + 개체번호` 조합에서 간격과 단축번호 오버레이 정렬이 불안정했다.
+- 루트에 레이아웃 반올림 및 디바이스 픽셀 맞춤 설정이 없어 렌더링 환경에 따라 글자 경계가 번질 여지가 있었다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Running/Standard_non_QQuri_Run1.xaml`: 1행의 축종·혈통·전체 번호·단축번호에 굴림체 11px와 좌측 정렬을 적용했다.
+- 1행 좌표를 축종 X=0, 혈통 X=35, 전체 번호 X=58, 단축번호 X=86으로 조정하고 단축번호를 Width 22, FontWeight `Normal`로 설정했다.
+- 루트에 `UseLayoutRounding="True"`와 `SnapsToDevicePixels="True"`를 적용했다.
+- 바인딩, 동적 색상 리소스, 다른 표시행과 C# 분기·파싱은 변경하지 않았다.
+- `WORKLOG.md`: 변경 원인, 공통 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 별도 전용 진행 뷰가 없고 `qquri=N`으로 `Standard_non_QQuri_Run1`을 사용하는 모든 128×128 진행 1페이지에 적용된다.
+- `StandardQQuri_Run1`, 전주 전용 `GimjeRun`, 진행 2페이지, 낙찰·유찰 화면 및 C# 소스에는 적용되지 않는다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- `git diff --check`: 공백 오류 없음. 기존 작업 파일을 포함한 줄바꿈 변환 경고만 확인했다.
+- XAML에서 굴림체 11px, 좌측 정렬, 좌표 및 단축번호 Width·FontWeight 속성을 확인했다.
+- 실제 안성축협 128×128 전광판에서 송아지·비육우·번식우의 혈통 및 `4-4-1` 개체번호 간격과 마지막 자리 정상 표출을 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 뿌리농가 미적용 진행 화면 개체번호 정렬`
+
+## 2026-09-27 - 128×128 낙찰 화면 단축번호 일반 굵기 확대 적용
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 공통 `QQuriSold`에서 현장 확인된 단축번호 일반 굵기 표시를 장성 전용 화면을 제외한 실제 사용 중인 128×128 낙찰 화면에 확대 적용한다.
+
+### 원인
+
+- 일부 낙찰 화면의 `EntityNumberShort`에 `FontWeight="Bold"`가 남아 전체 개체번호와 단축번호의 글자 폭·굵기가 달랐다.
+- 장성축협 전용 화면은 기존 표시 정책을 유지해야 하므로 변경 대상에서 제외했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Standard_non_X_Sold.xaml`: 단축번호 FontWeight를 `Bold`에서 `Normal`로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/QQuriSold_Weight.xaml`: 단축번호 FontWeight를 `Bold`에서 `Normal`로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/JecheonDanyangSold.xaml`: 단축번호 FontWeight를 `Bold`에서 `Normal`로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/QQuriSold_v3.xaml`: 단축번호 FontWeight를 `Bold`에서 `Normal`로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/YecheonSold.xaml`: 단축번호 FontWeight를 `Bold`에서 `Normal`로 변경했다.
+- 각 화면의 Margin, FontSize, 정렬, 전경·배경과 바인딩은 유지했다. `JangseongSold.xaml`은 변경하지 않았다.
+- `WORKLOG.md`: 확대 적용 대상과 장성 제외 범위 및 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 영천 및 `IsShowQQuri=X` 기본 화면, 임실, 제천단양·보령, 곡성 및 낙찰자 이름+번호 화면, 예천의 128×128 낙찰 화면 단축번호에 적용된다.
+- 장성축협 화면, 미사용 `QQuriSold_v2`, 도달하지 않는 염소용 블록, 진행·유찰 화면 및 C# 소스는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 5개 대상 화면의 단축번호 FontWeight `Normal`과 기존 위치·크기·색상이 유지되고 장성 화면은 변경되지 않은 것을 확인했다.
+- 실제 128×128 전광판에서 각 축협별 단축번호 위치 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 낙찰 화면 단축번호 굵기 통일`
+
 ## 2026-09-27 - 공통 낙찰 화면 단축번호 굵기 조정
 
 ### 작업 일자
