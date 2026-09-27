@@ -1,5 +1,50 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-27 - 이천 계열 낙찰 화면 단축번호 우측 위치 보정
+
+### 작업 일자
+
+- 2026-09-27
+
+### 작업 목적
+
+- 이천축협 128×128 낙찰 화면에서 가운데 네 자리 단축번호를 전체 개체번호와 정확히 맞춘다.
+
+### 원인
+
+- 이천 사업장 코드 `8808990844220`은 낙찰 화면에서 공통 `AnseongSold`를 사용한다.
+- 단축번호가 Grid 2~4열 영역에서 `HorizontalAlignment=Center`, Margin.Left `18`로 배치돼 Margin 변경량과 실제 이동량이 일치하지 않았고, 현장 화면에서 전체번호보다 약 1px 왼쪽에 표시됐다.
+- 단축번호를 왼쪽 정렬로 고정한 뒤에도 전체번호가 가운데 정렬을 사용해 문자열 렌더링 폭에 따라 전체번호의 시작점이 미세하게 달라졌고, 숫자 조합별로 상대 위치 차이가 발생했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/AnseongSold.xaml`: 단축번호를 `HorizontalAlignment=Left`로 변경하고 해당 Grid 영역 기준 Margin.Left를 `36`으로 설정해 오른쪽으로 보정했다.
+- Margin.Left `34` 적용 화면에서도 단축번호가 약 1px 왼쪽에 있어 현장 화면 기준 `35`로 최종 조정했다.
+- 전체번호도 `HorizontalAlignment=Left`, Margin.Left `6`으로 고정해 숫자 조합이 바뀌어도 전체번호와 단축번호의 상대 위치가 일정하도록 보정했다.
+- 전체번호 왼쪽 정렬 적용 후 현장 화면에서 단축번호가 약 1px 왼쪽에 있어 Margin.Left를 `35`에서 `36`으로 최종 조정했다.
+- 단축번호 FontSize `13`, FontWeight `Normal`, 동적 전경·배경과 전체 개체번호 위치는 유지했다.
+- 최저가, 낙찰가, 중량, 낙찰자 영역과 C# 분기는 변경하지 않았다.
+- `WORKLOG.md`: 원인, 수정값, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- `AnseongSold`를 공유하는 이천, 안성, 남원, 음성, 파주연천, 문경, 익산군산, 고성, 평택, 상주, 논산계룡, 구미칠곡, 포항, 옥천의 128×128 낙찰 화면 1행에 적용된다.
+- 다른 낙찰 View, 진행·유전·유찰 화면 및 C# 소스에는 적용되지 않는다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 단축번호 `HorizontalAlignment=Left`, Margin.Left `36`, FontSize `13`, FontWeight `Normal` 확인: 코드 확인 완료.
+- 전체번호 `HorizontalAlignment=Left`, Margin.Left `6`, FontSize `13` 확인: 코드 확인 완료.
+- 실제 이천축협 128×128 전광판에서 단축번호 위치 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 이천 계열 낙찰 화면 단축번호 위치 보정`
+
 ## 2026-09-27 - 순창축협 진행 화면 1행 개체번호 정렬 보정
 
 ### 작업 일자
