@@ -633,7 +633,7 @@ namespace CowAuctionSmall.Services
             }
 
             //260902 임시 장성
-            if (string.Equals(code, "8808990817675", StringComparison.Ordinal))
+            if (string.Equals(code, "8808990817675", StringComparison.Ordinal) && showPaternity == "Y")
             {
                 string[] keywords = { "친자", "으뜸", "혈통" };
                 var firstMatch = keywords
@@ -675,6 +675,11 @@ namespace CowAuctionSmall.Services
                         .Remove(firstMatch.Index, firstMatch.Keyword.Length)
                         .Trim(' ', ',');
                 }
+            }
+            else if (string.Equals(code, "8808990817675", StringComparison.Ordinal))
+            {
+                gv.FrontNoteWord = string.Empty;
+                gv.PaternityMatch = "-";
             }
             else
             {

@@ -51,9 +51,10 @@
 
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="22" Foreground="Violet" FontWeight="Bold"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"  Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="15" Margin="-2,-2,0,0"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Center" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" />
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="22,0,0,0"  Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Normal" />
+            <!-- 2. Row 1: 축종 및 개체번호 -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding StrCowDistinction}" Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="13" Margin="-2,-2,0,0"/>
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" Margin="6,0,0,0" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="36,0,0,0" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13" FontWeight="Normal" />
 
             <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="최저가 :"  Foreground="lime" FontSize="12"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBlock  Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding LowestPrice, Converter={StaticResource NumberFormatConverter}}" Foreground="Cyan" Margin="7,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">

@@ -1,5 +1,43 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-28 - 장성축협 친자 뱃지 설정 조건 보완
+
+### 작업 일자
+
+- 2026-09-28
+
+### 작업 목적
+
+- 장성축협의 `친자/으뜸/혈통` 뱃지가 `IsPaternityMatch=Y`일 때만 동작하도록 설정 조건을 일치시킨다.
+
+### 원인
+
+- 공통 친자 판정은 `IsPaternityMatch=N`일 때 비활성화되지만, 이후 실행되는 장성 전용 비고 키워드 처리가 설정값을 확인하지 않고 `PaternityMatch`를 다시 활성화했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Services/AnimalParseData.cs`: 장성 전용 비고 키워드 처리를 `IsPaternityMatch=Y`일 때만 실행하고, 그 외 설정에서는 뱃지 값을 비활성화한 채 비고 원문을 유지하도록 변경했다.
+- `WORKLOG.md`: 원인, 변경 조건, 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 장성축협 코드 `8808990817675`의 128×128 진행·낙찰·유찰 화면에 공통 호스트로 표시되는 친자 뱃지 데이터에 적용된다.
+- `IsPaternityMatch=Y`의 기존 `친자/으뜸/혈통` 문구·색상과 비고 키워드 제거 동작은 유지한다.
+- 익산군산 및 다른 축협의 친자 판정, `RunningNoteHost128`, `RunningNoteHost128_Running`과 개별 View는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 장성 `IsPaternityMatch=Y`에서 기존 키워드 처리를 유지하고, 그 외 설정에서는 뱃지를 비활성화하며 `Note`를 변경하지 않는 분기 확인: 코드 확인 완료.
+- 실제 장성축협 128×128 진행·낙찰·유찰 화면 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 장성 친자 뱃지 설정 조건 보완`
+
 ## 2026-09-28 - 영주축협 진행 화면 단축번호 잘림 보정
 
 ### 작업 일자
