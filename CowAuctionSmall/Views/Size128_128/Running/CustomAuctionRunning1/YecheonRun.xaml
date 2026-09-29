@@ -49,6 +49,7 @@
 
         <!-- 추가 -->
         <models:CowTypeToStyleConverter_OutLine_V3 x:Key="CowTypeToStyleConverter_OutLine_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
@@ -172,8 +173,7 @@
             <TextBlock Margin="0,0,0,110" Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" Panel.ZIndex="100"/>
 
             <TextBlock Margin="37,0,0,110" Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" Style="{Binding CowInfo.RegistrationCategory, Converter={StaticResource BloodFontStyle}}" Panel.ZIndex="100"/>
-            <TextBlock Margin="60,0,0,110" Text="{Binding CowInfo.EntityNumber}"  Foreground="{DynamicResource EntityNumberForeground}" Panel.ZIndex="99"/>
-            <TextBlock Margin="80,0,0,110" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" Panel.ZIndex="100" Width="30"/>
+            <TextBlock Margin="60,0,0,110" Foreground="{DynamicResource EntityNumberForeground}" Panel.ZIndex="99"><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
             <!-- ======================================================================================================================================================================= -->
 
             <!-- 새로 -->

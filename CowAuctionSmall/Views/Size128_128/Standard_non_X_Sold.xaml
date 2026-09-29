@@ -21,6 +21,7 @@
         </Style>
 
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
@@ -53,8 +54,7 @@
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="18" Foreground="Violet" FontWeight="Bold"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"  Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="11" Margin="0,-2,0,0"/>
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumber}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Center"  Foreground="{DynamicResource EntityNumberForeground}" FontSize="12" />
-            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Text="{Binding EntityNumberShort}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberShortForeground}" Margin="30,0,0,0" Width="26" Background="{DynamicResource EntityNumberShortBackground}" FontSize="12" FontWeight="Normal" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource EntityNumberForeground}" FontSize="12"><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal"/><Run Text=" "/><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
 
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" Grid.RowSpan="2" Text="{Binding Sex}" Style="{Binding CopyGValues, Converter={StaticResource CowTypeToStyleConverter_V3}}" VerticalAlignment="Top" x:Name="Sex"/>
             <TextBlock  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" FontSize="11">
@@ -101,7 +101,7 @@
                 </TextBlock>
 
                 <!-- Y : 사람 이름만 (5글자 초과 시 한 줄 흐름) -->
-                <common:BidderNameFlow Text="{Binding Bidder}"
+                <common:BidderNameFlow Text="{Binding BidderString}"
                                        FontWeight="Bold"
                                        Height="16"
                                        HorizontalAlignment="Stretch"

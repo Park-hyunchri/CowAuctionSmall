@@ -1,5 +1,199 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-09-29 - 128×128 축협 낙찰자 이름 흐름 표시 통일
+
+### 작업 일자
+
+- 2026-09-29
+
+### 작업 목적
+
+- 실제 사용하는 128×128 소 경매 낙찰 화면 전체에서 낙찰자 이름 5자는 고정 표시하고 6자 이상은 한 줄로 흐르게 한다.
+- Y 모드에서도 파싱 과정에서 잘리지 않은 전체 이름을 흐름 표시에 사용한다.
+
+### 원인
+
+- 공용 `BidderNameFlow`는 이미 5자 고정·6자 이상 흐름 조건을 지원하지만 일부 낙찰 View에만 적용돼 있었다.
+- `BidderName=Y` 파싱은 대부분 이름을 3자로, 해남진도·양평은 5자로 줄여 `Bidder`에 저장하므로 흐름 컨트롤이 있어도 6자 이상 이름을 받을 수 없었다.
+- 전역 `Bidder` 잘림 규칙을 제거하면 128×64·160×64 화면에도 영향을 주므로 128×128 흐름 표시용 전체 이름을 `BidderString`에 별도로 보존할 필요가 있었다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Services/AnimalParseData.cs`: Y 모드의 URL 디코딩된 전체 낙찰자 이름을 `BidderString`에 저장하고, 유효하지 않은 낙찰 데이터에서는 이전 이름이 남지 않도록 `BidderString`을 `-`로 초기화했다. 기존 `Bidder` 잘림 규칙은 유지했다.
+- 기존 흐름 View 6개(`AnseongSold`, `JangseongSold`, `JecheonDanyangSold`, `QQuriSold`, `QQuriSold_Weight`, `Standard_non_X_Sold`): Y 모드 `BidderNameFlow` 입력을 `Bidder`에서 `BidderString`으로 변경했다.
+- 단일 낙찰자 표시 View 4개(`YangpyeongSold`, `YecheonSold`, `HaenamJindoSold`, `MokpoMuanSinanSold`): N/X 모드는 기존 `Bidder` 고정 표시를 유지하고 Y/B 모드는 전체 이름을 `BidderNameFlow`로 표시하도록 변경했다.
+- 이름+참가번호 View 4개(`QQuriSold_v3`, `HoengseongBunyangSold`, `HoengseongSold`, `HwasunSold`): 참가번호 줄은 유지하고 이름 줄만 기존 위치·색상·크기에 맞춘 `BidderNameFlow`로 변경했다.
+- 공용 `BidderNameFlow`와 `FlowTextAnimation`은 변경하지 않았다.
+- `WORKLOG.md`: 낙찰자 전체 이름 보존, 적용 View와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 실제 화면 선택 분기에서 사용하는 128×128 소 경매 낙찰 View 14개에 적용된다.
+- Y와 B 모드의 이름은 5자까지 고정, 6자 이상은 초당 18px로 반복 흐름 표시된다.
+- N 모드 참가번호와 X 모드 마스킹 이름의 기존 고정 표시는 유지된다.
+- `Bidder` 값과 기존 잘림 규칙을 유지하므로 128×64·160×64 낙찰 화면에는 영향이 없다.
+- 진행·유찰 화면, 낙찰가, 개체번호, 화면 선택 분기와 공용 애니메이션 수명 주기는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- 실제 사용하는 128×128 소 경매 낙찰 View 14개 모두 `BidderNameFlow` 포함 여부 확인: 정상.
+- Y 모드 흐름 컨트롤에 기존 잘린 `Bidder` 바인딩이 남아 있지 않은지 확인: 정상.
+- Y 모드 전체 이름 저장 1개 및 무효 데이터 이름 초기화 2개 분기 확인: 정상.
+- 공용 기준 `Text.Length <= 5` 고정 및 6자 이상 강제 흐름 로직 유지 확인: 정상.
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- `git diff --check`: 공백 오류 없음. 기존 파일의 LF→CRLF 변환 예정 경고만 확인했다.
+- 실제 전광판에서 Y/B/N 모드별 5자·6자 이름, 참가번호 위치 및 반복 화면 진입 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 128x128 낙찰자 이름 흐름 표시 통일`
+
+## 2026-09-29 - 128×128 축협 화면 개체번호 구간별 표시 일괄 적용
+
+### 작업 일자
+
+- 2026-09-29
+
+### 작업 목적
+
+- 실제 화면 선택 분기에서 사용하는 128×128 소 경매 View 전체에 `4+4+1` 개체번호 구간별 표시 방식을 적용한다.
+- 전체번호 위에 단축번호를 덮는 구조를 제거하고 가운데 네 자리만 `users.xml`의 단축번호 전경·배경색으로 표시한다.
+
+### 원인
+
+- 축협별 진행·낙찰·유찰 View 대부분이 전체 개체번호와 단축번호를 별도 `TextBlock`으로 겹쳐 표시해 글꼴과 좌표에 따라 색상 경계 및 간격이 달라질 수 있었다.
+- 정읍과 상주 화면에서 하나의 `TextBlock`과 여러 `Run`을 사용하는 방식의 실제 표출 및 `users.xml` 색상 연동이 정상임을 확인했다.
+- `SetCustomDisplay`의 128×128 화면 선택 분기를 기준으로 개체번호를 표시하는 실제 사용 View 36개 중 기존 적용 6개를 제외한 30개가 기존 오버레이 방식으로 남아 있었다.
+
+### 변경 파일 및 내용
+
+- 진행 1페이지 11개: `Standard_non_QQuri_Run1_1`, `Standard_non_X_Run1`, `StandardQQuri_Run1`, `GimjeRun`, `HaenamJindo`, `MokpoMuanSinan`, `YangpyeongRun`, `YecheonRun`, `HoengseongRun`, `Hwasun`, `Jangseong` XAML에 구간별 표시를 적용했다.
+- 낙찰 12개: `Standard_non_X_Sold`, `QQuriSold_Weight`, `JecheonDanyangSold`, `JangseongSold`, `YangpyeongSold`, `YecheonSold`, `HaenamJindoSold`, `MokpoMuanSinanSold`, `QQuriSold_v3`, `HoengseongBunyangSold`, `HoengseongSold`, `HwasunSold` XAML에 구간별 표시를 적용했다.
+- 유찰 7개: `OutLineUnSold`, `HoengseongUnSold`, `YecheonUnSold`, `Standard_non_X_UnSold`, `HwasunUnSold`, `YangpyeongUnSold`, `JangseongUnSold` XAML에 구간별 표시를 적용했다.
+- 각 View에 기존 `EntityNumberPartConverter`를 리소스로 등록하고, 앞 네 자리·단축번호 네 자리·마지막 한 자리를 하나의 `TextBlock`에서 표시하도록 변경했다.
+- 가운데 네 자리는 `EntityNumberShortForeground`와 `EntityNumberShortBackground`, 나머지는 `EntityNumberForeground`를 사용한다.
+- 명시적으로 `굴림체`를 사용하던 승인 대상의 축종·혈통·개체번호는 `굴림`으로 변경했다. 각 View의 기존 FontSize와 시작 좌표 및 표시 조건은 유지했다.
+- 횡성·화순 낙찰/유찰 View 내부의 염소용 단축번호 표시는 변경하지 않았다.
+- `WORKLOG.md`: 실제 사용 View 전수 적용 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 128×128 소 경매의 실제 사용 진행 1페이지 13개, 낙찰 14개, 유찰 9개가 모두 동일한 `4+4+1` 표시 구조를 사용한다.
+- 진행 2페이지, 염소·말 화면, 현재 화면 선택 분기에서 생성되지 않는 보관 View, 데이터 파싱, ViewModel 및 화면 선택 로직은 변경하지 않았다.
+- 해남진도 진행 화면은 기존에 전체번호만 표시했으나 이번 적용으로 가운데 네 자리의 설정 색상·배경도 표시한다.
+- 횡성 진행 화면의 고정 `Red/Black` 단축번호 색상은 다른 축협과 동일하게 `users.xml` 동적 색상으로 변경했다.
+
+### 빌드 및 테스트 결과
+
+- 승인 대상 30개 XAML 각각에 `EntityNumberPartConverter` 리소스 1개, `First`/`Last` 구간 바인딩 각 1개가 존재하는지 확인: 정상.
+- 승인 대상 30개 XAML의 명시적 `굴림체` 잔존 여부 확인: 없음.
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- `git diff --check`: 공백 오류 없음. 기존 파일의 LF→CRLF 변환 예정 경고만 확인했다.
+- 실제 축협별 진행·낙찰·유찰 전광판 표출 확인: 미수행.
+- 해남진도 진행 및 횡성 진행의 변경된 단축번호 색상 연동 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 128x128 축협 화면 개체번호 표시 통일`
+
+## 2026-09-29 - 상주 진행·낙찰·유찰 개체번호 구간별 색상 표시
+
+### 작업 일자
+
+- 2026-09-29
+
+### 작업 목적
+
+- 상주축협의 진행·낙찰·유찰 화면에서도 정읍축협과 동일하게 `4+4+1` 개체번호의 가운데 네 자리를 겹침 없이 설정 색상과 배경으로 표시한다.
+
+### 원인
+
+- 상주축협 코드 `8808990657639`와 `IsShowQQuri=N` 조건은 진행 1페이지 `Standard_non_QQuri_Run1`, 낙찰 `AnseongSold`, 유찰 `QQuriUnSold`를 사용한다.
+- 세 화면 모두 전체 개체번호와 네 자리 단축번호를 서로 다른 `TextBlock`으로 겹쳐 표시해 글꼴 렌더링과 좌표에 따라 색상 경계와 번호 간격이 달라질 수 있었다.
+- 진행 2페이지 `AuctionRunning2`와 `AuctionRunning2_3`은 개체번호를 표시하지 않아 변경 대상에서 제외했다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_128/Running/Standard_non_QQuri_Run1.xaml`: 공용 `IsShowQQuri=N` 진행 화면의 오버레이를 제거하고 하나의 `TextBlock` 안에서 `4+4+1` 구간을 표시하도록 변경했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/AnseongSold.xaml`: 상주를 포함한 공용 낙찰 화면의 개체번호를 동일한 구간별 표시 방식으로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/QQuriUnSold.xaml`: 상주를 포함한 공용 유찰 화면의 개체번호를 동일한 구간별 표시 방식으로 변경했다.
+- 세 화면 모두 기존 `EntityNumberPartConverter`를 재사용하고 가운데 네 자리는 `EntityNumberShortForeground`와 `EntityNumberShortBackground`, 나머지는 `EntityNumberForeground`를 사용한다.
+- `CowAuctionSmall/Views/Size128_128/Running/Standard_non_QQuri_Run1.xaml`: 실제 표출 비교를 위해 진행 1행의 축종·혈통·개체번호 글꼴을 `굴림체 11px`에서 `굴림 11px`로 변경하고 기존 좌표를 유지했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionSold/AnseongSold.xaml`: 낙찰 화면에서 축종과 개체번호 사이의 간격을 줄이고 마지막 숫자의 우측 여유를 확보하도록 개체번호 Margin.Left를 `6`에서 `0`으로 변경했다.
+- `WORKLOG.md`: 상주 화면 선택 경로, 변경 내용, 공용 영향 범위와 검증 결과를 기록하고 정읍 현장 확인 결과를 갱신했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 상주축협 128×128 진행 1페이지, 낙찰 및 유찰 화면에 적용된다.
+- `Standard_non_QQuri_Run1`을 사용하는 다른 `IsShowQQuri=N` 사업장, `AnseongSold`를 공유하는 사업장 및 `QQuriUnSold`를 사용하는 다른 사업장에도 동일한 표시 방식이 적용된다.
+- 진행 2페이지, 염소용 개체번호, 데이터 파싱, ViewModel 및 화면 선택 분기는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- 기존 Converter와 상주 진행·낙찰·유찰 XAML 리소스의 컴파일: 성공.
+- 실제 상주축협 128×128 전광판에서 `4+4+1` 구간별 색상·배경·간격 정상 표출: 사용자 확인 완료.
+- 상주 진행 1행의 `굴림 11px` 표출 및 마지막 한 자리 비잘림: 사용자 확인 완료.
+- 상주 `AnseongSold` 낙찰 화면에서 축종과 개체번호 간격 및 마지막 한 자리 비잘림 확인: 미수행.
+- 공용 View를 사용하는 다른 축협 화면 회귀 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 상주 화면 개체번호 구간별 색상 표시`
+
+## 2026-09-29 - 정읍 진행·낙찰·유찰 개체번호 구간별 색상 표시
+
+### 작업 일자
+
+- 2026-09-29
+
+### 작업 목적
+
+- `4+4+1` 형식의 개체번호 위에 단축번호를 겹쳐 표시하지 않고, 하나의 텍스트에서 가운데 네 자리만 설정 색상과 배경으로 표시한다.
+
+### 원인
+
+- 기존 화면은 전체 개체번호와 네 자리 단축번호를 서로 다른 `TextBlock`으로 같은 위치에 겹쳐 표시해 글꼴 렌더링과 좌표에 따라 색상 경계와 번호 간격을 반복해서 보정해야 했다.
+- 전체 개체번호는 이미 `4 4 1` 형식이고 가운데 네 자리 값도 `EntityNumberShort`로 제공되므로, 앞·가운데·마지막 구간을 한 줄에서 직접 표시할 수 있다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Models/Converter/EntityNumberPartConverter.cs`: 전체 개체번호에서 공백을 제거한 뒤 앞 네 자리와 마지막 한 자리를 안전하게 반환하는 Converter를 추가했다.
+- `CowAuctionSmall/Views/Size128_128/Running/Standard_non_X_Run1_1.xaml`: 정읍 진행 화면의 전체번호·단축번호 오버레이를 제거하고 하나의 `TextBlock` 안에서 `4+4+1` 구간을 표시하도록 변경했다.
+- `CowAuctionSmall/Views/Size128_128/QQuriSold.xaml`: 공용 낙찰 화면의 개체번호를 동일한 구간별 표시 방식으로 변경했다.
+- `CowAuctionSmall/Views/Size128_128/CustomAuctionUnSold/NamwonUnSold.xaml`: 정읍·목무신 공용 유찰 화면의 개체번호를 동일한 구간별 표시 방식으로 변경했다.
+- 가운데 네 자리는 기존 `EntityNumberShortForeground`와 `EntityNumberShortBackground`를 사용하고 앞 네 자리와 마지막 한 자리는 기존 `EntityNumberForeground`를 사용한다.
+- `WORKLOG.md`: 원인, 변경 내용, 공용 영향 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 갱신하지 않았다.
+
+### 영향 범위
+
+- 정읍축협 사업장 코드 `8808990656953`의 128×128 진행 1페이지, 낙찰 및 유찰 화면에 적용된다.
+- `QQuriSold`를 사용하는 전용 낙찰 화면이 없는 다른 축협과 `NamwonUnSold`를 공유하는 목무신 유찰 화면에도 동일한 표시 방식이 적용된다.
+- 개체번호가 없는 `Eumseong2` 유전 화면, 염소용 개체번호, 데이터 파싱, ViewModel 및 화면 선택 분기는 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo` (`CowAuctionSmall` 폴더에서 실행): 성공, 오류 0개 / 기존 경고 102개.
+- Converter와 진행·낙찰·유찰 XAML 리소스의 컴파일: 성공.
+- 실제 정읍축협 128×128 전광판에서 `2198 6792 8`의 구간별 색상·배경·간격 및 `users.xml` 색상 연동 정상: 사용자 확인 완료.
+- 공용 `QQuriSold` 사용 축협과 목무신 유찰 화면 회귀 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 개체번호 가운데 네 자리 직접 색상 표시`
+
 ## 2026-09-29 - 정읍축협 진행 화면 개체번호 위치 보정
 
 ### 작업 일자

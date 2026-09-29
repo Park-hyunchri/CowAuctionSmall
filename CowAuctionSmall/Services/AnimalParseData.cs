@@ -465,10 +465,12 @@ namespace CowAuctionSmall.Services
             if (!isValidData)
             {
                 gv.Bidder = "-";
+                gv.BidderString = "-";
             }
             else if (isInvalidData30)
             {
                 gv.Bidder = "-";
+                gv.BidderString = "-";
             }
             else
             {
@@ -477,6 +479,7 @@ namespace CowAuctionSmall.Services
                 switch (BidderName)
                 {
                     case "Y": // 낙찰자 이름표시
+                        gv.BidderString = bidderSource;
                         if (userInfo.Auction.AuctionHouseCode.Equals("8808990656106") || userInfo.Auction.AuctionHouseCode.Equals("8808990643625"))//해남진도..
                         {
                             gv.Bidder = bidderSource.Length > 5 ? bidderSource.Substring(0, 5) : bidderSource;

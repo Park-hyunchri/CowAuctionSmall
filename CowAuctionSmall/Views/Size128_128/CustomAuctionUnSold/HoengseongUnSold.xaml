@@ -17,6 +17,7 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
     </UserControl.Resources>
 
@@ -45,8 +46,7 @@
             <!-- 개체번호 -->
             <Canvas Margin="0,73,0,0">
                 <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
-                <TextBlock Text="{Binding EntityNumber}" Margin="42,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="74,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="13"/>
+                <TextBlock Margin="42,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13"><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/><Run Text=" "/><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
             </Canvas>
 
             <!-- 지역 / 농가명 -->

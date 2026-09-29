@@ -48,6 +48,7 @@
 
         <!-- 추가 -->
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
@@ -82,8 +83,7 @@
             <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
             <Canvas Visibility="{Binding CowInfo.CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="{Binding CowInfo.StrCowDistinction}"   Style="{Binding CowInfo.StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumber}" Margin="44,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"/>
-                <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Margin="72,0,0,0" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/>
+                <TextBlock Margin="44,0,0,0" Foreground="{DynamicResource EntityNumberForeground}"><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
             </Canvas>
             <!-- ======================================================================================================================================================================= -->
             <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->

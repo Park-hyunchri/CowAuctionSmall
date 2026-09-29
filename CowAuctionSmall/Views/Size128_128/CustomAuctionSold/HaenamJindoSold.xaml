@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAuctionSold"
                                        xmlns:models="clr-namespace:CowAuctionSmall.Models.Converter"
+             xmlns:common="clr-namespace:CowAuctionSmall.Views.Common"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              mc:Ignorable="d" 
@@ -20,6 +21,7 @@
         </Style>
 
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
         <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
@@ -46,7 +48,36 @@
             <Canvas Margin="0,60,0,0" >
                 <TextBlock Text="낙찰자 : "  Foreground="Violet"  Margin="2,0,0,0" FontSize="13"/>
                 <Canvas x:Name="canvasBidder" ClipToBounds="True" Height="15" HorizontalAlignment="Left" Canvas.Left="60" VerticalAlignment="Center" Width="64">
-                    <TextBlock x:Name="bidder" Text="{Binding Bidder}"  Foreground="Cyan" FontSize="13"/>
+                    <TextBlock x:Name="bidder" Text="{Binding Bidder}" Foreground="Cyan" FontSize="13">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BidderName}" Value="Y">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BidderName}" Value="B">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <common:BidderNameFlow Text="{Binding BidderString}" Width="64" Height="15" Foreground="Cyan" FontSize="13">
+                        <common:BidderNameFlow.Style>
+                            <Style TargetType="{x:Type common:BidderNameFlow}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding BidderName}" Value="Y">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding BidderName}" Value="B">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </common:BidderNameFlow.Style>
+                    </common:BidderNameFlow>
                     <!--#FF69B4 -->
                 </Canvas>
             </Canvas>
@@ -55,8 +86,7 @@
             <!-- CowDistinction 값이 "1", "2", "3"인 경우 보이는 소 Canvas -->
             <Canvas Margin="0,75,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Cow}">
                 <TextBlock Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction"/>
-                <TextBlock Text="{Binding EntityNumber}" Margin="44,0,0,0" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberForeground}"/>
-                <TextBlock Text="{Binding EntityNumberShort}" Margin="74,0,0,0" Width="26" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal"/>
+                <TextBlock Margin="44,0,0,0" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberForeground}"><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal"/><Run Text=" "/><Run Text="{Binding EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
             </Canvas>
             <!-- CowDistinction 값이 "5"인 경우 보이는 염소 Canvas -->
             <Canvas Margin="0,75,0,0" Visibility="{Binding CowDistinction, Converter={StaticResource EntityNumberVisibilityConverter}, ConverterParameter=Goat}">

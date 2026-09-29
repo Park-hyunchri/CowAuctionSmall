@@ -49,6 +49,7 @@
 
         <!-- 추가 -->
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:PregnancyValueConverter  x:Key="PregnancyValueConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
@@ -88,7 +89,7 @@
         <Style x:Key="MungyeongBloodStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="Cyan"/>
             <Setter Property="Margin" Value="35,0,0,110"/>
-            <Setter Property="FontFamily" Value="굴림체"/>
+            <Setter Property="FontFamily" Value="굴림"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
         </Style>
@@ -111,10 +112,8 @@
                 <TextBlock Panel.ZIndex="50" 
                            Text="{Binding CowInfo.RegistrationCategory, Converter={StaticResource MotherLevelConverter}}" 
                            Style="{StaticResource MungyeongBloodStyle}"/>   <!-- Margin="37,0,0,0"  -->             
-                <!-- 전체 개체관리번호 (users.xml 동적 색상 적용) -->
-                <TextBlock Panel.ZIndex="100" Margin="58,0,0,108" FontFamily="굴림체" FontSize="11" HorizontalAlignment="Left" Text="{Binding CowInfo.EntityNumber}"  Foreground="{DynamicResource EntityNumberForeground}" />
-                <!-- 4자리 단축 번호 강조 박스 (users.xml 동적 색상 적용) -->
-                <TextBlock Panel.ZIndex="150" Margin="86,0,0,110" Width="22" FontFamily="굴림체" FontSize="11" HorizontalAlignment="Left" Text="{Binding CowInfo.EntityNumberShort}"  Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal" />
+                <!-- 전체 개체관리번호와 가운데 4자리 단축 번호 (users.xml 동적 색상 적용) -->
+                <TextBlock Panel.ZIndex="100" Margin="58,0,0,108" FontFamily="굴림" FontSize="11" HorizontalAlignment="Left" Foreground="{DynamicResource EntityNumberForeground}"><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontWeight="Normal"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
                 <!-- ======================================================================================================================================================================= -->
                 
                 <!-- 출하지역 색상값 (users.xml 동적 색상 적용) -->

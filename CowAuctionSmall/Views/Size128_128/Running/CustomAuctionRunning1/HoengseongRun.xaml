@@ -42,6 +42,7 @@
         </Style>
 
         <models:CowTypeToStyleConverter_V3 x:Key="CowTypeToStyleConverter_V3"/>
+        <models:EntityNumberPartConverter x:Key="EntityNumberPartConverter"/>
         <models:MotherLevelConverter x:Key="MotherLevelConverter" />
         <models:NumberFormatConverter x:Key="NumberFormatConverter"/>
 
@@ -74,8 +75,7 @@
 
             <!-- 1행: 개체번호 라인 (Y=0) -->
             <TextBlock Text="개체:" Foreground="lime" Canvas.Left="2" Canvas.Top="0" FontSize="13"/>
-            <TextBlock Text="{Binding CowInfo.EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" Canvas.Left="42" Canvas.Top="0" HorizontalAlignment="Left" FontSize="13"/>
-            <TextBlock Text="{Binding CowInfo.EntityNumberShort}" Foreground="Red" Background="Black" Canvas.Left="72" Canvas.Top="0" HorizontalAlignment="Left" FontSize="13"/>
+            <TextBlock Foreground="{DynamicResource EntityNumberForeground}" Canvas.Left="42" Canvas.Top="0" HorizontalAlignment="Left" FontSize="13"><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=First}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}"/><Run Text=" "/><Run Text="{Binding CowInfo.EntityNumber, Converter={StaticResource EntityNumberPartConverter}, ConverterParameter=Last}"/></TextBlock>
 
             <!-- 2행: 출하지역 / 농가명 (Y=16) -->
             <TextBlock Style="{StaticResource DistributionEventHiddenTextStyle}" Canvas.Left="2" Canvas.Top="16" Foreground="{DynamicResource LocationForeground}" FontSize="13" Text="{Binding CowInfo.Location}"/>
