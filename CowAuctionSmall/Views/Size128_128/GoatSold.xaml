@@ -81,7 +81,7 @@
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text="낙찰자" Foreground="Violet" FontSize="13" Margin="2,0,0,0" VerticalAlignment="Center"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Text=":" Foreground="Violet" FontSize="13" Margin="42,0,0,0" VerticalAlignment="Center"/>
 
-            <Grid Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" Grid.RowSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <Grid Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="3" Grid.RowSpan="2" Margin="7,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center">
 
                 <!-- N : 숫자만 (현재와 동일한 형태) -->
                 <TextBlock x:Name="tbBidderNumberOnly" Text="{Binding Bidder}" Foreground="Yellow" FontSize="30" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -99,8 +99,9 @@
 
                 <!-- Y : 사람 이름만 (5글자 초과 시 한 줄 흐름) -->
                 <common:BidderNameFlow Text="{Binding Bidder}"
+                                       FontSize="18"
                                        FontWeight="Bold"
-                                       Height="20"
+                                       Height="22"
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center">
                     <common:BidderNameFlow.Style>
