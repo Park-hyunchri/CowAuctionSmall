@@ -42,8 +42,8 @@
 
             <!-- 흘러가는 비고 텍스트 (색상: #f61c2d, 폰트크기: 12) -->
             <Canvas x:Name="canvasNote" 
-                    Canvas.Top="110"
-                    Width="124" Height="18" 
+                    Canvas.Top="111"
+                    Width="124" Height="15"
                     ClipToBounds="True">
                 <Canvas.Style>
                     <Style TargetType="Canvas">
