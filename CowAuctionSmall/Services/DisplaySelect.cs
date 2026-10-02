@@ -26,6 +26,7 @@ namespace CowAuctionSmall.Services
     public class DisplaySelect : IDisposable
     {
         private const string YeongcheonAuctionHouseCode = "8808990656687";
+        private const string SokchoAuctionHouseCode = "8808990806426";
 
         private enum PanelDisplayMode
         {
@@ -94,6 +95,13 @@ namespace CowAuctionSmall.Services
         private readonly Dictionary<VirtualizingStackPanel, PanelDisplayState> _panelStates = new Dictionary<VirtualizingStackPanel, PanelDisplayState>();
         private bool _isDisposed;
 
+        private bool IsSokcho128x64 =>
+            _displaySize == DisplaySizeParser.DisplaySize.Size128x64 &&
+            _nhCode == SokchoAuctionHouseCode;
+
+        private bool IsSokchoEvent =>
+            string.Equals(_userInfo.Auction?.LowestPriceTitle?.Trim(), "행사용", StringComparison.Ordinal);
+
         private static int ParseIntOrDefault(string? value, int fallback)
         {
             return int.TryParse(value, out var parsed) && parsed > 0 ? parsed : fallback;
@@ -149,6 +157,18 @@ namespace CowAuctionSmall.Services
             else
             {
                 _totalRunningPage = Convert.ToInt32(boardPageValue);
+            }
+
+            if (_nhCode == SokchoAuctionHouseCode)
+            {
+                if (_displaySize == DisplaySizeParser.DisplaySize.Size128x64)
+                {
+                    _totalRunningPage = IsSokchoEvent ? 1 : Math.Clamp(_totalRunningPage, 1, 2);
+                }
+                else if (_displaySize == DisplaySizeParser.DisplaySize.Size128x128)
+                {
+                    _totalRunningPage = Math.Clamp(_totalRunningPage, 1, 2);
+                }
             }
 
             int page1 = ParseIntOrDefault(pageSetting?.BoardPageTime ?? auction.BoardPageTime, 0);
@@ -824,7 +844,28 @@ namespace CowAuctionSmall.Services
 
             Func<int, UserControl?> createPage;
 
-            if (totalRunningPage <= 2 && IsStandardDisplaySize(_displaySize))
+            if (IsSokcho128x64)
+            {
+                createPage = pageNumber =>
+                {
+                    var pageName = $"SokchoRunPage{pageNumber}";
+                    var existingPage = existingPages.FirstOrDefault(p => p.Name == pageName);
+                    if (existingPage != null)
+                    {
+                        return existingPage;
+                    }
+
+                    if (IsSokchoEvent)
+                    {
+                        return new SokchoEventRun_64 { Name = pageName };
+                    }
+
+                    return pageNumber == 1
+                        ? new SokchoRunning1_64 { Name = pageName }
+                        : new SokchoRunning2_64 { Name = pageName };
+                };
+            }
+            else if (totalRunningPage <= 2 && IsStandardDisplaySize(_displaySize))
             {
                 // 표준 사이즈: 128x128, 160x64, 320x64
                 createPage = pageNumber => pageNumber switch
@@ -1054,6 +1095,9 @@ namespace CowAuctionSmall.Services
                     DisplaySizeParser.DisplaySize.Size128x128 =>
                         _setCustomDisplay.CustomAuctionSold_128(_nhCode, _userInfo.Auction?.BidderName ?? string.Empty, cowInfo.Is_Nh_QQuri, cowInfo.CowDistinction, cowInfo.Nh_ability_1_num, _userInfo.Auction?.LowestPriceTitle ?? string.Empty),
 
+                    DisplaySizeParser.DisplaySize.Size128x64 when _nhCode == SokchoAuctionHouseCode =>
+                        IsSokchoEvent ? new SokchoEventResult_64() : new SokchoSold_64(),
+
                     DisplaySizeParser.DisplaySize.Size160x64 =>
                         new AuctionSold_160_64(),
 
@@ -1135,6 +1179,9 @@ namespace CowAuctionSmall.Services
                 {
                     DisplaySizeParser.DisplaySize.Size128x128 =>
                         _setCustomDisplay.CustomAuctionUnSold_128(_nhCode, cowInfo.Is_Nh_QQuri, cowInfo.CowDistinction, cowInfo.Nh_ability_1_num),
+
+                    DisplaySizeParser.DisplaySize.Size128x64 when _nhCode == SokchoAuctionHouseCode =>
+                        IsSokchoEvent ? new SokchoEventResult_64() : new SokchoUnSold_64(),
 
                     DisplaySizeParser.DisplaySize.Size160x64 =>
                         new AuctionUnSold_160_64(),

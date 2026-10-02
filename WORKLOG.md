@@ -1,5 +1,104 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-02 - 속초 128×64 화면 Aliased 렌더링 적용
+
+### 작업 일자
+
+- 2026-10-02
+
+### 작업 목적
+
+- 속초 전용 128×64 화면의 글자 렌더링을 기존 공통 128×64 화면과 동일하게 맞춘다.
+
+### 원인
+
+- 속초 전용 XAML은 `TextOptions.TextFormattingMode="Display"`만 설정되어 렌더링 모드가 WPF 기본값 `Auto`에 맡겨져 있었다.
+- 기존 공통 128×64 화면은 `TextOptions.TextRenderingMode="Aliased"`를 명시하고 있다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_64/Running/SokchoRunning1_64.xaml`, `SokchoRunning2_64.xaml`, `SokchoEventRun_64.xaml`: 진행 화면에서 Aliased 렌더링을 명시했다.
+- `CowAuctionSmall/Views/Size128_64/SokchoSold_64.xaml`, `SokchoUnSold_64.xaml`, `SokchoEventResult_64.xaml`: 결과 화면에서 Aliased 렌더링을 명시했다.
+- `WORKLOG.md`: 변경 및 검증 결과를 기록했다.
+
+### 영향 범위
+
+- 속초 전용 128×64 여섯 화면의 글자 래스터화 방식만 변경된다. 글꼴, 글자 크기, 배치, 바인딩과 화면 선택 조건은 변경하지 않았다.
+- 일반 진행 1·2페이지의 실제 전광판 확인은 다음 속초 경매일 예정이며, 이번 작업에서는 미수행이다.
+
+### 빌드 및 테스트 결과
+
+- XAML XML 구문 확인: 여섯 파일 모두 정상 파싱.
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo`: 성공, 오류 0개 / 경고 102개.
+- 전광판 육안 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 속초 128x64 화면 Aliased 렌더링 적용`
+
+## 2026-10-02 - 속초양양축협 128×64 일반·한우경진 전용 화면 통합
+
+### 작업 일자
+
+- 2026-10-02
+
+### 작업 목적
+
+- 구형 속초양양축협 출하 AMS의 128×64 일반 경매 및 연 1회 한우경진 화면을 신형 WPF 프로그램에 속초 전용 View로 통합한다.
+- 전광판 크기는 기존대로 `Board.XML`의 `<Size>` 값을 사용하고, 속초 `Board.XML`이 `128,128`이면 기존 128×128 공통 View를 표시한다.
+
+### 원인
+
+- 기존 공통 128×64 진행 2페이지는 `RegistrationCategory`(본인 혈통)를 표시하지만 속초 운영 화면은 `MotherLevel`(어미 혈통)을 표시한다.
+- 신형 프로그램에 속초 한우경진 128×64 전용 화면과 속초 사업장 선택 분기가 없었다.
+- 128×128에서 페이지 수가 3~4로 설정되면 기존 화면 생성 조건상 128×64 경로로 내려갈 수 있어 속초에 한해 최대 2페이지 제한이 필요했다.
+
+### 검토한 운영 설정
+
+- 속초양양축협 사업장 코드: `8808990806426`.
+- 일반 `Board.XML`: 개별 보드 `128,64`, 20열×7행, 진행 2페이지와 낙찰·유찰 화면 구성.
+- `한우경진Board.XML`: 개별 보드 `128,64`, 동일한 20열×7행 배열, 진행·낙찰·유찰 상태에서 동일한 개체정보 양식 사용.
+- 필드 의미: `SpaceIndex` 계류대번호, `SipNumber` 출품번호, `MotherLevel` 어미 혈통, `RegistrationCategory` 본인 혈통, `CalvingNumber` 어미산차, `Pregnant` 임신개월수, `EntityNumber` 축산개체관리번호, `BirthMonth` 개월령, `Birth` 생년월일.
+- 한우경진 여부는 횡성과 동일하게 `users.XML`의 `<LowestPriceTitle>행사용</LowestPriceTitle>` 값으로 판단한다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Services/DisplaySelect.cs`: 속초 사업장 코드와 `128×64` 크기를 함께 검사하여 일반·한우경진 전용 View를 선택하도록 했다. 속초 128×64 일반은 최대 2페이지, 행사는 1페이지로 제한했다. 속초 `128×128`은 최대 2페이지로 제한하고 기존 128×128 공통 진행·낙찰·유찰 선택 로직을 그대로 사용하도록 했다.
+- `CowAuctionSmall/Views/Size128_64/Running/SokchoRunning1_64.xaml`, `.xaml.cs`: 속초 일반 진행 1페이지의 개체번호, 성별, 지역, 출하주, 최저가, 중량, 생년월일, 비고 화면과 비고 흐름 표시를 추가했다.
+- `CowAuctionSmall/Views/Size128_64/Running/SokchoRunning2_64.xaml`, `.xaml.cs`: 속초 일반 진행 2페이지의 KPN, 어미산차, 계대, 어미 혈통, 임신개월수, 비고 화면과 비고 흐름 표시를 추가했다.
+- `CowAuctionSmall/Views/Size128_64/SokchoSold_64.xaml`, `.xaml.cs`: 속초 전용 낙찰 화면을 추가했다.
+- `CowAuctionSmall/Views/Size128_64/SokchoUnSold_64.xaml`, `.xaml.cs`: 속초 전용 유찰 화면을 추가했다.
+- `CowAuctionSmall/Views/Size128_64/Running/SokchoEventRun_64.xaml`, `.xaml.cs`: 한우경진 진행 화면을 추가했다.
+- `CowAuctionSmall/Views/Size128_64/SokchoEventResult_64.xaml`, `.xaml.cs`: 한우경진 낙찰·유찰 공통 결과 화면을 추가했다.
+- `WORKLOG.md`: 속초 설정 검토, 구현 범위와 검증 결과를 기록했다.
+- `CODEX_HANDOFF.md`: 별도 후속 인수인계 항목 없이 본 작업 기록으로 충분하여 갱신하지 않았다.
+
+### 영향 범위
+
+- 속초 사업장 코드 `8808990806426`과 `Board.XML` 크기 `128,64` 조합에만 전용 화면이 적용된다.
+- 속초 `128,128`은 전용 64 View를 사용하지 않고 기존 128×128 공통 View를 사용한다.
+- 강진완도·하동·무진장 분기와 기존 공통 128×64/128×128/160×64/320×64 View는 수정하지 않았다.
+- 통신, 데이터 파싱, `Board.XML`/`users.XML`, 프로젝트 파일은 변경하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo`: 성공, 오류 0개 / 기존 경고 102개.
+- 신규 속초 XAML 6개 XML 파싱 확인: 정상.
+- 속초 진행 2페이지가 `MotherLevel`을 사용하고 `RegistrationCategory`를 사용하지 않는지 정적 확인: 정상.
+- 속초 전용 분기가 `Size128x64` 조건을 포함하고, `Size128x128`은 기존 공통 분기로 유지되는지 정적 확인: 정상.
+- 일반 낙찰·유찰 화면의 실제 전광판 표시 확인: 정상(사용자 확인). 낙찰 화면은 128×64 패널별 낙찰 정보와 빈 계류대 로고가 함께 정상 배치되는 것을 첨부 화면으로 확인했다.
+- 한우경진 화면의 실제 전광판 표시 확인: 정상(사용자 확인). 지역·출하주, 개체번호, 생년월일, 성별, KPN, 혈통번호와 빈 계류대 로고가 128×64 배열에 정상 배치되는 것을 첨부 화면으로 확인했다.
+- 일반 진행 1·2페이지와 한우경진 진행·낙찰·유찰 상태 전환별 동일 양식 유지 확인: 미수행.
+- 속초 `Board.XML`을 `128,128`로 변경했을 때 기존 128×128 공통 View 표시 확인: 정상(사용자 확인). 진행·낙찰·유찰 화면과 빈 계류대 로고가 128×128 패널 배열에 정상 배치되는 것을 첨부 화면으로 확인했다.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `feat: 속초양양 128x64 일반·한우경진 화면 추가`
+
 ## 2026-10-02 - 128×128 진행 화면 비고 하단 위치 보정
 
 ### 작업 일자
