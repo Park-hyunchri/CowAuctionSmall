@@ -9,6 +9,13 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using CowAuctionSmall.Models.Structures;
 using CowAuctionSmall.Services;
+using CowAuctionSmall.Utils;
+using CowAuctionSmall.Views.Size128_64;
+using CowAuctionSmall.Views.Size128_64.Running;
+using CowAuctionSmall.Views.SIze_160_64;
+using CowAuctionSmall.Views.SIze_160_64.Running;
+using CowAuctionSmall.Views.Size_320_64;
+using CowAuctionSmall.Views.Size_320_64.Running;
 using GAMSTest.Models;
 using GAMSTest.ViewModels;
 using GAMSTest.Views;
@@ -23,6 +30,9 @@ public sealed class DisplayTestController
     private readonly UserInfo _userInfo;
     private readonly DispatcherTimer _pageTimer;
     private readonly string _usersXmlPath;
+    private DisplaySizeParser.DisplaySize _displaySize = DisplaySizeParser.DisplaySize.Size128x128;
+    private double _panelWidth = 128;
+    private double _panelHeight = 128;
     private int _stepIndex;
 
     public DisplayTestController(UserInfo userInfo)
@@ -38,24 +48,32 @@ public sealed class DisplayTestController
     {
         mainContainer.Children.Clear();
         _hosts.Clear();
+        _displaySize = DisplaySizeParser.Parse(boardList.Size ?? "128,128");
+        (_panelWidth, _panelHeight) = _displaySize switch
+        {
+            DisplaySizeParser.DisplaySize.Size128x64 => (128, 64),
+            DisplaySizeParser.DisplaySize.Size160x64 => (160, 64),
+            DisplaySizeParser.DisplaySize.Size320x64 => (320, 64),
+            _ => (128, 128)
+        };
         var board = boardList.MultiBoards?.FirstOrDefault();
         if (board?.Rows == null) return;
 
         foreach (var row in board.Rows)
         {
-            var rowPanel = new StackPanel { Orientation = Orientation.Horizontal, Height = 128 };
+            var rowPanel = new StackPanel { Orientation = Orientation.Horizontal, Height = _panelHeight };
             mainContainer.Children.Add(rowPanel);
             foreach (var number in row)
             {
                 var host = new Grid
                 {
                     Name = $"Cow_{number}",
-                    Width = 128,
-                    Height = 128,
-                    MinWidth = 128,
-                    MaxWidth = 128,
-                    MinHeight = 128,
-                    MaxHeight = 128,
+                    Width = _panelWidth,
+                    Height = _panelHeight,
+                    MinWidth = _panelWidth,
+                    MaxWidth = _panelWidth,
+                    MinHeight = _panelHeight,
+                    MaxHeight = _panelHeight,
                     Background = Brushes.Black,
                     ClipToBounds = true
                 };
@@ -93,7 +111,7 @@ public sealed class DisplayTestController
             var name = panel.Name ?? string.Empty;
             var text = name.StartsWith("Cow_", StringComparison.OrdinalIgnoreCase) ? name[4..] : name;
             int.TryParse(text, out var number);
-            panel.Children.Add(new BoardNumberView(number));
+            panel.Children.Add(new BoardNumberView(number, _panelWidth, _panelHeight));
         }
     }
 
@@ -241,13 +259,33 @@ public sealed class DisplayTestController
         var nhCode = auction?.AuctionHouseCode ?? string.Empty;
         var qquri = auction?.IsShowQQuri ?? string.Empty;
         var selector = new SetCustomDisplay();
-        UserControl? innerView = normalizedMode switch
+        UserControl? innerView = _displaySize switch
         {
-            "RUN1" => selector.CustomAuctionRunning1_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent),
-            "RUN2" => selector.CustomAuctionRunning2_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent),
-            "UNSOLD" => selector.CustomAuctionUnSold_128(nhCode, qquri, data.CowDistinction, data.Nh_ability_1_num),
-            "SOLD" => selector.CustomAuctionSold_128(nhCode, auction?.BidderName ?? string.Empty, qquri, data.CowDistinction, data.Nh_ability_1_num, data.LowestPriceTitle),
-            _ => selector.CustomAuctionRunning1_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent)
+            DisplaySizeParser.DisplaySize.Size128x64 => Create128x64View(normalizedMode, nhCode),
+            DisplaySizeParser.DisplaySize.Size160x64 => normalizedMode switch
+            {
+                "RUN1" => selector.CustomAuctionRunning1_160_64(nhCode, qquri, data.CowDistinction),
+                "RUN2" => selector.CustomAuctionRunning2_160_64(nhCode, qquri, data.CowDistinction),
+                "UNSOLD" => new AuctionUnSold_160_64(),
+                "SOLD" => new AuctionSold_160_64(),
+                _ => selector.CustomAuctionRunning1_160_64(nhCode, qquri, data.CowDistinction)
+            },
+            DisplaySizeParser.DisplaySize.Size320x64 => normalizedMode switch
+            {
+                "RUN1" => selector.CustomAuctionRunning1_320_64(nhCode, qquri, data.CowDistinction),
+                "RUN2" => selector.CustomAuctionRunning2_320_64(nhCode, qquri, data.CowDistinction),
+                "UNSOLD" => new AuctionUnSold_320_64(),
+                "SOLD" => new AuctionSold_320_64(),
+                _ => selector.CustomAuctionRunning1_320_64(nhCode, qquri, data.CowDistinction)
+            },
+            _ => normalizedMode switch
+            {
+                "RUN1" => selector.CustomAuctionRunning1_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent),
+                "RUN2" => selector.CustomAuctionRunning2_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent),
+                "UNSOLD" => selector.CustomAuctionUnSold_128(nhCode, qquri, data.CowDistinction, data.Nh_ability_1_num),
+                "SOLD" => selector.CustomAuctionSold_128(nhCode, auction?.BidderName ?? string.Empty, qquri, data.CowDistinction, data.Nh_ability_1_num, data.LowestPriceTitle),
+                _ => selector.CustomAuctionRunning1_128(nhCode, qquri, data.CowDistinction, data.Is_Ｎh_Excellent, data.Is_Mother_Ｎh_Excellent)
+            }
         };
 
         if (innerView == null && normalizedMode == "UNSOLD") innerView = new CowAuctionSmall.Views.Size128_128.QQuriUnSold();
@@ -255,17 +293,42 @@ public sealed class DisplayTestController
         if (innerView == null) throw new InvalidOperationException($"{normalizedMode} 뷰 생성 결과가 null입니다.");
 
         innerView.DataContext = vm;
-        innerView.Width = 128;
-        innerView.Height = 128;
-        var container = new Grid { Width = 128, Height = 128, Background = Brushes.Black, ClipToBounds = true };
+        innerView.Width = _panelWidth;
+        innerView.Height = _panelHeight;
+        var container = new Grid { Width = _panelWidth, Height = _panelHeight, Background = Brushes.Black, ClipToBounds = true };
         container.Children.Add(innerView);
-        var noteCanvas = new Canvas { Margin = new Thickness(0, 108, 0, 0), Height = 20, ClipToBounds = true, IsHitTestVisible = false };
-        var note = new TextBlock { Text = vm.Note ?? string.Empty, Foreground = new SolidColorBrush(Color.FromRgb(246, 28, 45)), FontSize = 12 };
-        Canvas.SetLeft(note, 2);
-        Canvas.SetTop(note, 2);
-        noteCanvas.Children.Add(note);
-        container.Children.Add(noteCanvas);
-        return new UserControl { Width = 128, Height = 128, Content = container };
+        if (_displaySize == DisplaySizeParser.DisplaySize.Size128x128)
+        {
+            var noteCanvas = new Canvas { Margin = new Thickness(0, Math.Max(0, _panelHeight - 20), 0, 0), Height = Math.Min(20, _panelHeight), ClipToBounds = true, IsHitTestVisible = false };
+            var note = new TextBlock { Text = vm.Note ?? string.Empty, Foreground = new SolidColorBrush(Color.FromRgb(246, 28, 45)), FontSize = 12 };
+            Canvas.SetLeft(note, 2);
+            Canvas.SetTop(note, 2);
+            noteCanvas.Children.Add(note);
+            container.Children.Add(noteCanvas);
+        }
+        return new UserControl { Width = _panelWidth, Height = _panelHeight, Content = container };
+    }
+
+    private UserControl Create128x64View(string mode, string nhCode)
+    {
+        var isSokcho = nhCode == "8808990806426";
+        var isEvent = string.Equals(_userInfo.Auction?.LowestPriceTitle?.Trim(), "행사용", StringComparison.Ordinal);
+        return mode switch
+        {
+            "RUN1" when isSokcho && isEvent => new SokchoEventRun_64(),
+            "RUN2" when isSokcho && isEvent => new SokchoEventRun_64(),
+            "RUN1" when isSokcho => new SokchoRunning1_64(),
+            "RUN2" when isSokcho => new SokchoRunning2_64(),
+            "RUN1" => new AuctionRunning1_64(),
+            "RUN2" => new AuctionRunning2_64(),
+            "UNSOLD" when isSokcho && isEvent => new SokchoEventResult_64(),
+            "SOLD" when isSokcho && isEvent => new SokchoEventResult_64(),
+            "UNSOLD" when isSokcho => new SokchoUnSold_64(),
+            "SOLD" when isSokcho => new SokchoSold_64(),
+            "UNSOLD" => new AuctionUnSold_64(),
+            "SOLD" => new AuctionSold_64(),
+            _ => new AuctionRunning1_64()
+        };
     }
 
     private void WriteDiagnostics(string[] modes)

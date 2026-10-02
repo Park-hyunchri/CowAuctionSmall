@@ -19,8 +19,16 @@
                         <BeginStoryboard x:Name="BlinkStoryboard">
                             <Storyboard RepeatBehavior="Forever">
                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.BorderBrush)" Duration="0:0:1">
-                                    <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="Black"/>
-                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.6" Value="Red"/>
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="Black"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
+                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.6">
+                                        <DiscreteObjectKeyFrame.Value>
+                                            <SolidColorBrush Color="Red"/>
+                                        </DiscreteObjectKeyFrame.Value>
+                                    </DiscreteObjectKeyFrame>
                                 </ObjectAnimationUsingKeyFrames>
                             </Storyboard>
                         </BeginStoryboard>

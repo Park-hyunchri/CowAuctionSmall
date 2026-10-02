@@ -1,5 +1,81 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-02 - 속초 128×64 진행 화면 애니메이션 브러시 형식 보정
+
+### 작업 일자
+
+- 2026-10-02
+
+### 작업 목적
+
+- GAMSTest에서 128×64 뷰 페이지 선택 시 진행 1페이지의 UI 애니메이션 예외를 방지한다.
+
+### 원인
+
+- 속초 128×64 진행 1페이지의 `ObjectAnimationUsingKeyFrames`에서 `DiscreteObjectKeyFrame.Value`를 문자열(`Black`, `Red`)로 지정하고 있었다. 해당 값은 개체형으로 처리되어 `Border.BorderBrush`가 요구하는 `Brush` 형식과 맞지 않을 수 있다.
+- 같은 크기의 공통 진행 1페이지는 키 프레임 값에 `SolidColorBrush`를 명시해 형식을 맞추고 있었다.
+
+### 변경 파일 및 내용
+
+- `CowAuctionSmall/Views/Size128_64/Running/SokchoRunning1_64.xaml`: 두 키 프레임 값을 각각 검정·빨강 `SolidColorBrush`로 지정했다. 애니메이션 방식과 0초/0.6초 전환 시점은 유지했다.
+- `WORKLOG.md`: 오류 분석과 변경 및 검증 결과를 기록했다.
+
+### 영향 범위
+
+- 속초 128×64 진행 1페이지의 테두리 깜박임 애니메이션 값 형식만 변경했다. GAMSTest 로직, 공통 128×64, 128×128·160×64·320×64 화면은 수정하지 않았다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\CowAuctionSmall\CowAuctionSmall.csproj --configuration Debug --no-restore --nologo`: 성공, 오류 0개 / 경고 102개.
+- `dotnet build .\GAMSTest\GAMSTest.csproj --configuration Debug --no-restore --nologo`: 성공, 오류 0개 / 경고 1개.
+- 속초 XAML XML 파싱: 정상.
+- 128×64 뷰 페이지 실제 순환 및 애니메이션 확인: 정상(사용자 확인, 첨부 화면).
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: 속초 128x64 진행 애니메이션 브러시 형식 보정`
+
+## 2026-10-02 - GAMSTest Board.XML 해상도 적용
+
+### 작업 일자
+
+- 2026-10-02
+
+### 작업 목적
+
+- GAMSTest가 `Board.XML`의 `<Size>`에 설정된 전광판 해상도로 계류대 배열과 테스트 화면을 표시하도록 한다.
+
+### 원인
+
+- `DisplayWindow`가 `BoardXmlParser`를 통해 `BoardList`를 `DisplayTestController.Attach()`에 넘기고 파서도 `<Size>`를 읽지만, 컨트롤러가 해당 값을 무시하고 모든 보드 칸과 뷰를 128×128로 고정하고 있었다.
+- 계류대 번호 화면도 XAML에서 128×128 크기로 고정되어 있었다.
+
+### 변경 파일 및 내용
+
+- `GAMSTest/Services/DisplayTestController.cs`: 파싱된 크기에 따라 128×128, 128×64, 160×64, 320×64 보드 칸과 행 높이를 설정하고, 해당 크기의 진행·낙찰·유찰 뷰를 선택하도록 했다. 속초 128×64는 일반·행사 전용 뷰 선택을 유지한다. 별도 노트 오버레이는 128×128에서만 사용해 64픽셀 높이 화면을 가리지 않게 했다.
+- `GAMSTest/Views/BoardNumberView.xaml`, `BoardNumberView.xaml.cs`: 계류대 번호 화면이 실제 보드 칸 크기에 맞춰 늘어나고, 64픽셀 화면에서는 제목과 번호 글자 크기를 줄이도록 했다.
+- `WORKLOG.md`: 분석, 변경 범위와 검증 결과를 기록했다.
+
+### 영향 범위
+
+- 변경은 GAMSTest 화면의 크기 및 뷰 선택에만 적용된다. CowAuctionSmall 운영 프로그램, XML 설정 파일, 프로젝트 파일은 수정하지 않았다.
+- 지원되는 `<Size>` 값은 `128,128`, `128,64`, `160,64`, `320,64`이며 알 수 없는 값이나 누락값은 기존 128×128 동작을 유지한다.
+
+### 빌드 및 테스트 결과
+
+- `dotnet build .\GAMSTest\GAMSTest.csproj --configuration Debug --no-restore --nologo`: 성공, 오류 0개 / 기존 경고 1개 (`ControlWindowViewModel.ActionCommand.CanExecuteChanged` 미사용).
+- `git diff --check`: 공백 오류 없음.
+- 네 가지 해상도에 따른 보드 칸·뷰 분기 정적 확인: 정상.
+- WPF 창의 실제 전광판 크기별 육안 확인: 미수행.
+
+### Git
+
+- Commit hash: 미생성
+- Push 여부: 미수행
+- 제안 commit 메시지: `fix: GAMSTest에 Board XML 해상도 적용`
+
 ## 2026-10-02 - 속초 128×64 화면 Aliased 렌더링 적용
 
 ### 작업 일자
