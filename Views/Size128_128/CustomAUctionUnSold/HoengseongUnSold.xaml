@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold.HoengseongUnSold"
+             xmlns:entity="clr-namespace:CowAuctionSmall.Views.Common"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128.CustomAUctionUnSold"
+             xmlns:models="clr-namespace:CowAuctionSmall.Presentation.Converters"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             Height="128" Width="128">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid DataContext="{Binding Snapshot}" Background="black">
+        <Border BorderThickness="2" BorderBrush="OrangeRed"/>
+        <Grid>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="유    찰" FontSize="25" Foreground="#e5081b" FontWeight="Bold"/>
+
+            <Canvas Margin="2,30,0,0">
+                <TextBlock Style="{StaticResource SexTextV3}" DataContext="{Binding DataContext, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:HoengseongUnSold}}}" VerticalAlignment="Top" x:Name="Sex"/>
+            </Canvas>
+
+            <!-- 내정/시중/최저가 -->
+            <TextBlock Margin="2,25,0,0" FontSize="13">
+                <Run Text="내정가 : "/>
+                <Run Text="{Binding DataContext.LowestPriceText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:HoengseongUnSold}}}" Foreground="Yellow"/>
+            </TextBlock>
+
+            <TextBlock Margin="2,41,0,0" FontSize="13">
+                <Run Text="중량 : " Foreground="lime"/>
+                <Run Text="{Binding DataContext.WeightText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:HoengseongUnSold}}}" Foreground="Yellow"/>
+            </TextBlock>
+
+            <TextBlock Margin="2,57,0,0" Text="{Binding Birth}" Foreground="Cyan" FontSize="12"/>
+
+            <!-- 개체번호 -->
+            <Canvas Margin="0,73,0,0">
+                <TextBlock Text="개체 : " Foreground="lime" Margin="2,0,0,0" FontSize="13"/>
+                <entity:EntityNumberText Number="{Binding EntityNumber}" Margin="42,0,0,0" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" HighlightForeground="{DynamicResource EntityNumberShortForeground}" Style="{StaticResource {x:Type TextBlock}}" />
+            </Canvas>
+
+            <!-- 지역 / 농가명 -->
+            <TextBlock Margin="2,89,0,0" FontSize="12">
+                <Run Text="{Binding Location}" Foreground="{DynamicResource LocationForeground}"/>
+                <Run Text=" "/>
+                <Run Text="{Binding OwnerName}" Foreground="Cyan"/>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

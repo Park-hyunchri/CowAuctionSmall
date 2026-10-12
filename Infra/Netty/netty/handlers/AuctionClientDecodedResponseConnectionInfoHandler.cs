@@ -1,0 +1,35 @@
+﻿using CowAuctionSmall.Infra.Netty.models;
+using CowAuctionSmall.Infra.Netty.interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DotNetty.Transport.Channels;
+
+
+namespace CowAuctionSmall.Infra.Netty.netty.handlers
+{
+    /**
+ * 사용자 접속 정보 보낸 후 결과 수신
+ */
+    public class AuctionClientDecodedResponseConnectionInfoHandler : SimpleChannelInboundHandler<ResponseConnectionInfo>
+    {
+        private readonly iNettyControllable mController;
+
+        public AuctionClientDecodedResponseConnectionInfoHandler(iNettyControllable controller)
+        {
+            mController = controller ?? throw new ArgumentNullException(nameof(controller));
+        }
+
+        //@Override
+        protected override void ChannelRead0(IChannelHandlerContext ctx, ResponseConnectionInfo responseConnectionInfo)
+        {
+            if (mController != null)
+            {
+                mController.OnResponseConnectionInfo(responseConnectionInfo);
+            }
+            
+        }
+    }
+}

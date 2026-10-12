@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>livestock.ico</ApplicationIcon>
+    <BuildDate>$([System.DateTime]::Now.Subtract($([System.DateTime]::Parse('2000-01-01'))).Days)</BuildDate>
+    <BuildTime>$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds), 2))))</BuildTime>
+    <Version>1.1.$(BuildDate).$(BuildTime)</Version>
+    <AssemblyVersion>1.1.$(BuildDate).$(BuildTime)</AssemblyVersion>
+    <FileVersion>1.1.$(BuildDate).$(BuildTime)</FileVersion>
+    <InformationalVersion>1.1.$(BuildDate).$(BuildTime)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="livestock.ico" />
+    <Compile Remove="Validation\**\*.cs" />
+    <None Remove="Validation\**" />
+    <Compile Remove="Tools\**\*.cs" />
+    <Page Remove="Tools\**\*.xaml" />
+    <ApplicationDefinition Remove="Tools\**\*.xaml" />
+    <EmbeddedResource Remove="Tools\**" />
+    <Content Remove="Tools\**" />
+    <None Remove="Tools\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="EzDotNetty" Version="1.0.21" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.158" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="NLog" Version="6.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Config\Board.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\logo.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\logo2.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\실users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\개users.XML">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\Size128_128\Running\CustomAuctionRunning1\GimjeRun.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Size128_128\Running\Standard_non_QQuri_Run1_1.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

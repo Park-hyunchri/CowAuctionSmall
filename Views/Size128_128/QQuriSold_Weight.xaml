@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.QQuriSold_Weight"
+             xmlns:entity="clr-namespace:CowAuctionSmall.Views.Common"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CowAuctionSmall.Views.Size128_128"
+                          xmlns:models="clr-namespace:CowAuctionSmall.Presentation.Converters"
+             xmlns:common="clr-namespace:CowAuctionSmall.Views.Common"
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d" 
+             d:DesignHeight="128" d:DesignWidth="128">
+
+    <UserControl.Resources>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+
+        </Style>
+
+        <models:EntityNumberVisibilityConverter x:Key="EntityNumberVisibilityConverter"/>
+        <models:CowCowDist_NumToString x:Key="CowCowDist_NumToString"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+
+    <Border DataContext="{Binding Snapshot}" BorderBrush="#1E90FF" BorderThickness="2">
+
+        <Grid Background="Black">
+
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" Text="낙    찰" FontSize="22" Foreground="Violet" FontWeight="Bold"/>
+
+            <TextBlock Text="{Binding StrCowDistinction}"   Style="{Binding StrCowDistinction, Converter={StaticResource CowCowDist_NumToString}}" x:Name="StrCowDistinction" FontSize="13" Margin="2,22,0,0"/>
+            <entity:EntityNumberText Number="{Binding EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" FontSize="13" Margin="43,22,0,0" HighlightForeground="{DynamicResource EntityNumberShortForeground}" HighlightFontWeight="Regular" Style="{StaticResource {x:Type TextBlock}}" />
+
+            <TextBlock  Text="최저가 :"  Foreground="lime" FontSize="13"  Margin="2,36,0,0" />
+            <TextBlock  Text="{Binding DataContext.LowestPriceText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:QQuriSold_Weight}}}" Foreground="Cyan" Margin="60,36,0,0"  FontSize="13" />
+
+
+            <!-- 낙찰가 : 라벨 -->
+            <TextBlock Text="낙찰가 :"  Foreground="WhiteSmoke" FontSize="13" Margin="2,52,0,0"/>
+            <!-- 낙찰가 : 값 -->
+            <TextBlock  Text="{Binding DataContext.BidPriceText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:QQuriSold_Weight}}}" Foreground="WhiteSmoke" Margin="60,52,0,0" FontSize="13"/>
+
+            <StackPanel Orientation="Horizontal" Margin="2,67,0,0">
+                <TextBlock Text="중량" Foreground="lime" FontSize="13" Margin="4,0,0,0"/>
+                <TextBlock Text=":" Foreground="lime" FontSize="13" Margin="13,0,0,0"/>
+                <TextBlock Foreground="Cyan" FontSize="13" Margin="7,0,0,0">
+                    <Run Text="{Binding DataContext.FormattedWeightText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:QQuriSold_Weight}}}" Foreground="Orange"/>
+                    <Run Text=" kg" Foreground="Orange"/>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- 낙찰자 라벨 -->
+            <TextBlock Text="낙찰자" Foreground="Violet" FontSize="13" Margin="2,87,0,0"/>
+            <TextBlock Text=":" Foreground="Violet" FontSize="13" Margin="45,87,0,0"/>
+
+            <Grid Margin="55,73,0,0" VerticalAlignment="Top" Height="36">
+
+                <!-- N : 숫자만 (현재와 동일한 형태) -->
+                <!-- N : 숫자만 (첨부 이미지와 동일한 위치/크기) -->
+                <TextBlock x:Name="tbBidderNumberOnly" 
+                           Text="{Binding Bidder}" 
+                           Foreground="Yellow" 
+                           FontSize="26" 
+                           FontWeight="Bold" 
+                           HorizontalAlignment="Left" 
+                           VerticalAlignment="Center"
+                           Margin="0,6,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BidderName}" Value="N">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- Y : 사람 이름만 (5글자 초과 시 한 줄 흐름) -->
+                <common:BidderNameFlow Text="{Binding Bidder}"
+                                       FontWeight="Bold"
+                                       Height="20"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center">
+                    <common:BidderNameFlow.Style>
+                        <Style TargetType="{x:Type common:BidderNameFlow}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BidderName}" Value="Y">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </common:BidderNameFlow.Style>
+                </common:BidderNameFlow>
+
+                <!-- B : 윗줄 이름, 아랫줄 숫자 -->
+                <StackPanel x:Name="spBidderNumberAndName" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding BidderName}" Value="B">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <!-- 윗줄 : 이름 (5글자 초과 시 한 줄 흐름) -->
+                    <common:BidderNameFlow Text="{Binding BidderString}"
+                                           FontSize="11"
+                                           Height="14"
+                                           HorizontalAlignment="Stretch"/>
+
+                    <!-- 아랫줄 : 숫자 -->
+                    <TextBlock Foreground="Yellow" FontSize="18" FontWeight="Bold">
+                        <Run Text="{Binding BidderNum}" />
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

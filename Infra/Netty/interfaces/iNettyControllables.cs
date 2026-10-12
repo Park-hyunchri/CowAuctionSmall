@@ -1,0 +1,23 @@
+﻿using CowAuctionSmall.Infra.Netty.models;
+using DotNetty.Transport.Channels;
+using System;
+
+namespace CowAuctionSmall.Infra.Netty.interfaces
+{
+    public interface iNettyControllable
+    {
+        void onActiveChannel(IChannelHandlerContext ctx); // Channel Active 상태 반환
+
+        //string onActiveChannel(IChannel channel, ConnectionInfo ConnInfo); // Channel Active 상태 반환
+
+        void OnResponseConnectionInfo(ResponseConnectionInfo responseConnectionInfo); // 접속 정보 인증 응답
+
+        void OnCurrentAuctionData(String data); // 엔트리 정보 수신
+
+        void onCheckSession(IChannelHandlerContext ctx, AuctionCheckSession auctionCheckSession); // 경매 서버 접속 유효 확인 요청
+
+        void onChannelInactive(int port); // 서버와 연결 끊어졌을경우
+
+        void onConnectionException(); // 서버와 연결 실패
+    }
+}

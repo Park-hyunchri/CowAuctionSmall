@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Users>
+  <Auction>
+    <AuctionHouseCode>0000000000000</AuctionHouseCode>
+    <IsShowQQuri>Y</IsShowQQuri>
+    <BidderName>B</BidderName>
+    <IsShowOwnerName>NN</IsShowOwnerName>
+    <IsPaternityMatch>Y</IsPaternityMatch>
+    <ChangeSexName>N</ChangeSexName>
+    <CowBirth>Y</CowBirth>
+    <LowestPriceTitle>최저가</LowestPriceTitle>
+    <PageSetting><BoardPage>4</BoardPage></PageSetting>
+    <EntityNumberForeground>Yellow</EntityNumberForeground>
+    <EntityNumberShortForeground>White</EntityNumberShortForeground>
+    <LocationForeground>Lime</LocationForeground>
+    <EpdGradeForeground>Yellow</EpdGradeForeground>
+  </Auction>
+</Users>

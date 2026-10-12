@@ -1,152 +1,63 @@
-# CODEX HANDOFF
+# 다음 작업 인계
 
-## 2026-09-27 전주축협 128×128 진행 1행 개체번호 정렬
+기준일: 2026-10-12. 대상 저장소: `CowAuctionSmall` 신규 수령본.
 
-- 적용 대상: 전주축협 사업장 코드 `8808990656441`, 고산·김제 가축시장 공용 진행 1페이지 `CowAuctionSmall/Views/Size128_128/Running/GimjeRun.xaml`
-- C#의 `EntityNumber` 4-4-1 파싱은 변경하지 않고 XAML만 보정했다.
-- UserControl에 `UseLayoutRounding="True"`, `SnapsToDevicePixels="True"`를 적용했다.
-- 1행 축종·혈통·전체 번호·단축번호에 `FontFamily="굴림체"`, `FontSize="11"`, `HorizontalAlignment="Left"`를 명시했다.
-- 최종 좌표: 축종 `Margin="0,0,0,110"`, 혈통 `Margin="35,0,0,110"`, 전체 번호 `Margin="58,0,0,108"`, 단축번호 `Margin="86,0,0,110" Width="22"`.
-- 단축번호는 `FontWeight="Normal"`, `Panel.ZIndex="150"`, `EntityNumberShortForeground`와 `EntityNumberShortBackground` 동적 리소스를 유지한다.
-- 굴림체 11px에서 전체 번호 X=58과 앞 네 자리+공백 폭 약 27.5px을 기준으로 단축번호 시작점을 X=86에 맞췄다.
-- 사용자 현장 확인 결과 `송아지 혈통 2168 5501 7`이 겹침·잘림 없이 표시되고, 가운데 네 자리 강조도 정상이다.
-- 다른 축협 뷰에 적용할 때는 전역 `AnimalParseData.cs` 포맷을 바꾸지 말고 해당 XAML의 1행에만 우선 적용한다. 화면 폭, 테두리 두께, 기존 시작 좌표가 다를 수 있으므로 X=86을 그대로 복사하지 말고 `전체 번호 시작점 + 해당 폰트의 앞 4자리와 공백 폭`으로 단축번호 위치를 다시 계산한다.
-- 검증: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` 성공, 오류 0개 / 기존 경고 102개.
-- 관련 기록: 프로젝트 루트 `WORKLOG.md`의 2026-09-27 전주축협 개체번호 정렬 작업 항목.
+## 속초 개체번호·익산군산 친자 비고 적용
 
-## 2026-09-13 GAMSTest STOP 외부 명령 종료 처리
+- 2026-10-12 사용자 승인으로 속초 128×64 진행 1·2페이지의 번호 표시를 두 개의 겹치는 TextBlock에서 공통 `EntityNumberText` 하나로 변경했다. 가운데 네 자리 흰색, 나머지 노란색이며 위치·글꼴 크기는 유지했다.
+- 익산·군산(`8808990227283`)에 한해 비고의 `친자일치`·`친자 일치`·`친자확인`·`친자 확인` 중 가장 먼저 나타나는 한 문구로 친자일치를 보완하고 해당 문구만 제거한다. `IsPaternityMatch=N`이면 보완·제거를 건너뛰고 공통 최종 숨김 정책을 따른다.
+- `AnimalParseData`와 두 속초 진행 XAML, 기존 `ItemUpdateChecks`의 익산·군산 예상값, 기능 문서를 갱신했다. 사용하지 않은 비고 문구·그 밖의 사업장 데이터에는 영향이 없도록 범위를 제한했다.
+- 제품·GAMSTest Debug 솔루션 빌드는 경고 0·오류 0. 자동 검사는 실행하지 않았으며 Release·게시·현장 속초 화면/수신 검증은 미수행. WORKLOG 최신 기록 참조.
 
-- `GAMSTest/Views/ControlWindow.xaml.cs`의 수신 콜백에 `Dispatcher.BeginInvoke`, `_isClosing` 확인 및 대소문자 무관 STOP 분기 적용
-- STOP은 `Close()`로 기존 서버 취소·타이머 중지·표출창 닫기·애플리케이션 종료 경로를 호출한다. 출하 AMS 실행 함수는 호출하지 않는다.
-- 기존 NUMBER/RED/GREEN/BLUE 처리와 단독 실행 시 번호 자동 시작은 유지한다.
-- 빌드: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore` 성공, 오류 0개 / 경고 1개(CS0067, `ControlWindowViewModel.cs(66,95)`)
-- 이전 사용자 확인 Release/win-x64 빌드·게시 성공 및 자체 동작 정상은 수정 전 결과이며, 해당 Release 경고 개수는 미확인이다.
-- 사용자 확인: STOP 수신 시 제어창·표출창·GAMSTest 프로세스 종료 정상, 출하 AMS 실행 상태 유지
-- 사용자 확인: 재실행 시 번호 자동 표시와 Named Pipe 재연결 후 NUMBER/RED/GREEN/BLUE 전환 정상
-- STOP 종료 및 Named Pipe 외부 연동 확인 완료. 기존 종료 경로의 번호 재표시로 종료 직전 번호 화면이 잠깐 보일 수 있다.
-- 이번 수정 파일: `GAMSTest/Views/ControlWindow.xaml.cs`, `WORKLOG.md`, `CODEX_HANDOFF.md`. 기존 다른 소스 변경은 보존했다.
-- 실행 중인 GAMSTest 명령 전송 및 Git commit/push: 미수행
+## 속초 전용 화면 복원·첨부 문서 검토
 
-## 2026-09-13 GAMSTest Release/win-x64 검증 결과
+- 2026-10-12 사용자 승인으로 속초 8808990806426의 128×64 전용 6종(XAML/code-behind 12개)을 복원했다. 일반 진행 1/2·최대 2페이지·전용 낙찰/유찰, 제목 Trim=행사용은 행사 진행 1페이지·행사 결과. 속초 128×128의 최대 2페이지도 유지했다.
+- AuctionViewFactory/DisplaySelect가 제품·GAMSTest의 선택·인증 후 페이지 제한을 공유하고 캐시 이름을 일반/속초일반/속초행사로 구분한다. 원본 좌표·색상·글꼴 보존. 현재 ItemDisplay/Snapshot 서식 바인딩과 비고 예약 작업·애니메이션 해제에 연결했다. 속초 번호 오버레이는 유지했다.
+- 임시 출력 `<TEMP>/CowAuction-SokchoRestore-20261012`에서 검사 Debug·제품/도구 Release 경고 0·오류 0, `DisplayTestChecks.dll --skip-measurements` 최종 1,127개 통과. 실제 WPF 6종·인증 후 같은 패널 캐시 전환·페이지 조건·비고 수명·수동/자동 점멸 확인. 게시·배포·속초 서버·전광판 검증은 미수행.
+- 첨부 260928 문서는 검토만 했다. 공통/장성 뱃지는 존재하지만 익산군산 비고 기반 친자 보완은 없다. 장성 N 무시 문제는 현재 해결됐고 두 호스트는 공통 호스트로 통합됐다. 별도 파서/뱃지 수정 없음.
+- 첨부 260929 문서는 검토만 했다. 정읍 포함 EntityNumberText 59개가 한 TextBlock·Run 분할/가운데 색상을 사용하지만 가운데 배경 강조는 없다. 속초 복원 6종은 기존 번호 오버레이를 유지한다. 별도 번호 표시 변경 없음.
+- WORKLOG 최신 항목과 [화면 기능](Docs/기능/화면표시_페이지전환.md)을 확인한다. 자동 버전·낙찰 범위·Named Pipe·로그 보관·기존 운영 XML 유지, commit/push 미수행.
 
-- 사용자가 확인한 `GAMSTest` Release/win-x64 빌드 성공
-- 사용자가 확인한 Release/win-x64 게시 성공
-- 사용자가 수행한 GAMSTest 자체 동작 테스트 정상
-- 경고 개수: 미확인
-- Named Pipe 외부 연동 테스트 여부: 정상(사용자 확인, STOP 및 NUMBER/RED/GREEN/BLUE)
-- 이번 반영 범위: `WORKLOG.md`, `CODEX_HANDOFF.md` 기록만 갱신
-- 소스 수정 및 Git commit/push: 미수행
+## 로그 보관·배치·뿌리농가 설정 최신 기준
 
-## 2026-09-12 GAMSTest MockDataFactory 보강
+- 2026-10-12 사용자 요청으로 무기한 ZIP 보관을 대체했다. 제품 Logs의 .log·.log.zip·서비스 생성 SHA-256 해시 ZIP은 PC 로컬 오늘.AddMonths(-2)까지 경계일 포함 자동 삭제한다. 시작 및 1시간 간격, 독점 핸들·날짜 재확인·취소 보호·잠금 파일 재시도. 파일별 압축과 검증은 유지하며 새 ZIP은 원본 수정일을 유지한다. 다른 ZIP·임시 파일·폴더·링크 경로는 보존한다.
+- 가상 로그 `ReferenceAdoptionChecks.dll log-archive` 최종 44개 통과. 검사 Debug 및 제품·도구 Release 빌드 경고 0·오류 0. 임시 출력은 `<TEMP>/CowAuction-LogRetention-20261012`. 기존 운영 로그의 실제 삭제·앱 실행·게시/배포는 미수행이며 새 제품 EXE 실행 시 정책 적용.
+- 사용자 배치 기준: 단일 2560×1600=11행×20열, 3840×1080=7행×30열, 듀얼 5120×1600=11행×40열, 7680×1080=7행×60열. 최적은 8행×40열(사용자 오기 정정 답변)·6행×60열. 128×128·100% 배율 가정. GAMSTest 현재 400슬롯 제한은 유지해 최대 듀얼 440/420슬롯은 미지원이다. 확장·성능·DPI 확인은 후속 작업.
+- IsShowQQuri의 N은 유지된다. Y는 서버 뿌리농가/우량 정보 활성화, N은 해당 활성화 경로 미사용, X는 별도 미적용 화면 선택이다. 기존 N을 일괄 X로 바꾸지 않는다. 운영 XML·관련 파서/화면 선택은 이번에 수정하지 않았다.
+- 상세는 [로그 보관](Docs/기능/설정_로그.md), [배치 기준](Docs/기능/화면표시_페이지전환.md), WORKLOG를 확인한다. 자동 버전·기존 사용자 변경 보존. commit/push 미수행.
 
-- 패널 번호 `% 4` 기반 성별(암/수/거세/암소) 및 축종 순환 적용
-- 진행·유전·유찰·낙찰 공통 비고 `테스트 데이터 입니다`, 최저가·중량·개체번호 매핑
-- EPD 수치·등급(A, B, C, D) 및 농협 우량·뿌리농가 플래그 설정
-- 낙찰가·낙찰자 정보 보강으로 화면 공백 제거
-- 빌드: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
-- 결과: 성공 / 오류 0개 / 경고 1개
-- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
+## 자동 버전 유지
 
-## 2026-09-12 GAMSTest 운영 프로그램 실행 기능
+- 사용자가 출하 AMS와 출하 AMS 테스트 두 프로젝트의 제거된 자동 버전을 복원하고, 고정 버전으로 돌아가지 않도록 이유와 기록을 보관하도록 요청했다.
+- `CowAuctionSmall.csproj`와 `Tools/GAMSTest/GAMSTest.csproj`의 Version·AssemblyVersion·FileVersion·InformationalVersion은 `1.1.<2000-01-01 이후 일수>.<당일 경과 초/2 정수 변환값>`이다. InformationalVersion에 Git 해시를 추가하지 않는다.
+- 이유: 서로 다른 EXE가 같은 고정 버전이면 현장 수정본 식별·장애 추적·배포 교체 확인이 어렵다. 사용자 명시적 요청 없이 고정 버전으로 변경하거나 자동 버전 속성을 제거하지 않는다. 신규 소스 수령·통합·게시 설정 변경 시 두 프로젝트 모두 확인한다.
+- 상세 기준은 [설정과 로그](Docs/기능/설정_로그.md#빌드게시-자동-버전), 유지 규칙은 [AGENTS.md](AGENTS.md), 실제 검증 결과는 [WORKLOG.md](WORKLOG.md)를 확인한다.
+- 약 2초 단위이며 빌드 생략 시 기존 버전을 유지한다. 두 앱의 평가 시각이 달라 실제 버전값이 다를 수 있다.
 
-- ControlWindow에 `CowAuctionSmall.exe` 실행 및 Bring to Front 버튼 추가
-- `user32.dll`의 `ShowWindowAsync(SW_RESTORE)`, `SetForegroundWindow` 적용
-- 실행 중인 CowAuctionSmall 창은 복원 후 전면 활성화
-- 미실행 시 배포 경로 및 개발 빌드 경로를 탐색하여 `WorkingDirectory` 유지 실행
-- 빌드: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
-- 결과: 성공 / 오류 0개 / 경고 1개
-- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음(0건)
-- Git commit/push: 미수행
+## 자동 버전 검증 결과
 
-## 2026-09-12 GAMSTest 작업 인계
+- Debug·Release 솔루션 빌드: 각각 경고 0·오류 0. 두 앱 EXE·DLL의 파일·제품·어셈블리 버전 일치 확인.
+- 임시 출력 `<TEMP>/CowAuction-New-AutoVersion-20261012`에서 기존 프로필로 두 앱 게시 성공. 제품 `1.1.9781.23914`, 도구 `1.1.9781.23918`을 게시 직후 확인했다. 도구 게시 폴더는 EXE 한 개다.
+- 운영 앱 실행·서버 접속·전광판·현장 배포는 미수행이다. 상세 명령·결과는 WORKLOG의 2026-10-12 항목을 확인한다.
 
-- ControlWindow를 [번호], [뷰 페이지] 버튼 구조로 통합
-- [뷰 페이지]는 진행, 유전능력, 유찰, 낙찰을 5초 주기로 순환
-- 번호 또는 RGB 버튼 클릭 시 순환 타이머 중지
-- RGB 실행 시 패널 자식 요소를 제거하고 순수 단색 표시
-- SetCustomDisplay 기반 128x128 View 생성 및 users.XML의 AuctionHouseCode, LowestPriceTitle, BidderName 반영
-- Mock gValues를 각 View의 DataContext로 주입
-- 기존 운영 DLL 참조로 기존 View와 서비스 재사용
-- ProjectReference 대신 DLL 참조를 사용하여 GAMSTest 중복 포함 문제 방지
+## 기존 변경 보호와 범위
 
-### 빌드 및 상태
-- 명령: `dotnet build GAMSTest\GAMSTest.csproj --configuration Debug --no-restore`
-- 결과: 성공 / 오류 0개 / 경고 1개
-- 경고: `GAMSTest/ViewModels/ControlWindowViewModel.cs(46)` CS0067 `ActionCommand.CanExecuteChanged` 이벤트 미사용
-- 기존 CowAuctionSmall 관련 추적 파일 diff: 변경 없음
-- Git commit/push: 미수행
+- 시작 시 기존 미커밋·미추적 변경 93개 항목이 있었다. 기존 통합 소스·사용자 XML·게시 프로필 변경을 보존한다.
+- 자동 버전 복원 작업의 범위는 버전 설정과 유지 기록이었다. 이후 아래 횡성 낙찰 화면 최소 수정을 별도로 승인받았다. 경매 파서·통신·운영 설정은 수정하지 않았다.
+- 운영 앱·서버 접속·현장 전광판·배포 교체는 수행하지 않는다. Git commit과 push는 각각 사용자 명시적 요청이 있을 때만 수행한다.
 
-## 프로젝트
-- 프로젝트명: CowAuctionSmall (출하 AMS / 가축 경매 전광판 클라이언트)
-- 기술 스택: C# (.NET 9.0), WPF, MVVM, Windows
-- 주요 모듈: Models, ViewModels, Views, Services, NetProto, Config, Utils, Resources
+## 횡성 낙찰 화면 적용 범위 복원
 
-## 마지막 업데이트
-- 날짜: 2026-09-04
-- 작성자: Codex / 사용자
+- 2026-10-12 사용자 승인으로 `Presentation/Display/SetCustomDisplay.cs`의 128×128 낙찰 선택을 수정했다. 횡성 일반 경매만 HoengseongSold, 횡성 행사용은 HoengseongBunyangSold다.
+- 타 축협 기본 분기는 뿌리농가 표시 X의 Standard_non_X_Sold, 그 외 비육우·번식우 QQuriSold_Weight, 나머지 QQuriSold다. 기존 전용 5축협과 염소·말 우선 처리를 유지한다. 과거 제거된 전용 분기 전체 복원은 수행하지 않았다.
+- `BidderChecks.cs`의 횡성·타 축협·설정·축종·공통 팩터리·기존 전용 분기 검사를 추가했다. 임시 출력 `<TEMP>/CowAuction-Hoengseong-Sold-20261012`의 `ReferenceAdoptionChecks.dll bidder` 434개 통과. 검사 프로젝트와 제품·GAMSTest Debug 빌드 각각 경고 0·오류 0.
+- [화면 선택 기준](Docs/기능/화면표시_페이지전환.md#페이지와-화면-선택), [작업 기록](WORKLOG.md)을 확인한다. 기존 사용자 변경·자동 버전 설정 보존. Release·게시·운영 서버·현장 전광판·배포·commit/push는 미수행이다.
 
-## 현재 작업 목적
-- 가축 경매 현장 전광판 프로그램 안정성 유지
-- 회사 PC와 집 PC 간 작업 인계 상태 유지
+## GAMSTest 수동 점멸·외부 제어 명령 복원
 
-## 현재까지 완료
-- `8746a4f` 네티 재연결 안정화, 상황별 API 폴링 주기 최적화 및 디스플레이 패널 잔재 초기화
-- `52c554d` 횡성축협 성별 표출 로직 수정
-- `453684c` 횡성축협 행사용/경매용 설정에 따른 진행 화면 타이틀 매핑 및 항목 숨김 적용
-- `949ea2a` 횡성축협 분양가 행사 모드 조건부 항목 숨김 및 레이아웃 재배치
-- `e09d3c4` 횡성축협 낙찰 화면 전용 분기 우선 처리
-
-## 현재 작업 중
-- 해남진도축협(`8808990656106`) 통신 안정화 및 일괄/단일 경매 표출 보완 완료
-- 구현·Debug 빌드는 완료됐으며, 사용자의 커밋 요청 대기 중
-
-## 현재 Git 상태
-- Branch: `master`
-- HEAD: `8746a4f` (`origin/master`와 동일)
-- 원격 상태: `HEAD`와 `origin/master` 동일
-- Working tree 변경:
-  - `Services/NettyAsyncMsgProcess.cs` — 일괄 SD `F` 마감 신호 전달
-  - `Services/ServerGetData.cs` — 재연결 직렬화, 일괄 종료 정리, 강제 재조회, 최신 스냅샷 동기화
-  - `Services/DisplaySelect.cs` — 일괄 경매 중 화면 회전 정지 및 진행 페이지 바인딩 해제
-  - `WORKLOG.md` — 해남진도 작업 기록
-  - `CODEX_HANDOFF.md` — 현재 인계 문서 갱신
-
-## 미완료 작업 및 확인 필요 사항
-- 실제 해남진도 서버에서 2002 중복 접속 시 30초 동안 재연결하지 않는지 확인
-- 실제 128×128 전광판에서 AS 8006·SD `F` 뒤 낙찰/유찰 화면이 즉시 전환되는지 확인
-- AS 8001 refresh 및 SZ 수신 후 계류대 위치·비고 변경이 반영되는지 확인
-- 주요 화면 상태, 화면 전환·반복 진입, 해상도별 표시, 데이터 바인딩 및 통신 회귀 확인 필요
-
-## 이번 작업의 범위·주의사항
-- 대상은 해남진도축협 코드 `8808990656106`이다.
-- 장성축협 코드 `8808990657103`의 페이지 순환 및 관련 분기는 보류 지시에 따라 수정하지 않았다.
-- 해남진도는 전용 1페이지 진행 화면(`HaenamJindo.xaml`)을 유지하며 페이지 순환 대상에 추가하지 않았다.
-- 실제 현장 확인 전에는 이 미커밋 변경을 임의로 되돌리거나 확장하지 않는다.
-
-## 다음 작업 순서
-1. `git status` 및 최근 커밋 확인
-2. 사용자 신규 작업·오류 요청 접수
-3. `AGENTS.md`, `CODEX_HANDOFF.md`, 관련 소스 분석
-4. 문제 현상, 원인, 수정 대상 파일, 영향 범위, 검증 계획 보고
-5. 사용자의 명시적 수정 승인 후 승인된 파일만 수정
-6. 구현 후 최소 빌드·테스트 수행 및 WORKLOG.md 기록
-
-## 빌드·테스트 상태
-- 최신 작업 빌드: `dotnet build .\CowAuctionSmall.csproj --configuration Debug --no-restore` 성공
-- 결과: 오류 0개, 기존 경고 100개
-- 최신 작업의 실제 전광판·운영 통신 수동 확인: 미수행
-- 자동화 테스트: 미수행
-
-## 참고 파일 및 주의사항
-- `AGENTS.md`: 수정 승인, 파일 범위, 빌드·테스트 및 보고 규칙
-- `WORKLOG.md`: 완료 작업 기록. 실제 Git 상태와 함께 확인
-- `기록용.txt`: 과거 이력 참고용이며 현재 소스를 우선함
-- `error.md`: 사용자가 요청하지 않는 한 CowAuctionSmall 분석 대상에서 제외
-- 예천, 강진완도, 무진장, 정읍 등 축협별 조건문과 설정값 보존
-- `.csproj`, NuGet 패키지, Git 설정, 운영 설정값은 별도 승인 없이 변경하지 않음
-
-## Git 작업 원칙
-- Commit·Push는 사용자의 명시적 요청이 있을 때만 수행
-- 커밋 전 `git status`, 변경 파일 목록, 커밋 메시지를 확인
-- 현재 해남진도 안정화·인계 문서 작업의 커밋: 미생성
-- 현재 인계 문서 갱신 작업의 Push: 미수행
+- 2026-10-12 사용자 “정상 동작 확인 완료” 회신으로 요청 동작의 사용자 확인을 완료했다. 첨부 화면은 외부 제어 프로그램·GAMSTest 제어창·RED 단색 표출 근거다. NUMBER/다른 RGB/STOP 및 점멸은 사용자 확인으로 기록하며, 실제 EXE 경로·버전·원격 구성·물리 전광판 여부는 미확인이다. 아래 미수행 항목은 당시 에이전트 검증 범위를 보존한 기록이다.
+- 2026-10-12 사용자의 동작 복원 요청으로 개별 진행·유전은 테두리 점멸 없이 표시한다. 자동 뷰 페이지 순환은 점멸 유지, 같은 자동 페이지 수동 선택 시 순환과 점멸을 종료한다. 화면 캐시·비고 스크롤 유지.
+- Named Pipe `GAMSTest.DisplayCommand`의 NUMBER·RED·GREEN·BLUE·STOP을 복원했다. 대소문자 무관, 한 연결당 한 줄. NUMBER/RGB는 기존 ViewModel Command로 표시·밝기를 적용하고 STOP은 두 창·타이머·캐시·Pipe 정리 및 도구 종료다. 출하 AMS 실행 버튼은 호출하지 않는다.
+- 검사: 임시 출력 `<TEMP>/CowAuction-Gams-Pipe-Manual-20261012`의 `DisplayTestChecks.dll --skip-measurements` 1,037개 통과. 제품·도구·검사 Debug 빌드 경고 0·오류 0. 고유한 검사 Pipe로 재연결·종료·명령을 검증했다.
+- Release 단일 EXE 게시 성공. `<TEMP>/CowAuction-Gams-Pipe-Manual-20261012/publish-tool/GAMSTest.exe`, 147,571,583바이트, 파일·제품 버전 1.1.9781.25800. 게시본 자체를 격리 실행하여 기본 Pipe의 NUMBER/RGB 전달 및 STOP 뒤 종료 코드 0을 확인했다. 기존 배포본 교체·실제 외부 제어 프로그램·원격 PC·전광판·운영 서버는 미수행.
+- 현장 적용은 새 EXE를 배포하고 외부 제어 프로그램의 실행 경로를 확인해야 한다. [연동 규약](Docs/기능/전광판_점검도구.md#외부-전광판-제어-프로그램-연동)과 WORKLOG의 결과를 확인한다. 자동 버전·횡성 낙찰 분기·기존 사용자 설정 보존, commit/push 미수행.

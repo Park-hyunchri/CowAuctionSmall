@@ -1,0 +1,83 @@
+﻿<UserControl x:Class="CowAuctionSmall.Views.Size128_128.Running.CowHistorySearchRun"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:common="clr-namespace:CowAuctionSmall.Views.Common"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             FontFamily="굴림"
+             TextOptions.TextFormattingMode="Display"
+             mc:Ignorable="d"
+             d:DesignHeight="128" d:DesignWidth="128">
+    <UserControl.Resources>
+        <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
+            <Setter Property="BorderBrush" Value="black"/>
+        </Style>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="RenderOptions.ClearTypeHint" Value="Enabled"/>
+            <Setter Property="TextOptions.TextRenderingMode" Value="Aliased"/>
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+            <Setter Property="IsHitTestVisible" Value="False"/>
+        </Style>
+
+    </UserControl.Resources>
+
+    <Border BorderThickness="2" Style="{StaticResource BlinkingBorderStyle2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="black">
+        <Grid DataContext="{Binding ItemDisplay}">
+            <Grid>
+
+
+                <!-- 같은 최신 이력의 이름과 사육지를 표시한다. 긴 값은 표시 폭 안에서 흐른다. -->
+                <Grid Margin="0,2,0,0" Height="15" VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="44"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="농가명 :" Foreground="lime"/>
+                    <common:BidderNameFlow x:Name="historyOwner" Grid.Column="1" Text="{Binding HistoryOwnerNameText, Mode=OneWay}" Foreground="Cyan" FontSize="12"/>
+                </Grid>
+
+                <Grid Margin="0,17,0,0" Height="15" VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="44"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="주소 :" Foreground="lime"/>
+                    <common:BidderNameFlow x:Name="historyAddress" Grid.Column="1" Text="{Binding HistoryFarmAddressText, Mode=OneWay}" Foreground="{DynamicResource LocationForeground}" FontSize="12"/>
+                </Grid>
+
+                <TextBlock Margin="0,32,0,0" Foreground="lime">
+                <Run Text="개체 :"/>
+                <Run Text="002" Foreground="Yellow"/>
+                <Run Text="{Binding Snapshot.EntityNumber, Mode=OneWay}" Foreground="Yellow"/>
+                </TextBlock>
+
+
+                <TextBlock Margin="0,42,0,0" Text="---------------------" Foreground="lime"/>
+
+                <!-- ======================================================================================================================================================================= -->
+                <!-- 파서가 제공한 어미 개체번호를 그대로 표시한다. -->
+                <TextBlock Margin="0,53,0,0" Foreground="lime">
+                <Run Text="어미 :"/>
+                <Run Text="002" Foreground="Yellow"/>
+                <Run Text="{Binding Snapshot.MatherEntityNumber, Mode=OneWay}" Foreground="Yellow"/>
+                </TextBlock>
+
+
+                <Border BorderBrush="Transparent" BorderThickness="0" Margin="0,53,0,0" Height="36">
+                    <Rectangle Stroke="OrangeRed" StrokeThickness="2"  StrokeDashArray="3 3"/>
+                    <!-- 3만큼 그리고, 3만큼 쉽니다 -->
+                </Border>
+
+
+                <TextBlock Margin="0,74,0,0" Foreground="lime" HorizontalAlignment="Center">
+                <Run Text="쇠고기/이력제"/>
+                </TextBlock>
+                <TextBlock Margin="0,89,0,0" Foreground="lime" HorizontalAlignment="Center">
+                <Run Text="조회용 화면"/>
+                </TextBlock>
+
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

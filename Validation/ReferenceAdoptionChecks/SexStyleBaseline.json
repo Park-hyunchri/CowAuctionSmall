@@ -1,0 +1,762 @@
+[
+  {
+    "Profile": "128",
+    "Sex": "암",
+    "FontSize": 25,
+    "Foreground": "#FFFF0064",
+    "Margin": "0,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "수",
+    "FontSize": 25,
+    "Foreground": "#FF1E90FF",
+    "Margin": "0,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "거세",
+    "FontSize": 24,
+    "Foreground": "#FFD6B700",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "비육",
+    "FontSize": 24,
+    "Foreground": "#FFFED900",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "암소",
+    "FontSize": 24,
+    "Foreground": "#FFD60053",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "숫소",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "미경산",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "프리마틴",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "비거세",
+    "FontSize": 24,
+    "Foreground": "#FFD6B700",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "공통",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "새끼",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "프",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "거",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "비거",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "프리",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "새",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "-",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "128",
+    "Sex": "UNKNOWN",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "1,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.55,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "암",
+    "FontSize": 25,
+    "Foreground": "#FFFF0064",
+    "Margin": "15,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "수",
+    "FontSize": 25,
+    "Foreground": "#FF1E90FF",
+    "Margin": "15,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "거세",
+    "FontSize": 24,
+    "Foreground": "#FFD6B700",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "비육",
+    "FontSize": 24,
+    "Foreground": "#FFFED900",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "암소",
+    "FontSize": 24,
+    "Foreground": "#FFD60053",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "숫소",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "미경산",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "-10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 0.8
+  },
+  {
+    "Profile": "160",
+    "Sex": "프리마틴",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "-10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.5,
+    "ScaleY": 0.8
+  },
+  {
+    "Profile": "160",
+    "Sex": "비거세",
+    "FontSize": 24,
+    "Foreground": "#FFD6B700",
+    "Margin": "-10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 0.8
+  },
+  {
+    "Profile": "160",
+    "Sex": "공통",
+    "FontSize": 24,
+    "Foreground": "#FF1E90FF",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "새끼",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "7,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "프",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "거",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "비거",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "프리",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "새",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "-",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "160",
+    "Sex": "UNKNOWN",
+    "FontSize": 24,
+    "Foreground": "#FFFF69B4",
+    "Margin": "10,-3,0,0",
+    "Weight": 700,
+    "ScaleX": 0.7,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "암",
+    "FontSize": 28,
+    "Foreground": "#FFFF0064",
+    "Margin": "90,-2,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "수",
+    "FontSize": 28,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "90,-2,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "거세",
+    "FontSize": 23,
+    "Foreground": "#FFD6B700",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "비육",
+    "FontSize": 23,
+    "Foreground": "#FFFED900",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "암소",
+    "FontSize": 23,
+    "Foreground": "#FFD60053",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "숫소",
+    "FontSize": 23,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "미경산",
+    "FontSize": 23,
+    "Foreground": "#FFFF69B4",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "프리마틴",
+    "FontSize": 23,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "비거세",
+    "FontSize": 23,
+    "Foreground": "#FFD6B700",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "공통",
+    "FontSize": 23,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "새끼",
+    "FontSize": 23,
+    "Foreground": "#FFFF69B4",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "프",
+    "FontSize": 28,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "90,-2,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "거",
+    "FontSize": 23,
+    "Foreground": "#FFD6B700",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "비거",
+    "FontSize": 23,
+    "Foreground": "#FFD6B700",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "프리",
+    "FontSize": 23,
+    "Foreground": "#FF5CAFFF",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "새",
+    "FontSize": 23,
+    "Foreground": "#FFFF69B4",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "-",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "V3",
+    "Sex": "UNKNOWN",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "암",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "수",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "거세",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "비육",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "암소",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "숫소",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "미경산",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "프리마틴",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "비거세",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "공통",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "새끼",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "프",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "거",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "비거",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "프리",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "새",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "-",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  },
+  {
+    "Profile": "Fallback",
+    "Sex": "UNKNOWN",
+    "FontSize": 23,
+    "Foreground": "#FF000000",
+    "Margin": "76,4,0,0",
+    "Weight": 700,
+    "ScaleX": 1,
+    "ScaleY": 1
+  }
+]

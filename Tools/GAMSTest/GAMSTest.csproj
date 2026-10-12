@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <BuildDate>$([System.DateTime]::Now.Subtract($([System.DateTime]::Parse('2000-01-01'))).Days)</BuildDate>
+    <BuildTime>$([System.Convert]::ToInt32($([MSBuild]::Divide($([System.DateTime]::Now.TimeOfDay.TotalSeconds), 2))))</BuildTime>
+    <Version>1.1.$(BuildDate).$(BuildTime)</Version>
+    <AssemblyVersion>1.1.$(BuildDate).$(BuildTime)</AssemblyVersion>
+    <FileVersion>1.1.$(BuildDate).$(BuildTime)</FileVersion>
+    <InformationalVersion>1.1.$(BuildDate).$(BuildTime)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <!-- 점검 배포본으로 제품의 운영 XML·로그 설정이 전파되지 않도록 SDK 복사 단계를 제한한다. -->
+    <_GetChildProjectCopyToOutputDirectoryItems>false</_GetChildProjectCopyToOutputDirectoryItems>
+    <_GetChildProjectCopyToPublishDirectoryItems>false</_GetChildProjectCopyToPublishDirectoryItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../CowAuctionSmall.csproj" />
+    <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Examples/*.XML" CopyToOutputDirectory="Never" CopyToPublishDirectory="Never" />
+    <EmbeddedResource Include="Examples/*.XML">
+      <LogicalName>GAMSTest.Examples.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

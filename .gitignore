@@ -362,5 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Local .NET CLI homes created for build verification
-.dotnet-home-*/
+# Local AnimalTrace API credentials
+/Config/animalTrace.local.json
+
+# Share the GAMSTest single-file folder profile (no deployment credentials).
+!/Tools/GAMSTest/Properties/PublishProfiles/SingleFile-win-x64.pubxml

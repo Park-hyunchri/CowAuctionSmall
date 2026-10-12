@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Board>
+  <Size>128,128</Size>
+  <MultiBoard Name="가상 8개">
+    <RowIdx>1,2,3,4</RowIdx>
+    <RowIdx>5,6,7,8</RowIdx>
+  </MultiBoard>
+  <MultiBoard Name="중복 번호 점검">
+    <RowIdx>1,1,2,2</RowIdx>
+  </MultiBoard>
+</Board>
