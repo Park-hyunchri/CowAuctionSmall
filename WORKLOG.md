@@ -1,5 +1,14 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-13 — 현재 통합 소스 origin 커밋·푸시
+
+- 목적·승인: 사용자가 현재까지의 내용을 기록하고 GitHub 커밋·푸시하도록 요청했다. 두 원격 중 사용자는 `origin`을 선택했고, `origin/master` 기준 새 브랜치 및 자격 증명 없는 설정 템플릿으로 게시하는 방식을 승인했다.
+- 원인·범위: 현재 작업 브랜치는 GitHub master와 분기되어 있었고 기존 로컬 커밋의 `Config/users.XML`에 사용자 ID·암호가 포함돼 있었다. 현재 소스 스냅샷만 `origin/master` 최신 `5604778`의 자식 커밋으로 만들어 기존 비공개 이력을 전송하지 않았다.
+- 이력·설정 보호: `WORKLOG.md`의 원격 104개와 현재 96개 항목을 합쳐 181개 제목을 보존했다. 같은 제목의 빈 현재 항목은 원격 본문을 유지했다. `Config/users.XML`, `Config/개users.XML`, `Config/실users.XML`은 GitHub 커밋용 템플릿에서 UserID·Password·Address·AddressEPD·AddressQcn·Port·PageTimerPort 값을 비웠다. 원래 작업 폴더의 운영 설정은 변경하지 않았다.
+- GitHub 결과: 새 브랜치 `codex/current-cowauctionsmall-20261013`의 소스 스냅샷 커밋 `70ea39b919fae91e734df4e75711dda4ffff92c3`을 `origin`에 푸시했다. 이 스냅샷은 origin/master 최신 커밋을 부모로 둔 단일 커밋이며, 기존 작업 브랜치와 그 커밋 이력은 푸시하지 않았다. 게시 결과는 이어지는 문서 커밋으로 같은 브랜치에 기록했다.
+- 검증: 설정 템플릿의 인증값·운영 주소·포트가 비어 있고 원격 WORKLOG 104개 본문이 모두 보존됨을 확인했다. 구현 검증은 앞선 기록의 Debug 솔루션 빌드 및 ReferenceAdoptionChecks 컴파일 경고 0·오류 0을 참조한다. 자동 검사는 이번 Git 작업에서 재실행하지 않았다.
+
+
 ## 2026-10-12 — 속초 번호 분할 강조 및 익산·군산 비고 친자 보완
 
 - 목적·승인: 사용자가 속초 128×64 진행 화면 번호의 한 TextBlock 분할·가운데 글자색 강조와 익산·군산의 비고 문구 기반 친자 보완·문구 제거를 검토한 뒤 구현을 승인했다.
