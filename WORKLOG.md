@@ -1,5 +1,17 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-15 — 영천 염소 일괄경매 주황색 테두리 복원
+
+- 목적·승인: 이전 버전에서 정상 운영된 영천 염소 일괄경매 테두리가 최신 버전에 누락됐다는 검토 요청 후, 사용자가 제안한 소스 3개 파일의 복원을 승인했다. 사용자는 이전 버전의 2026-10-14 영천 염소경매 정상 운영을 확인했으며, 최신 수정본의 현장 검증과는 구분한다.
+- 원인: 최신 소스에 전용 표시 속성, DisplaySelect의 상태 구독·갱신·해제, 주황색 XAML 트리거가 누락돼 있었다. 최신 AuctionDisplayStateMessage는 이전 버전과 형식이 다르고 경매 데이터 갱신보다 먼저 발행된다.
+- 변경 파일: `ViewModels/AuctionContPanelViewModel.cs`에 IsBatchGoatBorderHighlighted와 변경 알림을 복원했다. `Presentation/Display/DisplaySelect.cs`에 영천·일괄·염소·상태 11 조건, 최신 경매 상태 수신·보관·UI Dispatcher 갱신·구독 해제 및 해제 후 콜백 무시를 추가했다. 새 화면과 재사용 화면에도 마지막 수신 상태를 반영하며 수신 상태가 없는 초기 화면은 기존 일괄 진행 플래그를 사용한다. `Views/Size128_128/Running/Standard_Goat_Run.xaml`에 고정 #FFA500 테두리와 강조 중 점멸 억제를 복원했다.
+- 승인·영향 범위: 승인된 소스 3개와 이 WORKLOG 기록만 변경했다. 적용 대상은 영천 128×128 염소 일괄경매 진행 화면이다. C#/WPF/MVVM 구조, 통신 파서, 타 사업장·축종·단일경매의 기존 표시, 낙찰·유찰 화면, 프로젝트·패키지·자동 버전·설정은 변경하지 않았다. 제품 소스 변경으로 제품 및 참조 검증 프로젝트가 다시 빌드된다.
+- 빌드: 최초 `dotnet build CowAuctionSmall.csproj --configuration Debug --no-restore -m:1 -v:minimal`은 WPF Application과 동명 네임스페이스 충돌 CS0234로 실패했다. 추가한 코드에서 System.Windows.Application을 명시한 뒤 `dotnet build Validation/ReferenceAdoptionChecks/ReferenceAdoptionChecks.csproj --configuration Debug --no-restore -m:1 -v:minimal`로 제품 및 검증 프로젝트 빌드 성공, 경고 0·오류 0. restore·clean·프로젝트 파일 변경 미수행.
+- 전용 검증: 저장소 외 TEMP/CowAuction-GoatBorder-f7d863c1539547779c44c2628ac60fd4의 일회성 C# 검사기를 설치 SDK csc로 컴파일하고 dotnet exec로 실행해 159개 통과. 제품 App·통신·타이머를 시작하지 않고 컴파일된 제품의 실제 메서드와 WPF View를 검사했다. 시작·중복 시작·종료, 사업장/축종/상태/경매방식/단계 조합, 실제 주황색·점멸 억제·검정 복귀, 단일 전환·연결 상태 초기화, 백그라운드 수신의 UI 전환, 해제 후 예약 콜백, 화면 생성·재사용, 플래그 갱신 순서와 초기 표시를 확인했다. 검사기 최초 실행은 공통 리소스 로드 누락으로 실패해 검사기에 DisplayResources.xaml을 로드한 후 통과했다. 저장소에 테스트 파일을 추가하지 않았다.
+- 기존 검사: `dotnet Validation/ReferenceAdoptionChecks/bin/Debug/net10.0-windows/ReferenceAdoptionChecks.dll footer` 119개 통과. 동일 실행의 `stage4`는 DisplayLifetimeChecks.cs:221의 횡성 낙찰 화면 기대값 QQuriSold에서 실패했다. 현재 SetCustomDisplay는 횡성에 HoengseongSold를 반환하며 해당 소스와 검사 파일은 Git diff상 변경 없음이다. 승인 범위 밖의 기대값/낙찰 분기는 변경하지 않았다. 전체 회귀 통과로 판정하지 않는다.
+- Git·문서: git status 및 관련 diff로 소스 3개 변경과 기존 사용자 변경(CODEX_HANDOFF.md, 운영 XML 3개, WORKLOG.md)을 구분했다. 기존 WORKLOG 내용 보존, CODEX_HANDOFF.md는 이번 작업에서 미갱신. git diff --check 통과. commit hash 미생성, push 미수행. 제안 메시지: `fix: 영천 염소 일괄경매 주황색 테두리 복원`.
+- 추가 확인·미수행: 실제 전광판/운영 서버/패킷, Release·전체 솔루션 빌드, 게시·배포 미수행. 현장에서 일괄 시작·종료·재시작, 진행 중 화면 재진입, 낙찰 청색·유찰 적색 유지 및 타 축협·해상도 회귀를 확인해야 한다. 기존 stage4 횡성 낙찰 기대값 불일치는 별도 검토 대상이다.
+
 ## 2026-10-13 — 현재 통합 소스 origin 커밋·푸시
 
 - 목적·승인: 사용자가 현재까지의 내용을 기록하고 GitHub 커밋·푸시하도록 요청했다. 두 원격 중 사용자는 `origin`을 선택했고, `origin/master` 기준 새 브랜치 및 자격 증명 없는 설정 템플릿으로 게시하는 방식을 승인했다.
