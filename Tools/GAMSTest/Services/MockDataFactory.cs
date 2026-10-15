@@ -29,7 +29,7 @@ public static class MockDataFactory
             KPN = empty ? "" : "KPN1234", Pregnant = "3", CalvingNumber = "2",
             Note = empty ? "" : "가상 자료입니다. 긴 비고 흐름과 글자 겹침을 확인합니다.",
             NoteChangeOwner = empty ? "" : "가상 이력 1회", PaternityMatch = empty || settings.IsPaternityMatch != "Y" ? "" : "친자",
-            FrontNoteWord = empty || settings.IsPaternityMatch != "Y" ? "" : "친자", FrontNoteWordBrush = "Lime",
+            FrontNoteWord = empty || settings.IsPaternityMatch != "Y" ? "" : "친자", FrontNoteWordBrush = settings.HouseCode == "8808990817675" ? "Lime" : "Yellow",
             SelectShowWeight_EPD = settings.SelectShowWeightEpd,
             HistoryOwner = empty ? null : new AnimalHistoryOwner("가상소유주", "전라남도 가상군 가상면 점검로 123"),
             Is_Nh_QQuri = settings.Qquri, Is_Ｎh_Excellent = settings.NhExcellent,

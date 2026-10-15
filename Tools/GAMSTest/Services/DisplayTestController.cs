@@ -168,6 +168,7 @@ public sealed class DisplayTestController : IDisposable
                     Width = slot.Host.Width, Height = slot.Host.Height,
                     ItemDisplay = slot.ViewModel!.ItemDisplay, ScrollOwner = slot.ViewModel
                 };
+                host.UseCalfPaternityBadge = _settings.HouseCode == "8808990656106";
                 // Keep the note in the visual tree; only replace the page behind it.
                 if (ReferenceEquals(slot.Host.Child, host))
                 {

@@ -1,5 +1,18 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-15 — GAMSTest 해남진도 친자 배지 옵션 및 최신 화면 반영
+
+- 목적·승인: 사용자가 GAMS 테스트에서 해남진도 친자 배지가 라임색이고 송아지 어미번호가 남는 현상을 검토 요청한 뒤, 제안한 도구 소스 2개·검증·기능 문서·WORKLOG의 수정을 승인했다.
+- 원인: GAMSTest는 제품 ViewFactory와 실제 View를 사용하지만 DisplaySelect를 거치지 않아 해남진도 UseCalfPaternityBadge 옵션을 전달하지 않았다. MockDataFactory의 배지 색상도 Lime으로 고정됐다. 로컬 Tools/GAMSTest/bin/Debug/net10.0-windows의 EXE·제품 DLL은 10월 12일 빌드로 송아지 어미번호 제거 전 화면이었다. 첨부 화면의 실제 실행 경로는 조회 시 프로세스가 없어 미확인이다.
+- 변경 파일·내용: `Tools/GAMSTest/Services/DisplayTestController.cs`에서 진행 호스트 생성·재사용 시 해남진도 코드에만 UseCalfPaternityBadge를 전달한다. `Tools/GAMSTest/Services/MockDataFactory.cs`의 일반 배지 샘플은 Yellow로 하고 장성의 Lime은 유지했다. `Validation/DisplayTestChecks/ControllerChecks.cs`에 합성 Board/users XML, 축종·친자 표시 설정·진행/유전/낙찰/유찰/대기 반복 전환, 최신 어미번호·최저가 좌표·배지 비겹침·색상·캐시 및 다른 축협 회귀 검사를 추가했다. `Docs/기능/전광판_점검도구.md`에 실제 옵션·샘플·재빌드 기준을 기록하고 이 WORKLOG를 갱신했다.
+- 영향·보존: 승인된 5개 파일만 수정했다. 제품 화면 XAML·파서·운영 XML·프로젝트/패키지·자동 버전·버튼 UI 변경 없음. 기본 테스트 축종은 송아지 1이고 전체 슬롯에 같은 샘플 축종을 사용한다. 비육우·번식우는 자동 검사의 테스트 설정 객체를 바꿔 확인했다. 빌드 영향은 제품 참조와 GAMSTest·검증 프로젝트이며 운영 배포본 교체는 하지 않았다.
+- 빌드: `dotnet build Tools/GAMSTest/GAMSTest.csproj --configuration Debug --no-restore -m:1 -v:minimal` 최초 CS2012(obj 제품 DLL 쓰기 권한) 실패 후 권한 승인받아 동일 명령 성공, 경고 0·오류 0. 제품과 GAMS DLL을 함께 갱신했다. 기존 복원 자산이 있는 TEMP/CowAuction-SokchoRestore-20261012를 사용한 `dotnet build Validation/DisplayTestChecks/DisplayTestChecks.csproj --configuration Debug --artifacts-path <해당 경로> --no-restore -m:1 -v:minimal`도 성공, 경고 0·오류 0. restore·clean 없음.
+- 전체 검사 제한: DisplayTestChecks --skip-measurements --screenshots 실행은 기존 SokchoChecks.cs:111의 개체번호 기대값(`Sokcho view displays the restored entity number`)에서 중단됐다. 속초 소스·해당 검사·Program.cs는 이번에 변경하지 않았다. 전체 통과로 판정하지 않는다.
+- 제어 경로 검증: TEMP/GAMSTest-ControllerRunner-35947d58967e4275b7f22bbfe9733e0c의 임시 실행 진입점과 저장소의 실제 ControllerChecks.cs를 SDK csc로 컴파일했다. 저장소 Program.cs를 바꾸지 않고 ControllerChecks.Run(false) 전체를 실행해 938개 통과했다. 임시 진입점의 최초 참조 중복(WindowsBase)과 NLog 초기 로드 문제는 임시 검사기에서 참조·로더 진입점을 바로잡았다. 최종 dotnet exec는 기본 GAMS 출력 폴더의 실제 DLL과 GAMSTest.runtimeconfig.json을 사용했으며 캐시 출력에 대한 실행도 938개 통과했다. 제품 App·운영 서버 접속 없음.
+- 화면·파일 확인: TEMP/GAMSTest-Haenam-20261015-Screenshots의 송아지/비육우 진행 PNG를 직접 확인했다. 송아지는 어미번호 없음·노란 친자 배지·15픽셀 행 간격, 비육우는 어미번호 유지·진행 배지 없음이다. 기본 GAMS EXE·DLL·포함 제품 DLL의 파일 버전은 1.1.9784.18463이며 제품 출력과 GAMS 포함 CowAuctionSmall.dll SHA-256이 일치한다.
+- Git·문서: git status·관련 diff 및 git diff --check 확인. 기존 CODEX_HANDOFF.md·운영 XML 3개·WORKLOG 변경 보존. CODEX_HANDOFF.md는 이번에 미갱신. commit hash 미생성, push 미수행. 제안 메시지: `fix: GAMSTest 해남진도 친자 배지 표시 동기화`.
+- 추가 확인·미수행: 수정 실행본은 Tools/GAMSTest/bin/Debug/net10.0-windows/GAMSTest.exe다. 기존 다른 경로의 단일 EXE 배포본은 교체하지 않았다. 실제 전광판·사용자 첨부 실행본·운영 XML로 앱 실행·Release/전체 솔루션 빌드·게시·배포·100/200슬롯 장시간 측정 미수행. 기존 전체 검사의 속초 개체번호 기대값 실패는 별도 검토 대상이다.
+
 ## 2026-10-15 — 해남진도 송아지 검사일·최저가 줄 간격 확대
 
 - 목적·승인: 사용자가 첨부한 송아지 표출 화면을 기준으로 하단 비고를 제외한 브루셀라·구제역·최저 3줄의 간격 조정을 요청했다. 좌표와 수정 파일·검증 방법을 안내한 후 같은 화면의 후속 조정으로 진행했다.

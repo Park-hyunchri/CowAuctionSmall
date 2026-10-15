@@ -26,6 +26,7 @@ internal static class ControllerChecks
         trace.Switch.Level = SourceLevels.Error;
         try
         {
+            CheckHaenamPaternity(errors);
             foreach (Resolution size in new[] { Resolution.Size128x64, Resolution.Size128x128, Resolution.Size160x64, Resolution.Size320x64 })
                 CheckSize(size, errors);
             CheckSamples();
@@ -114,6 +115,96 @@ internal static class ControllerChecks
         Program.Check(controller.IsDisposed && controller.CachedViewCount == 0 && controller.SlotCount == 0 && canvas.Children.Count == 0, "dispose releases attached views and caches");
     }
 
+    private static void CheckHaenamPaternity(BindingErrors errors)
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "GAMSTest-Haenam-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(directory);
+        string board = Path.Combine(directory, "Board.XML"), users = Path.Combine(directory, "users.XML");
+        File.WriteAllText(board, "<Boards><Size>128,128</Size><MultiBoard><RowIdx>1,2</RowIdx></MultiBoard></Boards>");
+        var canvas = new Canvas();
+        using var controller = new DisplayTestController(canvas);
+        static IEnumerable<DependencyObject> Nodes(DependencyObject node)
+        {
+            yield return node;
+            for (int index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
+                foreach (var child in Nodes(VisualTreeHelper.GetChild(node, index))) yield return child;
+        }
+        foreach (string enabled in new[] { "Y", "N" })
+        foreach (string animal in new[] { "1", "2", "3" })
+        {
+            File.WriteAllText(users, $"<Users><Auction><AuctionHouseCode>8808990656106</AuctionHouseCode><IsShowQQuri>Y</IsShowQQuri><IsPaternityMatch>{enabled}</IsPaternityMatch></Auction></Users>");
+            var settings = TestSettingsLoader.Load(board, users);
+            settings.CowDistinction = animal;
+            Program.Check(settings.HouseCode == "8808990656106" && settings.Resolution == Resolution.Size128x128
+                && settings.Rows[0].SequenceEqual(new[] { 1, 2 }), "Haenam tool reads house and physical layout from synthetic XML");
+            var sample = MockDataFactory.Create(1, settings, SampleKind.Normal);
+            Program.Check(sample.CowDistinction == animal && sample.FrontNoteWordBrush == "Yellow", "Haenam tool sample preserves animal type and yellow paternity brush");
+            controller.Configure(settings, SampleKind.Normal);
+            using var source = Host(canvas);
+            int cached = 0;
+            foreach (string key in new[] { "RUN1", "RUN2", "RUN1", "UNSOLD", "RUN1", "SOLD", "RUN1", "WAIT", "RUN1" })
+            {
+                errors.Clear();
+                var mode = controller.Modes.Single(value => value.Key == key);
+                controller.ShowMode(mode); Layout(canvas);
+                ExportScreenshot(canvas, $"Haenam_{animal}_{enabled}_{key}");
+                foreach (Border slot in canvas.Children)
+                {
+                    var host = slot.Child as RunningNoteHost128;
+                    var page = (FrameworkElement)(host?.PageContent ?? slot.Child);
+                    var item = mode.Page > 0 ? ((AuctionContPanelViewModel)page.DataContext).CowInfo
+                        : ((AuctionItemDisplayViewModel)page.DataContext).Snapshot;
+                    Program.Check(item.CowDistinction == animal, "GAMS real page receives the selected animal kind: " + key);
+                    if (host != null)
+                    {
+                        bool running = mode.Page > 0;
+                        bool visible = enabled == "Y" && (!running || animal == "1");
+                        var badge = (Border)host.FindName("borderPaternityMatch");
+                        var text = (TextBlock)badge.Child;
+                        var note = (Canvas)host.FindName("canvasNote");
+                        Program.Check(host.UseCalfPaternityBadge == running && badge.Visibility == (visible ? Visibility.Visible : Visibility.Collapsed),
+                            "GAMS Haenam running/result badge policy: " + animal + "/" + enabled + "/" + key);
+                        Program.Check(Canvas.GetLeft(note) == (visible ? 32 : 2), "GAMS Haenam note left offset follows actual badge visibility");
+                        if (visible)
+                            Program.Check(badge.BorderBrush.ToString() == "#FFFFFF00" && text.Foreground.ToString() == "#FFFFFF00"
+                                && text.Text == "친자", "GAMS Haenam real badge has yellow text and frame");
+                    }
+                    if (key is "RUN1" or "WAIT")
+                    {
+                        Program.Check(page.GetType().Name == "HaenamJindo", "GAMS selects the actual Haenam progress page");
+                        var mother = Nodes(page).OfType<TextBlock>().Single(text => text.Text == "어미 : ");
+                        var lowest = Nodes(page).OfType<TextBlock>().Single(text => text.Text == "최저");
+                        Program.Check(((Canvas)mother.Parent).Visibility == (animal == "1" ? Visibility.Collapsed : Visibility.Visible),
+                            "GAMS actual Haenam mother row is hidden only for calves");
+                        Program.Check(((Canvas)lowest.Parent).Margin.Top == (animal == "1" ? 89 : 95), "GAMS uses the latest calf row spacing while preserving adult coordinates");
+                        if (animal == "1" && enabled == "Y")
+                        {
+                            var badge = (Border)host!.FindName("borderPaternityMatch");
+                            var textBounds = lowest.TransformToAncestor(host).TransformBounds(new Rect(lowest.RenderSize));
+                            var badgeBounds = badge.TransformToAncestor(host).TransformBounds(new Rect(badge.RenderSize));
+                            Program.Check(textBounds.Bottom <= badgeBounds.Top, "GAMS actual calf price does not overlap paternity badge");
+                        }
+                    }
+                }
+                Program.Check(errors.Text.Length == 0, "GAMS Haenam real view binding trace: " + errors.Text);
+                if (key == "SOLD") cached = controller.CachedViewCount;
+            }
+            Program.Check(controller.CachedViewCount == cached + 2, "GAMS revisiting modes only adds the distinct WAIT view, not duplicate cached pages");
+            source.RootVisual = null; Program.Drain();
+        }
+        foreach (string house in new[] { "SYNTHETIC", "8808990817675" })
+        {
+            var settings = new TestSettings { HouseCode = house, Rows = [[1]], CowDistinction = "2" };
+            controller.Configure(settings, SampleKind.Normal);
+            using var source = Host(canvas);
+            controller.ShowMode(controller.Modes.Single(mode => mode.Key == "RUN1")); Layout(canvas);
+            var host = (RunningNoteHost128)((Border)canvas.Children[0]).Child;
+            var badge = (Border)host.FindName("borderPaternityMatch");
+            Program.Check(!host.UseCalfPaternityBadge && badge.Visibility == Visibility.Visible, "other houses retain adult paternity badge in GAMS");
+            Program.Check(badge.BorderBrush.ToString() == (house == "8808990817675" ? "#FF00FF00" : "#FFFFFF00"), "GAMS preserves Jangseong lime and ordinary yellow sample colors");
+            source.RootVisual = null; Program.Drain();
+        }
+    }
     private static void CheckSamples()
     {
         var settings = new TestSettings { IsShowOwnerName = "NN" };
