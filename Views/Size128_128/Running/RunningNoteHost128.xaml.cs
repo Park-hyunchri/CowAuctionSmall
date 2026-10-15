@@ -45,6 +45,15 @@ namespace CowAuctionSmall.Views.Size128_128.Running
             set => SetValue(ScrollOwnerProperty, value);
         }
 
+        public static readonly DependencyProperty UseCalfPaternityBadgeProperty = DependencyProperty.Register(
+            nameof(UseCalfPaternityBadge), typeof(bool), typeof(RunningNoteHost128), new PropertyMetadata(false));
+
+        public bool UseCalfPaternityBadge
+        {
+            get => (bool)GetValue(UseCalfPaternityBadgeProperty);
+            set => SetValue(UseCalfPaternityBadgeProperty, value);
+        }
+
         private FlowTextAnimation? _flowTextAnimation;
         private DispatcherOperation? _pendingAnimation;
 

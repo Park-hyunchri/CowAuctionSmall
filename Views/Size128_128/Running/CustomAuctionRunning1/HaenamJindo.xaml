@@ -80,30 +80,79 @@
             <!-- ======================================================================================================================================================================= -->
 
             <Canvas Margin="0,59,0,0">
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="1">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
                 <TextBlock Text="어미 : "  Foreground="lime" Margin="2,0,0,0" FontSize="11"/>
                 <TextBlock Text="{Binding MatherEntityNumber}" Margin="35,0,0,0" Foreground="Yellow" FontSize="11"/>
             </Canvas>
                 <!-- ======================================================================================================================================================================= -->
 
-            <Canvas Margin="0,71,0,0">
+            <Canvas>
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Margin" Value="0,71,0,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="1">
+                                <Setter Property="Margin" Value="0,59,0,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
                 <!-- qmfn -->
                 <TextBlock Text="브루셀라:"  Foreground="#FF0064" Margin="2,0,0,0" FontSize="11"/>
                 <TextBlock Text="{Binding brucellosisTestDate}" Foreground="#FF0064"  Margin="50,0,0,0" FontSize="11" />
             </Canvas>
 
-            <Canvas Margin="0,83,0,0">
+            <Canvas>
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Margin" Value="0,83,0,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="1">
+                                <Setter Property="Margin" Value="0,74,0,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
                 <!-- 생년월일 -->
                 <TextBlock Text="구 제 역"  Foreground="#FF0064" Margin="2,0,0,0" FontSize="11"/>
                 <TextBlock Text=":"  Foreground="#FF0064" Margin="46,0,0,0" FontSize="11"/>
                 <TextBlock Text="{Binding footAndMouthDiseaseTestDate}" Foreground="#FF0064" Margin="50,0,0,0" FontSize="11" />
             </Canvas>
 
-            <Canvas Margin="0,95,0,0">
+            <Canvas>
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Margin" Value="0,95,0,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="1">
+                                <Setter Property="Margin" Value="0,89,0,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
                 <TextBlock Text="최저"  Foreground="lime" Margin="2,0,0,0" FontSize="13" FontWeight="Bold"/>
                 <TextBlock Text="{Binding DataContext.ItemDisplay.LowestPriceOrDashText, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type local:HaenamJindo}}}" Margin="32,0,0,0" Foreground="Yellow" FontSize="13" FontWeight="Bold"/>
             </Canvas>
 
-            <Canvas Margin="75,97,0,0">
+            <Canvas>
+                <Canvas.Style>
+                    <Style TargetType="Canvas">
+                        <Setter Property="Margin" Value="75,97,0,0"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CowDistinction}" Value="1">
+                                <Setter Property="Margin" Value="75,91,0,0"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Canvas.Style>
                 <TextBlock Text="산차"  Foreground="lime" Margin="5,0,0,0" FontSize="11"/>
                 <TextBlock Text=":"  Foreground="lime" Margin="30,0,0,0" FontSize="11"/>
                 <TextBlock Text="{Binding CalvingNumber}" Margin="35,0,0,0" Foreground="Yellow" FontSize="11"/>

@@ -1,5 +1,28 @@
 # CowAuctionSmall 작업 기록
 
+## 2026-10-15 — 해남진도 송아지 검사일·최저가 줄 간격 확대
+
+- 목적·승인: 사용자가 첨부한 송아지 표출 화면을 기준으로 하단 비고를 제외한 브루셀라·구제역·최저 3줄의 간격 조정을 요청했다. 좌표와 수정 파일·검증 방법을 안내한 후 같은 화면의 후속 조정으로 진행했다.
+- 원인: 송아지의 어미번호 행 제거 후 세 항목은 59·71·83픽셀의 12픽셀 간격으로 모여 있었고 최저가 아래에 여유가 남았다.
+- 변경 파일: `Views/Size128_128/Running/CustomAuctionRunning1/HaenamJindo.xaml`의 송아지 전용 구제역 좌표를 71→74, 최저가를 83→89, 같은 행 산차를 85→91픽셀로 변경했다. 브루셀라 59픽셀을 기준으로 15픽셀 간격을 적용했다. `Validation/ReferenceAdoptionChecks/BindingChecks.cs`의 해당 좌표 기대값을 갱신했다. `Docs/기능/화면표시_페이지전환.md`에 새 좌표를 반영했고 이 WORKLOG 기록을 추가했다.
+- 영향·보존: 해남진도 128×128 송아지 진행 화면의 세 줄과 산차 배치만 조정했다. 하단 비고·친자 배지의 위치, 비육우·번식우 좌표, 다른 축협 및 낙찰·유찰 양식, 운영 XML·프로젝트·패키지·자동 버전은 유지한다. 빌드 영향은 제품과 참조 검증 프로젝트다. 앞선 승인 작업 및 기존 사용자 변경을 보존했다.
+- 빌드·테스트: `dotnet build Validation/ReferenceAdoptionChecks/ReferenceAdoptionChecks.csproj --configuration Debug --no-restore -m:1 -v:minimal` 제품 및 검증 프로젝트 성공, 경고 0·오류 0. `dotnet Validation/ReferenceAdoptionChecks/bin/Debug/net10.0-windows/ReferenceAdoptionChecks.dll note-host` 145개 통과. 실제 WPF 좌표 기준 최저가·산차와 친자 배지 비겹침, 축종 전환 시 성우 기존 좌표 복귀, 비고 및 배지 회귀를 확인했다. git diff --check 통과. 기존 전체 binding의 화면 개수 기대값 실패는 앞선 기록과 같으며 이번에 재실행하지 않았다.
+- 문서·Git: WORKLOG.md 갱신, CODEX_HANDOFF.md는 이번에 미갱신. git status 및 관련 diff 확인. commit hash 미생성, push 미수행. 제안 메시지: `fix: 해남진도 송아지 진행 정보 줄 간격 조정`.
+- 추가 확인·미수행: 실제 전광판에서 줄 간격과 하단 가독성 확인 필요. 운영 앱 실행·서버 접속·Release/전체 솔루션 빌드·게시·배포 미수행.
+
+## 2026-10-15 — 해남진도 송아지 진행 양식 및 친자 배지 조정
+
+- 목적·승인: 사용자가 해남진도 진행 화면의 송아지만 어미번호 행을 제거하고 비고 앞에 노란 친자 배지를 표시하며, 비육우·번식우는 현재 양식을 유지하고 배지 없이 표시하도록 요청한 뒤 제안한 파일 범위의 진행을 승인했다.
+- 문제·원인: 해남진도 최저가 행은 세로 95픽셀이고 공통 친자 배지는 108픽셀에 위치해 글자 영역이 겹쳤다. 기존 호스트의 배지 표시에는 축종 구분이 없었다. 현재 일반 파서 색상은 Yellow이며 Lime은 장성 전용 값이지만, 이번 해남진도 진행 표시에서는 기존 스냅샷 색상이 Lime이어도 노랑으로 표시하도록 했다.
+- 변경 파일·내용: `Views/Size128_128/Running/CustomAuctionRunning1/HaenamJindo.xaml`에서 CowDistinction=1일 때만 어미번호 행을 숨기고 브루셀라·구제역·최저가·산차를 12픽셀 올렸다. 다른 축종의 원래 좌표는 유지한다. `Presentation/Display/DisplaySelect.cs`에서 해남진도 진행 호스트에만 UseCalfPaternityBadge를 설정한다. `Views/Size128_128/Running/RunningNoteHost128.xaml.cs`에는 표시 옵션용 의존성 속성만 추가했다. 동명 `.xaml`에는 옵션 활성 시 송아지만 배지를 표시하고 글자·테두리를 Yellow로 고정하며 실제 배지 표시 여부에 맞춰 비고 시작 위치를 전환하도록 했다. 업무 로직을 code-behind에 추가하지 않았다.
+- 검사·문서 파일: `Validation/ReferenceAdoptionChecks/BindingChecks.cs`에 실제 화면 및 DisplayRunningPageNum을 사용하는 해남진도 검사들을 추가했다. `Docs/기능/화면표시_페이지전환.md`에 축종별 표시와 진행 화면 한정 범위를 기록했다. 이 WORKLOG를 최신 항목으로 추가했다. CODEX_HANDOFF.md는 이번 작업에서 갱신하지 않았다.
+- 승인·영향: 승인된 소스 4개, 검증 1개, 기능 문서 및 작업 기록만 변경했다. 해남진도 128×128 진행 화면의 송아지 레이아웃·공통 비고 표시 옵션에 한정한다. 비육우·번식우의 기존 양식과 원본 어미번호·친자 판정·색상 데이터, IsPaternityMatch=N 처리, 다른 축협·낙찰·유찰 표시 규칙은 유지한다. 프로젝트·패키지·운영 XML·자동 버전 및 성별 표시 규칙 변경 없음. 빌드 영향은 제품과 참조 검증 프로젝트다.
+- 빌드: `dotnet build Validation/ReferenceAdoptionChecks/ReferenceAdoptionChecks.csproj --configuration Debug --no-restore -m:1 -v:minimal`로 제품 및 검증 프로젝트 성공, 경고 0·오류 0. restore·clean·프로젝트 설정 변경 없음.
+- 전용·회귀 검증: `dotnet Validation/ReferenceAdoptionChecks/bin/Debug/net10.0-windows/ReferenceAdoptionChecks.dll note-host` 145개 통과. 일반 Application과 합성 데이터로 실제 WPF 바인딩을 확인했으며 제품 App·UDP/페이지 타이머·운영 서버 연결은 시작하지 않았다. 송아지↔비육우↔번식우 반복 전환, 송아지의 실제 최저가/산차 글자 영역과 배지 비겹침, 친자 배지의 노란 글자·테두리, 비육우·번식우 숨김, 친자 없음·설정 비활성 데이터·복원 시 비고 위치, 다른 진행 페이지·다른 축협의 기존 색상, 낙찰·유찰의 기존 배지 유지, 애니메이션 해제 및 바인딩 오류 없음을 확인했다.
+- 전체 검사 제한: 같은 검증 실행 파일의 `binding`은 기존 `binding coverage includes all 33 running pages` 고정 개수 검사에서 중단됐다. 이번 작업에서 진행 View 클래스나 해당 기대 개수는 변경하지 않았다. 전체 바인딩 회귀 통과로 판정하지 않으며 승인 목적 밖의 화면 개수 기준은 수정하지 않았다.
+- Git·보존: 시작 시 기존 CODEX_HANDOFF.md·운영 XML 3개·WORKLOG.md 변경을 보존했고 git status 및 관련 diff로 이번 작업과 구분했다. git diff --check 통과. commit hash 미생성, push 미수행. 제안 메시지: `fix: 해남진도 송아지 진행 친자 배지 겹침 수정`.
+- 추가 확인·미수행: 실제 전광판·운영 서버·실제 수신 패킷·Release/전체 솔루션 빌드·게시·배포 미수행. 현장 송아지/비육우/번식우, 친자일치 유무·표시 설정, 긴 비고 스크롤 및 진행↔낙찰↔유찰 반복 전환을 확인해야 한다. 전체 binding의 화면 개수 기준 불일치는 별도 검토 대상이다.
+
 ## 2026-10-15 — 영천 염소 일괄경매 주황색 테두리 복원
 
 - 목적·승인: 이전 버전에서 정상 운영된 영천 염소 일괄경매 테두리가 최신 버전에 누락됐다는 검토 요청 후, 사용자가 제안한 소스 3개 파일의 복원을 승인했다. 사용자는 이전 버전의 2026-10-14 영천 염소경매 정상 운영을 확인했으며, 최신 수정본의 현장 검증과는 구분한다.

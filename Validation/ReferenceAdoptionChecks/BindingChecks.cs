@@ -46,6 +46,7 @@ internal static class BindingChecks
                 probe.RootVisual = null;
             }
             errors.Clear();
+            CheckHaenamPaternity(errors);
             if (noteHostsOnly)
             {
                 CheckSharedControls(errors);
@@ -325,6 +326,107 @@ internal static class BindingChecks
         AssertNoErrors(errors, "result publication boundary/state switches");
     }
 
+    private static void CheckHaenamPaternity(BindingErrors errors)
+    {
+        errors.Clear();
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        Type storeType = typeof(DisplaySelect).Assembly.GetType("CowAuctionSmall.Presentation.Display.DisplayPanelStore", true)!;
+        var running = new ObservableCollection<AuctionContPanelViewModel>();
+        using var store = (IDisposable)Activator.CreateInstance(storeType, flags, null, new object[] { running }, null)!;
+        var display = (DisplaySelect)RuntimeHelpers.GetUninitializedObject(typeof(DisplaySelect));
+        void Set(string field, object value) => typeof(DisplaySelect).GetField(field, flags)!.SetValue(display, value);
+        Set("_panelStates", store);
+        Set("_displaySize", DisplaySizeParser.DisplaySize.Size128x128);
+        Set("_userInfo", new UserInfo { Auction = new Auction { AuctionHouseCode = "8808990656106", BidderName = "Y" } });
+        Set("_nhCode", "8808990656106");
+        Set("_setCustomDisplay", new SetCustomDisplay());
+        var panel = new VirtualizingStackPanel { Width = 128, Height = 128 };
+        using var window = Host(panel);
+        object state = storeType.GetMethod("Get", flags)!.Invoke(store, new object[] { panel })!;
+        void SetState(string field, object value) => state.GetType().GetField(field)!.SetValue(state, value);
+        var item = Sample();
+        item.MatherEntityNumber = "1736 8570 5";
+        item.PaternityMatch = "친자일치";
+        item.FrontNoteWord = "친자";
+        item.FrontNoteWordBrush = "Lime";
+        using var model = Model(item);
+        running.Add(model);
+        SetState("RunningViewModel", model);
+        SetState("UseRunningNoteHost", true);
+        var mode = state.GetType().GetField("Mode")!;
+        mode.SetValue(state, Enum.Parse(mode.FieldType, "Running"));
+        var page = new CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.HaenamJindo { DataContext = model };
+        SetState("RunningPages", new List<UserControl> { page, new StandardQQuri_Run1 { DataContext = model } });
+        display.DisplayRunningPageNum(panel, item, 1); Pump();
+        var host = (RunningNoteHost128)panel.Children[0];
+        var badge = (Border)host.FindName("borderPaternityMatch");
+        var badgeText = (TextBlock)badge.Child;
+        var noteCanvas = (Canvas)host.FindName("canvasNote");
+        Canvas Row(string label) => (Canvas)Nodes(page).OfType<TextBlock>().Single(text => text.Text == label).Parent;
+        Canvas mother = Row("어미 : ");
+        Canvas brucellosis = Row("브루셀라:");
+        Canvas vaccine = Row("구 제 역");
+        Canvas lowest = Row("최저");
+        Canvas calving = Row("산차");
+        foreach (string kind in new[] { "1", "2", "3", "1", "3", "2", "1" })
+        {
+            item.CowDistinction = kind;
+            model.UpdateCowInfo(item);
+            display.DisplayRunningPageNum(panel, item, 1); Pump();
+            bool calf = kind == "1";
+            Program.Check(host.UseCalfPaternityBadge && ReferenceEquals(host, panel.Children[0]), "Haenam running selection reuses calf-policy host: " + kind);
+            Program.Check(mother.Visibility == (calf ? Visibility.Collapsed : Visibility.Visible), "Haenam mother row is removed only for calves: " + kind);
+            Program.Check(brucellosis.Margin.Top == (calf ? 59 : 71) && vaccine.Margin.Top == (calf ? 74 : 83)
+                && lowest.Margin.Top == (calf ? 89 : 95) && calving.Margin.Top == (calf ? 91 : 97), "Haenam calf rows shift and adult layout remains unchanged: " + kind);
+            Program.Check(badge.Visibility == (calf ? Visibility.Visible : Visibility.Collapsed)
+                && Canvas.GetLeft(noteCanvas) == (calf ? 32 : 2), "Haenam badge and note offset follow animal type: " + kind);
+            Program.Check(badge.BorderBrush.ToString() == "#FFFFFF00" && badgeText.Foreground.ToString() == "#FFFFFF00"
+                && badgeText.Text == "친자", "Haenam uses yellow badge text and frame even with a cached lime brush");
+            Program.Check(model.CowInfo.PaternityMatch == "친자일치" && model.CowInfo.FrontNoteWordBrush == "Lime"
+                && model.CowInfo.MatherEntityNumber == "1736 8570 5", "Haenam presentation never modifies source paternity/mother data");
+            if (calf)
+            {
+                var badgeBounds = badge.TransformToAncestor(host).TransformBounds(new Rect(badge.RenderSize));
+                foreach (var row in new[] { lowest, calving })
+                foreach (var text in row.Children.OfType<TextBlock>())
+                {
+                    var bounds = text.TransformToAncestor(host).TransformBounds(new Rect(text.RenderSize));
+                    Program.Check(bounds.Bottom <= badgeBounds.Top, "Haenam actual price/calving glyph box does not overlap badge");
+                }
+            }
+        }
+        foreach (string match in new[] { "", "-", "친자일치" })
+        {
+            item.PaternityMatch = match;
+            model.UpdateCowInfo(item); Pump();
+            bool visible = match == "친자일치";
+            Program.Check(badge.Visibility == (visible ? Visibility.Visible : Visibility.Collapsed)
+                && Canvas.GetLeft(noteCanvas) == (visible ? 32 : 2), "Haenam absent/disabled/restored paternity resets note position");
+        }
+        item.CowDistinction = "2"; model.UpdateCowInfo(item); Pump();
+        display.DisplayRunningPageNum(panel, item, 2); Pump();
+        Program.Check(badge.Visibility == Visibility.Collapsed, "Haenam adult badge also remains hidden on another hosted running page");
+        Set("_nhCode", "SYNTHETIC");
+        display.DisplayRunningPageNum(panel, item, 2); Pump();
+        Program.Check(!host.UseCalfPaternityBadge && badge.Visibility == Visibility.Visible && Canvas.GetLeft(noteCanvas) == 32
+            && badge.BorderBrush.ToString() == "#FF00FF00" && badgeText.Foreground.ToString() == "#FF00FF00", "other house restores original adult badge and brush");
+        Set("_nhCode", "8808990656106");
+        display.DisplayRunningPageNum(panel, item, 1); Pump();
+        Program.Check(host.UseCalfPaternityBadge && badge.Visibility == Visibility.Collapsed, "returning to Haenam clears an adult badge");
+        foreach (bool sold in new[] { true, false })
+        {
+            item.AuctionResultStatus = sold ? "22" : "23";
+            if (sold) display.DisplaySold(panel, item); else display.DisplayUnSold(panel, item);
+            Pump();
+            var resultHost = (RunningNoteHost128)panel.Children[0];
+            var resultBadge = (Border)resultHost.FindName("borderPaternityMatch");
+            Program.Check(!resultHost.UseCalfPaternityBadge && resultBadge.Visibility == Visibility.Visible
+                && resultBadge.BorderBrush.ToString() == "#FF00FF00", "Haenam result retains the original adult badge policy: " + sold);
+        }
+        window.RootVisual = null; Pump();
+        Program.Check(host.GetType().GetField("_flowTextAnimation", flags)!.GetValue(host) == null, "Haenam running host releases note animation on state change");
+        AssertNoErrors(errors, "Haenam calf-only paternity layout and shared host regression");
+    }
     private static void CheckSharedControls(BindingErrors errors)
     {
         errors.Clear();

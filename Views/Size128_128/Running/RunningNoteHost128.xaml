@@ -25,20 +25,54 @@
             <Border x:Name="borderPaternityMatch"
                     Canvas.Left="2" Canvas.Top="108"
                     Width="28" Height="18"
-                    BorderBrush="{Binding FrontNoteWordBrush}"
                     BorderThickness="1"
                     CornerRadius="3"
                     Padding="1"
                     Panel.ZIndex="100"
-                    IsHitTestVisible="False"
-                    Visibility="{Binding HasPaternityMatch, Converter={StaticResource BoolToVis}, FallbackValue=Collapsed, TargetNullValue=Collapsed}">
+                    IsHitTestVisible="False">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="BorderBrush" Value="{Binding FrontNoteWordBrush}"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasPaternityMatch}" Value="True"/>
+                                    <Condition Binding="{Binding UseCalfPaternityBadge, RelativeSource={RelativeSource AncestorType={x:Type local:RunningNoteHost128}}}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasPaternityMatch}" Value="True"/>
+                                    <Condition Binding="{Binding UseCalfPaternityBadge, RelativeSource={RelativeSource AncestorType={x:Type local:RunningNoteHost128}}}" Value="True"/>
+                                    <Condition Binding="{Binding CowDistinction}" Value="1"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding UseCalfPaternityBadge, RelativeSource={RelativeSource AncestorType={x:Type local:RunningNoteHost128}}}" Value="True">
+                                <Setter Property="BorderBrush" Value="Yellow"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
 
                 <TextBlock Text="{Binding FrontNoteWord}" 
-                           Foreground="{Binding FrontNoteWordBrush}" 
                            FontSize="11" 
                            FontWeight="Normal"
                            HorizontalAlignment="Center" 
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{Binding FrontNoteWordBrush}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding UseCalfPaternityBadge, RelativeSource={RelativeSource AncestorType={x:Type local:RunningNoteHost128}}}" Value="True">
+                                    <Setter Property="Foreground" Value="Yellow"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Border>
 
             <!-- 흘러가는 비고 텍스트 (색상: #f61c2d, 폰트크기: 12) -->
@@ -50,7 +84,7 @@
                     <Style TargetType="Canvas">
                         <Setter Property="Canvas.Left" Value="2"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding HasPaternityMatch}" Value="True">
+                            <DataTrigger Binding="{Binding Visibility, ElementName=borderPaternityMatch}" Value="Visible">
                                 <Setter Property="Canvas.Left" Value="32"/>
                             </DataTrigger>
                         </Style.Triggers>

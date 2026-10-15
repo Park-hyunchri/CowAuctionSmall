@@ -922,6 +922,7 @@ namespace CowAuctionSmall.Presentation.Display
             if (useHostForPage)
             {
                 var host = state.RunningNoteHost ??= new RunningNoteHost128();
+                host.UseCalfPaternityBadge = _nhCode == "8808990656106";
                 if (!ReferenceEquals(host.ScrollOwner, state.RunningViewModel))
                 {
                     BindingOperations.ClearBinding(host, RunningNoteHost128.ItemDisplayProperty);
