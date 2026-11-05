@@ -118,6 +118,45 @@ static class ScrollChecks
             window.Close();
             AnimationClock Clock() => (AnimationClock)typeof(FlowTextAnimation).GetField("_animationClock", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Animation(host))!;
         }
+        {
+            var host = new RunningNoteHost128();
+            var item = new gValues { TraceNumber = "1", SipNumber = "1", SpaceIndex = "1", Note = "가나다라마바사", FrontNoteWord = "친자", PaternityMatch = "" };
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item);
+            var window = new Window { Content = host, Width = 160, Height = 180, Left = -10000, Top = -10000, ShowActivated = false };
+            var note = (TextBlock)host.FindName("note");
+            note.FontSize = 16;
+            var canvas = (Canvas)host.FindName("canvasNote");
+            window.Show(); Pump(200);
+            bool IsAnimating() => (bool)typeof(FlowTextAnimation).GetField("_isAnimating", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Animation(host))!;
+            AnimationClock? CurrentClock() => (AnimationClock?)typeof(FlowTextAnimation).GetField("_animationClock", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(Animation(host))!;
+            note.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Check(note.DesiredSize.Width > 94 && note.DesiredSize.Width <= 124 && !IsAnimating() && canvas.ActualWidth == 124, "short note fits without badge"); checks++;
+            item = item.Clone(); item.PaternityMatch = "친자일치";
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item); Pump(200);
+            Check(canvas.ActualWidth == 94 && IsAnimating() && CurrentClock() != null, "short overflowing note scrolls with badge"); checks++;
+            var clock = CurrentClock();
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item.Clone()); Pump(200);
+            Check(ReferenceEquals(clock, CurrentClock()), "unchanged note and width preserve clock"); checks++;
+            item = item.Clone(); item.PaternityMatch = "";
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item); Pump(200);
+            Check(canvas.ActualWidth == 124 && !IsAnimating() && CurrentClock() == null, "badge removal stops scrolling when note fits"); checks++;
+            item = item.Clone(); item.PaternityMatch = "친자일치"; item.Note = "새로운 긴 비고 내용입니다";
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item); Pump(200);
+            Check(canvas.ActualWidth == 94 && note.Text == item.Note && IsAnimating() && CurrentClock() != null, "simultaneous text and width update uses final state"); checks++;
+            Pump(300);
+            double before = Canvas.GetLeft(canvas) + ((TranslateTransform)note.RenderTransform).X;
+            clock = CurrentClock();
+            item = item.Clone(); item.PaternityMatch = "";
+            host.ItemDisplay = new AuctionItemDisplayViewModel(item); Pump(100);
+            double after = Canvas.GetLeft(canvas) + ((TranslateTransform)note.RenderTransform).X;
+            Check(IsAnimating() && CurrentClock() != null && !ReferenceEquals(clock, CurrentClock()) && Math.Abs(after - before) < 8,
+                "scrolling width change replaces clock and preserves screen position"); checks++;
+            window.Content = null; Pump(100);
+            Check(Animation(host) == null, "viewport observer releases on unload"); checks++;
+            window.Content = host; Pump(200);
+            Check(Animation(host) != null && IsAnimating(), "viewport observer resumes on reload"); checks++;
+            window.Close();
+        }
         Console.WriteLine($"PASS {checks} scroll lifecycle checks; real WPF clocks, synthetic text only");
     }
 }

@@ -19,6 +19,7 @@
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding IsRunning}" Value="True"/>
                         <Condition Binding="{Binding IsBatchGoatBorderHighlighted}" Value="False"/>
+                        <Condition Binding="{Binding IsVisible, RelativeSource={RelativeSource Self}}" Value="True"/>
                     </MultiDataTrigger.Conditions>
                     <MultiDataTrigger.EnterActions>
                         <BeginStoryboard x:Name="BlinkStoryboard">
@@ -44,7 +45,7 @@
                         </BeginStoryboard>
                     </MultiDataTrigger.EnterActions>
                     <MultiDataTrigger.ExitActions>
-                        <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                        <RemoveStoryboard BeginStoryboardName="BlinkStoryboard"/>
                     </MultiDataTrigger.ExitActions>
                 </MultiDataTrigger>
                 <DataTrigger Binding="{Binding IsBatchGoatBorderHighlighted}" Value="True">

@@ -15,8 +15,12 @@
         <Style x:Key="BlinkingBorderStyle2" TargetType="Border">
             <Setter Property="BorderBrush" Value="black"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.IsRunning, RelativeSource={RelativeSource AncestorType={x:Type local:Standard_non_QQuri_Run1}}}" Value="True">
-                    <DataTrigger.EnterActions>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding DataContext.IsRunning, RelativeSource={RelativeSource AncestorType={x:Type local:Standard_non_QQuri_Run1}}}" Value="True"/>
+                        <Condition Binding="{Binding IsVisible, RelativeSource={RelativeSource Self}}" Value="True"/>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.EnterActions>
                         <BeginStoryboard x:Name="BlinkStoryboard">
                             <Storyboard RepeatBehavior="Forever">
                                 <ObjectAnimationUsingKeyFrames
@@ -38,11 +42,11 @@
                                 </ObjectAnimationUsingKeyFrames>
                             </Storyboard>
                         </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                    <DataTrigger.ExitActions>
-                        <StopStoryboard BeginStoryboardName="BlinkStoryboard"/>
-                    </DataTrigger.ExitActions>
-                </DataTrigger>
+                    </MultiDataTrigger.EnterActions>
+                    <MultiDataTrigger.ExitActions>
+                        <RemoveStoryboard BeginStoryboardName="BlinkStoryboard"/>
+                    </MultiDataTrigger.ExitActions>
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
 

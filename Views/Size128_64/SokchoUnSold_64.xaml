@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:models="clr-namespace:CowAuctionSmall.Presentation.Converters"
+             xmlns:entity="clr-namespace:CowAuctionSmall.Views.Common"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              TextOptions.TextRenderingMode="Aliased"
@@ -16,8 +17,7 @@
         <Canvas Width="126" Height="62">
             <TextBlock Canvas.Left="2" Canvas.Top="0" Text="{Binding Snapshot.Sex, Mode=OneWay}" Foreground="DarkOrchid" FontWeight="Bold" FontSize="19"/>
             <TextBlock Canvas.Left="34" Canvas.Top="1" Text="개체:" Foreground="Lime" FontSize="11"/>
-            <TextBlock Canvas.Left="62" Canvas.Top="1" Text="{Binding Snapshot.EntityNumber, Mode=OneWay}" Foreground="{DynamicResource EntityNumberForeground}" FontSize="11"/>
-            <TextBlock Canvas.Left="90" Canvas.Top="1" Text="{Binding Snapshot.EntityNumberShort, Mode=OneWay}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="11"/>
+            <entity:EntityNumberText Canvas.Left="62" Canvas.Top="1" Number="{Binding Snapshot.EntityNumber, Mode=OneWay}" Foreground="{DynamicResource EntityNumberForeground}" HighlightForeground="{DynamicResource EntityNumberShortForeground}" FontSize="11"/>
 
             <TextBlock Canvas.Left="34" Canvas.Top="14" Text="최저:" Foreground="Lime" FontSize="11"/>
             <TextBlock Canvas.Left="69" Canvas.Top="14" Text="{Binding LowestPriceText, Mode=OneWay}" Foreground="Yellow" FontSize="11"/>

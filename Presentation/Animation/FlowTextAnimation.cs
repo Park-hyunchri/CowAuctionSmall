@@ -27,6 +27,8 @@ public class FlowTextAnimation
     private readonly int _minScrollTextLength;
     private readonly bool _forceScrollWhenLengthExceeded;
     private readonly bool _coalesceTextChanges;
+    private readonly bool _observeViewportChanges;
+    private double _lastCanvasLeft;
     private DispatcherOperation? _pendingTextChange;
     private string? _observedText;
     private TranslateTransform? _translate;
@@ -48,7 +50,7 @@ public class FlowTextAnimation
     /// <summary>
     /// 뷰모델 연동형 마퀴 애니메이션을 생성한다.
     /// </summary>
-    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, AuctionContPanelViewModel viewModel, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false, bool coalesceTextChanges = false)
+    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, AuctionContPanelViewModel viewModel, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false, bool coalesceTextChanges = false, bool observeViewportChanges = false)
     {
         _textBlock = textBlock;
         _canvas = canvas;
@@ -56,6 +58,7 @@ public class FlowTextAnimation
         _speed = speed;
         _useViewModel = true;
         _coalesceTextChanges = coalesceTextChanges;
+        _observeViewportChanges = observeViewportChanges;
         _useRenderTransform = useRenderTransform;
         _pageKey = pageKey;
         _minScrollTextLength = Math.Max(0, minScrollTextLength);
@@ -65,13 +68,14 @@ public class FlowTextAnimation
     /// <summary>
     /// 뷰모델 없이 동작하는 마퀴 애니메이션을 생성한다.
     /// </summary>
-    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false, bool coalesceTextChanges = false)
+    public FlowTextAnimation(TextBlock textBlock, Canvas canvas, double speed = 15, bool useRenderTransform = true, string? pageKey = null, int minScrollTextLength = DefaultMinScrollTextLength, bool forceScrollWhenLengthExceeded = false, bool coalesceTextChanges = false, bool observeViewportChanges = false)
     {
         _textBlock = textBlock;
         _canvas = canvas;
         _speed = speed;
         _useViewModel = false;
         _coalesceTextChanges = coalesceTextChanges;
+        _observeViewportChanges = observeViewportChanges;
         _useRenderTransform = useRenderTransform;
         _pageKey = pageKey;
         _minScrollTextLength = Math.Max(0, minScrollTextLength);
@@ -94,6 +98,12 @@ public class FlowTextAnimation
             return;
 
         PrepareLayout();
+        if (_observeViewportChanges)
+        {
+            _observedText = _textBlock.Text;
+            _lastCanvasLeft = Canvas.GetLeft(_canvas);
+            HookSizeChanged();
+        }
 
         if (!_shouldScroll)
         {
@@ -451,6 +461,11 @@ public class FlowTextAnimation
     /// </summary>
     private void OnCanvasSizeChanged(object sender, SizeChangedEventArgs e)
     {
+        if (_observeViewportChanges)
+        {
+            ScheduleCombinedRefresh();
+            return;
+        }
         if (e.NewSize.Width <= 0)
             return;
 
@@ -562,9 +577,15 @@ public class FlowTextAnimation
         }
 
         PrepareLayout();
+        if (_observeViewportChanges)
+        {
+            _observedText = _textBlock.Text;
+            _lastCanvasLeft = Canvas.GetLeft(_canvas);
+            HookSizeChanged();
+        }
         if (_shouldScroll)
         {
-            UnhookSizeChanged();
+            if (!_observeViewportChanges) UnhookSizeChanged();
             StartAnimation(forceRestart: true);
         }
         else
@@ -579,6 +600,11 @@ public class FlowTextAnimation
     /// </summary>
     private void OnTextChanged(object? sender, EventArgs e)
     {
+        if (_observeViewportChanges)
+        {
+            ScheduleCombinedRefresh();
+            return;
+        }
         if (!_coalesceTextChanges)
         {
             RefreshText();
@@ -594,6 +620,34 @@ public class FlowTextAnimation
             if (string.Equals(_observedText, _textBlock.Text, StringComparison.Ordinal)) return;
             _observedText = _textBlock.Text;
             RefreshText();
+        }));
+    }
+
+    private void ScheduleCombinedRefresh()
+    {
+        if (_pendingTextChange != null) return;
+        _pendingTextChange = _textBlock.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+        {
+            _pendingTextChange = null;
+            if (!_textBlock.IsVisible) return;
+            string currentText = _textBlock.Text ?? string.Empty;
+            double width = _canvas.ActualWidth;
+            double left = Canvas.GetLeft(_canvas);
+            bool textChanged = !string.Equals(_observedText, currentText, StringComparison.Ordinal);
+            bool widthChanged = Math.Abs(width - _viewportWidth) > 0.001;
+            if (!textChanged && !widthChanged) return;
+
+            double position = _isAnimating ? GetCurrentPositionUtc(DateTime.UtcNow) + _lastCanvasLeft - left : 0;
+            _observedText = currentText;
+            if (_isAnimating) StopAnimation(true, updatePosition: false);
+            if (textChanged && _useViewModel && _viewModel != null)
+                _viewModel.UpdateNoteTextSnapshot(ResolveNoteKey()!, currentText);
+            PrepareLayout();
+            _lastCanvasLeft = left;
+            if (_shouldScroll)
+                StartAnimation(textChanged ? _viewportWidth : position, forceRestart: true);
+            else
+                ApplyPosition(0);
         }));
     }
 

@@ -126,11 +126,11 @@ namespace CowAuctionSmall.Views.Size128_128.Running
                 // 💡 ViewModel이 있으면 ViewModel을 포함하는 생성자 호출
                 if (ScrollOwner is AuctionContPanelViewModel viewModel)
                 {
-                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, viewModel, speed: 18, useRenderTransform: true, coalesceTextChanges: true);
+                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, viewModel, speed: 18, useRenderTransform: true, minScrollTextLength: 0, coalesceTextChanges: true, observeViewportChanges: true);
                 }
                 else
                 {
-                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, speed: 18, useRenderTransform: true, coalesceTextChanges: true);
+                    _flowTextAnimation = new FlowTextAnimation(note, canvasNote, speed: 18, useRenderTransform: true, minScrollTextLength: 0, coalesceTextChanges: true, observeViewportChanges: true);
                 }
 
                 _flowTextAnimation.Start();

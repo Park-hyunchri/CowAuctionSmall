@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 internal static class BindingChecks
@@ -47,10 +48,13 @@ internal static class BindingChecks
             }
             errors.Clear();
             CheckHaenamPaternity(errors);
+            CheckHaenamNoteIntegration(errors);
             if (noteHostsOnly)
             {
                 CheckSharedControls(errors);
                 CheckResultBoundary(errors);
+                CheckBorderRepeat(errors);
+                CheckPilotBorders(errors);
                 return;
             }
             ItemDisplayChecks.Run();
@@ -63,8 +67,12 @@ internal static class BindingChecks
                     && type.Namespace?.StartsWith("CowAuctionSmall.Views", StringComparison.Ordinal) == true).ToArray();
             Type[] running = controls.Where(type => (type.Namespace!.Contains(".Running", StringComparison.Ordinal) || type.Name is "AuctionRunning2" or "AuctionRunning3")
                 && !type.Name.StartsWith("RunningNoteHost", StringComparison.Ordinal) && type.Name != "AuctionRunning2_320_64").OrderBy(type => type.FullName).ToArray();
-            Program.Check(running.Length == 33 && running.Any(type => type.Name == "CowHistorySearchRun"),
-                "binding coverage includes all 33 running pages, including the added history page");
+            string[] requiredRunning = { "CowHistorySearchRun", "SokchoRunning1_64", "SokchoRunning2_64", "SokchoEventRun_64" };
+            string runningNames = string.Join(", ", running.Select(type => type.FullName));
+            string missingRunning = string.Join(", ", requiredRunning.Where(name => !running.Any(type => type.Name == name)));
+            Console.WriteLine($"Running reflection inventory: {running.Length}; {runningNames}; missing required: {missingRunning}");
+            Program.Check(running.Length == 36 && missingRunning.Length == 0,
+                $"binding coverage expected 36 running pages and required views; actual={running.Length}; missing=[{missingRunning}]; actual views=[{runningNames}]");
             var failures = new List<Exception>();
             foreach (Type type in running)
             {
@@ -74,11 +82,19 @@ internal static class BindingChecks
             Type[] results = controls.Where(type => !type.Namespace!.Contains(".Running", StringComparison.Ordinal)
                 && (type.Name.Contains("Sold", StringComparison.OrdinalIgnoreCase))).OrderBy(type => type.FullName).ToArray();
             Program.Check(results.Length >= 25, "binding coverage includes all result view families");
-            foreach (Type type in results) CheckResult(type, errors);
-            CheckSharedControls(errors);
-            CheckResultBoundary(errors);
+            foreach (Type type in results)
+            {
+                try { CheckResult(type, errors); }
+                catch (Exception error) { failures.Add(new InvalidOperationException(type.FullName, error)); }
+            }
+            try { CheckResult(typeof(CowAuctionSmall.Views.Size128_64.SokchoEventResult_64), errors); }
+            catch (Exception error) { failures.Add(new InvalidOperationException("SokchoEventResult_64", error)); }
+            try { CheckSharedControls(errors); }
+            catch (Exception error) { failures.Add(new InvalidOperationException("Shared controls", error)); }
+            try { CheckResultBoundary(errors); }
+            catch (Exception error) { failures.Add(new InvalidOperationException("Result boundary", error)); }
             Console.WriteLine($"Binding coverage: {running.Length} running pages, {results.Length} result views, shared note host in both modes and common badge; generic Application, synthetic data, no product App or DisplaySelect/network startup.");
-            if (failures.Count > 0) throw new AggregateException("Running page binding failures", failures);
+            if (failures.Count > 0) throw new AggregateException("Binding failures", failures);
         }
         finally { trace.Listeners.Remove(errors); trace.Switch.Level = previousLevel; }
     }
@@ -175,6 +191,7 @@ internal static class BindingChecks
         var source = Sample();
         using var model = Model(source);
         var view = (UserControl)Activator.CreateInstance(type)!;
+        if (type.Name.StartsWith("Sokcho", StringComparison.Ordinal)) { view.Width = 128; view.Height = 64; }
         view.DataContext = model;
         using var host = Host(view);
         Program.Check(ReferenceEquals(view.DataContext, model), "running root keeps VM: " + type.Name);
@@ -201,23 +218,22 @@ internal static class BindingChecks
         foreach (TextBlock note in Nodes(view).OfType<TextBlock>().Where(text => BindingOperations.IsDataBound(text, NoteText.NormalProperty)))
             Program.Check(note.Text.Contains("CHANGED_NOTE") && note.Text.Contains("CHANGED_HISTORY"), "embedded note/history refresh: " + type.Name);
         var itemSnapshot = model.CowInfo;
-        model.IsRunning = true; PumpAnimation();
+        model.IsRunning = true;
         Program.Check(ReferenceEquals(itemSnapshot, model.CowInfo), "running state-only does not replace item: " + type.Name);
-        Border[] borders = Nodes(view).OfType<Border>().Where(border => border.Style?.Triggers.OfType<DataTrigger>()
-            .Any(trigger => (trigger.Binding as Binding)?.Path?.Path?.EndsWith("IsRunning", StringComparison.Ordinal) == true) == true).ToArray();
+        Border[] borders = Nodes(view).OfType<Border>().Where(border => BorderStoryboards(border).Any()).ToArray();
         if (borders.Length > 0)
         {
-            Program.Check(borders.Any(border => DependencyPropertyHelper.GetValueSource(border, Border.BorderBrushProperty).IsAnimated),
-                "state-only running notification starts border animation: " + type.Name);
-            model.IsRunning = false; PumpAnimation();
-            Program.Check(borders.All(border => border.BorderBrush is SolidColorBrush brush && brush.Color == Colors.Black),
-                "state-only stopped notification restores black border: " + type.Name);
+            CheckBorderState(view, model, borders, true, type.Name);
+            model.IsRunning = false;
+            CheckBorderState(view, model, borders, false, type.Name);
         }
         host.RootVisual = null; Pump();
         Program.Check(!view.IsLoaded, "running page unloads: " + type.Name);
         host.RootVisual = view; Pump();
         AssertValues(view, model.CowInfo, type.Name + " reload");
         SexDisplayChecks.CheckView(view, source, model.UpdateCowInfo);
+        if (type.Name.StartsWith("Sokcho", StringComparison.Ordinal))
+            CheckSokchoNumber(view, source, model.UpdateCowInfo);
         host.RootVisual = null; Pump();
         AssertNoErrors(errors, type.Name + " update/reload");
     }
@@ -226,6 +242,7 @@ internal static class BindingChecks
     {
         errors.Clear();
         var view = (UserControl)Activator.CreateInstance(type)!;
+        if (type.Name.StartsWith("Sokcho", StringComparison.Ordinal)) { view.Width = 128; view.Height = 64; }
         var item = Sample(); item.AuctionResultStatus = type.Name.Contains("UnSold", StringComparison.OrdinalIgnoreCase) ? "23" : "22";
         view.DataContext = new AuctionItemDisplayViewModel(item);
         using var host = Host(view);
@@ -236,9 +253,30 @@ internal static class BindingChecks
         view.DataContext = new AuctionItemDisplayViewModel(updated); Pump();
         if (!placeholder) AssertValues(view, updated, type.Name + " replaced");
         SexDisplayChecks.CheckView(view, item, value => view.DataContext = new AuctionItemDisplayViewModel(value));
+        if (type.Name.StartsWith("Sokcho", StringComparison.Ordinal))
+            CheckSokchoNumber(view, item, value => view.DataContext = new AuctionItemDisplayViewModel(value));
         host.RootVisual = null; Pump();
         Program.Check(!view.IsLoaded, "result page unloads: " + type.Name);
         AssertNoErrors(errors, type.Name);
+    }
+
+    private static void CheckSokchoNumber(UserControl view, gValues source, Action<gValues> update)
+    {
+        var number = Nodes(view).OfType<EntityNumberText>().Single();
+        var item = source.Clone();
+        item.EntityNumber = "1234 5678 9";
+        update(item); Pump();
+        var runs = number.Inlines.OfType<Run>().ToArray();
+        Program.Check(string.Concat(runs.Select(run => run.Text)) == "1234 5678 9" && runs[1].Text == "5678"
+            && runs[1].Foreground.ToString() == number.HighlightForeground?.ToString(), "Sokcho number and highlight: " + view.GetType().Name);
+        var bounds = number.TransformToAncestor(view).TransformBounds(new Rect(number.RenderSize));
+        Program.Check(bounds.Left >= 0 && bounds.Right <= 128, "Sokcho number fits 128 width: " + view.GetType().Name);
+        item = item.Clone(); item.EntityNumber = ""; update(item); Pump();
+        Program.Check(string.Concat(runs.Select(run => run.Text)) == "", "Sokcho empty number: " + view.GetType().Name);
+        item = item.Clone(); item.EntityNumber = "AB-12"; update(item); Pump();
+        Program.Check(string.Concat(runs.Select(run => run.Text)) == "AB-12" && runs[1].Text == "", "Sokcho invalid number: " + view.GetType().Name);
+        item = item.Clone(); item.EntityNumber = "2345 6789 0"; update(item); Pump();
+        Program.Check(string.Concat(runs.Select(run => run.Text)) == "2345 6789 0" && runs[1].Text == "6789", "Sokcho updated number: " + view.GetType().Name);
     }
 
     private static void CheckResultBoundary(BindingErrors errors)
@@ -283,6 +321,18 @@ internal static class BindingChecks
         var runningHost = (RunningNoteHost128)panel.Children[0];
         Program.Check(ReferenceEquals(runningHost.ScrollOwner, runningModel) && ReferenceEquals(runningHost.ItemDisplay, runningModel.ItemDisplay),
             "real running page selection connects shared display and scroll owner");
+        var cachedPage = runningHost.PageContent as Standard_non_QQuri_Run1 ?? throw new InvalidOperationException("Expected cached running page");
+        var cachedBorders = Nodes(cachedPage).OfType<Border>().Where(border => BorderStoryboards(border).Any()).ToArray();
+        runningModel.IsRunning = true;
+        CheckBorderState(cachedPage, runningModel, cachedBorders, true, "real cached page first");
+        display.DisplayRunningPageNum(panel, initial, 2); Pump();
+        CheckBorderState(cachedPage, runningModel, cachedBorders, false, "real cached page detached");
+        Program.Check(runningModel.IsRunning && !cachedPage.IsLoaded, "real cache retains running state while page is detached");
+        display.DisplayRunningPageNum(panel, initial, 1); Pump();
+        Program.Check(ReferenceEquals(runningHost.PageContent, cachedPage), "real cache reuses same running page");
+        CheckBorderState(cachedPage, runningModel, cachedBorders, true, "real cached page restored");
+        runningModel.IsRunning = false;
+        CheckBorderState(cachedPage, runningModel, cachedBorders, false, "real cached page stopped");
         runningModel.Note = "RUNNING_NOTE_CHANGED"; Pump();
         Program.Check(((TextBlock)runningHost.FindName("note")).Text.Contains("RUNNING_NOTE_CHANGED"), "running publication updates host via ItemDisplay binding");
         display.DisplayRunningPageNum(panel, initial, 2); Pump();
@@ -379,7 +429,7 @@ internal static class BindingChecks
             Program.Check(brucellosis.Margin.Top == (calf ? 59 : 71) && vaccine.Margin.Top == (calf ? 74 : 83)
                 && lowest.Margin.Top == (calf ? 89 : 95) && calving.Margin.Top == (calf ? 91 : 97), "Haenam calf rows shift and adult layout remains unchanged: " + kind);
             Program.Check(badge.Visibility == (calf ? Visibility.Visible : Visibility.Collapsed)
-                && Canvas.GetLeft(noteCanvas) == (calf ? 32 : 2), "Haenam badge and note offset follow animal type: " + kind);
+                && Canvas.GetLeft(noteCanvas) == (calf ? 32 : 2) && noteCanvas.Width == (calf ? 94 : 124), "Haenam badge and note offset follow animal type: " + kind);
             Program.Check(badge.BorderBrush.ToString() == "#FFFFFF00" && badgeText.Foreground.ToString() == "#FFFFFF00"
                 && badgeText.Text == "친자", "Haenam uses yellow badge text and frame even with a cached lime brush");
             Program.Check(model.CowInfo.PaternityMatch == "친자일치" && model.CowInfo.FrontNoteWordBrush == "Lime"
@@ -401,7 +451,7 @@ internal static class BindingChecks
             model.UpdateCowInfo(item); Pump();
             bool visible = match == "친자일치";
             Program.Check(badge.Visibility == (visible ? Visibility.Visible : Visibility.Collapsed)
-                && Canvas.GetLeft(noteCanvas) == (visible ? 32 : 2), "Haenam absent/disabled/restored paternity resets note position");
+                && Canvas.GetLeft(noteCanvas) == (visible ? 32 : 2) && noteCanvas.Width == (visible ? 94 : 124), "Haenam absent/disabled/restored paternity resets note position");
         }
         item.CowDistinction = "2"; model.UpdateCowInfo(item); Pump();
         display.DisplayRunningPageNum(panel, item, 2); Pump();
@@ -427,6 +477,114 @@ internal static class BindingChecks
         Program.Check(host.GetType().GetField("_flowTextAnimation", flags)!.GetValue(host) == null, "Haenam running host releases note animation on state change");
         AssertNoErrors(errors, "Haenam calf-only paternity layout and shared host regression");
     }
+    private static void CheckHaenamNoteIntegration(BindingErrors errors)
+    {
+        const string house = "8808990656106";
+        const string shortOverflow = "가나다라마바사아";
+        const string longNote = "긴 비고 내용이 화면을 넘어가는 통합 확인입니다";
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        Type storeType = typeof(DisplaySelect).Assembly.GetType("CowAuctionSmall.Presentation.Display.DisplayPanelStore", true)!;
+        Type flowType = typeof(CowAuctionSmall.Presentation.Animation.FlowTextAnimation);
+        void Drain()
+        {
+            var frame = new DispatcherFrame();
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+            timer.Tick += (_, _) => { timer.Stop(); frame.Continue = false; };
+            timer.Start(); Dispatcher.PushFrame(frame);
+        }
+        foreach (string kind in new[] { "1", "2", "3" })
+        foreach (string result in new[] { "sold", "unsold-x", "unsold-q" })
+        {
+            errors.Clear();
+            var running = new ObservableCollection<AuctionContPanelViewModel>();
+            using var store = (IDisposable)Activator.CreateInstance(storeType, flags, null, new object[] { running }, null)!;
+            var display = (DisplaySelect)RuntimeHelpers.GetUninitializedObject(typeof(DisplaySelect));
+            void Set(string name, object value) => typeof(DisplaySelect).GetField(name, flags)!.SetValue(display, value);
+            Set("_panelStates", store); Set("_displaySize", DisplaySizeParser.DisplaySize.Size128x128);
+            Set("_userInfo", new UserInfo { Auction = new Auction { AuctionHouseCode = house, BidderName = "Y" } });
+            Set("_nhCode", house); Set("_setCustomDisplay", new SetCustomDisplay());
+            Set("pageTime", new List<int> { 5, 5 }); Set("_requestedRunningPage", 1); Set("_totalRunningPage", 1);
+            typeof(DisplaySelect).GetProperty("TodayAuctionItems")!.SetValue(display, running);
+            var panel = new VirtualizingStackPanel { Width = 128, Height = 128 };
+            using var window = Host(panel);
+            var item = Sample();
+            item.CowDistinction = kind; item.TraceNumber = "000000000000001"; item.SipNumber = "1"; item.SpaceIndex = "1";
+            item.Is_Nh_QQuri = result == "unsold-x" ? "X" : "Y"; item.Nh_ability_1_num = "";
+            item.PaternityMatch = "친자일치"; item.FrontNoteWord = "친자"; item.Note = shortOverflow; item.NoteChangeOwner = "";
+            void PublishRunning() { display.DisplayRunning(panel, item, 10); Drain(); }
+            void PublishResult() { if (result == "sold") display.DisplaySold(panel, item); else display.DisplayUnSold(panel, item); Drain(); }
+            RunningNoteHost128 Current() => (RunningNoteHost128)panel.Children[0];
+            object? Animation(RunningNoteHost128 host) => host.GetType().GetField("_flowTextAnimation", flags)!.GetValue(host);
+            AnimationClock? Clock(RunningNoteHost128 host) => Animation(host) is object animation ? (AnimationClock?)flowType.GetField("_animationClock", flags)!.GetValue(animation) : null;
+            void AssertNote(RunningNoteHost128 host, bool badgeVisible, bool scroll, string label)
+            {
+                var badge = (Border)host.FindName("borderPaternityMatch");
+                var canvas = (Canvas)host.FindName("canvasNote");
+                var text = (TextBlock)host.FindName("note");
+                Program.Check(badge.Visibility == (badgeVisible ? Visibility.Visible : Visibility.Collapsed)
+                    && Canvas.GetLeft(canvas) == (badgeVisible ? 32 : 2) && canvas.ActualWidth == (badgeVisible ? 94 : 124), label + " badge and actual viewport");
+                Program.Check(text.Text == item.Note && ReferenceEquals(host.ItemDisplay!.Snapshot, canvas.DataContext), label + " note snapshot binding");
+                text.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                Program.Check((text.DesiredSize.Width > canvas.ActualWidth) == scroll && (Clock(host) != null) == scroll, label + $" measured width/clock: text={text.DesiredSize.Width}, viewport={canvas.ActualWidth}");
+            }
+            PublishRunning();
+            var first = Current();
+            Program.Check(first.PageContent is CowAuctionSmall.Views.Size128_128.Running.CustomAuctionRunning1.HaenamJindo, "actual Haenam running selection " + kind);
+            bool runningBadge = kind == "1";
+            AssertNote(first, runningBadge, runningBadge, "running short " + kind);
+            item = item.Clone(); item.PaternityMatch = ""; item.FrontNoteWord = ""; PublishRunning();
+            AssertNote(first, false, false, "running badge removed " + kind);
+            item = item.Clone(); item.Note = longNote; PublishRunning();
+            AssertNote(first, false, true, "running long without badge " + kind);
+            var runningClock = Clock(first);
+            item = item.Clone(); item.LowestPrice = "998"; PublishRunning();
+            Program.Check(ReferenceEquals(runningClock, Clock(first)), "same running text and width preserve clock " + kind);
+            item = item.Clone(); item.PaternityMatch = "친자일치"; item.FrontNoteWord = "친자"; PublishRunning();
+            AssertNote(first, runningBadge, true, "running long with paternity " + kind);
+            item = item.Clone(); item.Note = "짧음"; PublishRunning();
+            AssertNote(first, runningBadge, false, "running fitting short " + kind);
+            item = item.Clone(); item.Note = ""; PublishRunning();
+            AssertNote(first, runningBadge, false, "running empty " + kind);
+            item = item.Clone(); item.Note = shortOverflow; PublishRunning();
+            AssertNote(first, runningBadge, runningBadge, "running restored short " + kind);
+            var oldRunningClock = Clock(first);
+            item.AuctionResultStatus = result == "sold" ? "22" : "23";
+            PublishResult();
+            var resultHost = Current();
+            string expected = result == "sold" ? "HaenamJindoSold" : result == "unsold-x" ? "Standard_non_X_UnSold" : "QQuriUnSold";
+            Program.Check(resultHost.PageContent?.GetType().Name == expected && !ReferenceEquals(first, resultHost) && Animation(first) == null,
+                "actual result selection and old host cleanup " + kind + "/" + result);
+            Program.Check(oldRunningClock == null || oldRunningClock.CurrentState == ClockState.Stopped, "old running clock stopped " + kind + "/" + result);
+            AssertNote(resultHost, true, true, "result short " + kind + "/" + result);
+            var clock = Clock(resultHost);
+            item = item.Clone(); item.LowestPrice = "999"; PublishResult();
+            Program.Check(ReferenceEquals(clock, Clock(resultHost)), "same result text and width preserve clock " + kind + "/" + result);
+            item = item.Clone(); item.PaternityMatch = ""; item.FrontNoteWord = ""; PublishResult();
+            AssertNote(resultHost, false, false, "result badge removed " + kind + "/" + result);
+            item = item.Clone(); item.Note = longNote; PublishResult();
+            AssertNote(resultHost, false, true, "result long without badge " + kind + "/" + result);
+            item = item.Clone(); item.PaternityMatch = "친자일치"; item.FrontNoteWord = "친자"; PublishResult();
+            AssertNote(resultHost, true, true, "result long with badge " + kind + "/" + result);
+            item = item.Clone(); item.Note = "짧음"; PublishResult();
+            AssertNote(resultHost, true, false, "result fitting short " + kind + "/" + result);
+            item = item.Clone(); item.Note = ""; PublishResult();
+            AssertNote(resultHost, true, false, "result empty " + kind + "/" + result);
+            item = item.Clone(); item.Note = longNote; PublishResult();
+            AssertNote(resultHost, true, true, "result resumes before next animal " + kind + "/" + result);
+            var oldResultClock = Clock(resultHost)!;
+            item = item.Clone(); item.TraceNumber = "000000000000002"; item.SipNumber = "2"; item.AuctionResultStatus = "11"; item.Note = "다음 개체의 새로운 긴 비고를 표시합니다";
+            PublishRunning();
+            var next = Current();
+            Program.Check(!ReferenceEquals(resultHost, next) && Animation(resultHost) == null && next.ItemDisplay!.Snapshot.TraceNumber == item.TraceNumber,
+                "next animal releases result host " + kind + "/" + result);
+            Program.Check(oldResultClock.CurrentState == ClockState.Stopped, "next animal stops result clock " + kind + "/" + result);
+            AssertNote(next, runningBadge, true, "next running long " + kind + "/" + result);
+            window.RootVisual = null; Drain();
+            AssertNoErrors(errors, "Haenam note integration " + kind + "/" + result);
+        }
+        Console.WriteLine("Haenam note integration: 3 animal types x sold and both unsold selection paths");
+    }
+
     private static void CheckSharedControls(BindingErrors errors)
     {
         errors.Clear();
@@ -458,10 +616,10 @@ internal static class BindingChecks
             Program.Check(badgeBorder.Visibility == Visibility.Visible, "note host shows paternity: " + running);
             if (running)
             {
-                model.IsRunning = true; PumpAnimation();
+                model.IsRunning = true;
                 var page = view.PageContent as FrameworkElement ?? throw new InvalidOperationException("Running page is missing.");
-                Program.Check(Nodes(page).OfType<Border>().Any(border => DependencyPropertyHelper.GetValueSource(border, Border.BorderBrushProperty).IsAnimated),
-                    "nested running page keeps concrete ancestor state binding under note host");
+                Border[] borders = Nodes(page).OfType<Border>().ToArray();
+                CheckBorderState(page, model, borders, true, "nested " + page.GetType().Name);
                 AssertValues(page, model.CowInfo, "nested running page");
                 model.Note = "SETTER_NOTE"; Pump();
                 Program.Check(note.Text.Contains("SETTER_NOTE"), "root note setter refreshes actual note host binding");
@@ -509,6 +667,7 @@ internal static class BindingChecks
                 }
             }
             if (path?.StartsWith("Snapshot.", StringComparison.Ordinal) == true) path = path.Substring("Snapshot.".Length);
+            if (path?.StartsWith("CowInfo.", StringComparison.Ordinal) == true) path = path.Substring("CowInfo.".Length);
             if (path == null || !DisplayFields.Contains(path)) continue;
             string expectedText = (string)typeof(gValues).GetProperty(path)!.GetValue(expected)!;
             string actual = (node is EntityNumberText number ? new TextRange(number.ContentStart, number.ContentEnd).Text : node.GetValue(property)?.ToString() ?? "").Replace(",", "");
@@ -546,12 +705,153 @@ internal static class BindingChecks
         Dispatcher.PushFrame(frame);
     }
 
-    private static void PumpAnimation()
+    private static void CheckBorderState(FrameworkElement view, AuctionContPanelViewModel model, Border[] borders, bool running, string label)
     {
+        const int timeoutMs = 2500;
+        var targets = borders.SelectMany(border => BorderStoryboards(border).Select(item => (Border: border, item.Storyboard, item.Name, item.Removes))).ToArray();
+        Program.Check(targets.Length > 0, "named border storyboard lookup failed: " + label);
+        var stopwatch = Stopwatch.StartNew();
+        string? lookupError = null;
+        var initialColors = targets.Select(target => (target.Border.BorderBrush as SolidColorBrush)?.Color).ToArray();
+        var sawChange = new bool[targets.Length];
+        bool Ready()
+        {
+            try
+            {
+                bool[] states = targets.Select((target, index) =>
+                {
+                    ClockState state;
+                    try { state = target.Storyboard.GetCurrentState(target.Border); }
+                    catch (InvalidOperationException) when (!running && target.Removes && !DependencyPropertyHelper.GetValueSource(target.Border, Border.BorderBrushProperty).IsAnimated)
+                    { return target.Border.BorderBrush is SolidColorBrush black && black.Color == Colors.Black; }
+                    var color = (target.Border.BorderBrush as SolidColorBrush)?.Color;
+                    if (color.HasValue && initialColors[index].HasValue && color != initialColors[index]) sawChange[index] = true;
+                    return running ? state == ClockState.Active && sawChange[index] && DependencyPropertyHelper.GetValueSource(target.Border, Border.BorderBrushProperty).IsAnimated
+                        : (target.Removes ? !DependencyPropertyHelper.GetValueSource(target.Border, Border.BorderBrushProperty).IsAnimated : state == ClockState.Stopped) && color == Colors.Black;
+                }).ToArray();
+                lookupError = null;
+                return running ? states.Any(state => state) : states.All(state => state);
+            }
+            catch (InvalidOperationException ex) { lookupError = ex.Message; return false; }
+        }
         var frame = new DispatcherFrame();
-        var timer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(35) };
-        timer.Tick += (_, _) => { timer.Stop(); frame.Continue = false; };
-        timer.Start(); Dispatcher.PushFrame(frame);
+        var timer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(10) };
+        timer.Tick += (_, _) => { if (Ready() || stopwatch.ElapsedMilliseconds >= timeoutMs) { timer.Stop(); frame.Continue = false; } };
+        if (!Ready()) { timer.Start(); Dispatcher.PushFrame(frame); }
+        stopwatch.Stop();
+        string borderStates = string.Join("; ", borders.Select((border, index) =>
+        {
+            var state = DependencyPropertyHelper.GetValueSource(border, Border.BorderBrushProperty);
+            string paths = string.Join(",", border.Style?.Triggers.OfType<DataTrigger>().Select(trigger => (trigger.Binding as Binding)?.Path?.Path) ?? Array.Empty<string?>());
+            string clocks = string.Join(",", targets.Where(target => ReferenceEquals(target.Border, border)).Select(target =>
+            {
+                try { return $"{target.Name}:{target.Storyboard.GetCurrentState(border)}"; }
+                catch (InvalidOperationException ex) { return $"{target.Name}:조회실패({ex.Message})"; }
+            }));
+            return $"{index}:animated={state.IsAnimated},source={state.BaseValueSource},brush={border.BorderBrush},loaded={border.IsLoaded},visible={border.IsVisible},context={border.DataContext?.GetType().Name},trigger=[{paths}],clocks=[{clocks}]";
+        }));
+        string diagnostic = $"view={label}, target={running}, IsRunning={model.IsRunning}, dataContextMatches={ReferenceEquals(view.DataContext, model)}, context={view.DataContext?.GetType().Name}, loaded={view.IsLoaded}, visible={view.IsVisible}, borders={borders.Length}, elapsedMs={stopwatch.ElapsedMilliseconds}, timeoutMs={timeoutMs}, lookupError={lookupError}, {borderStates}";
+        Console.WriteLine("Border animation: " + diagnostic);
+        Program.Check(borders.Length > 0 && Ready(), "border animation state: " + diagnostic);
+    }
+
+    private static IEnumerable<(Storyboard Storyboard, string Name, bool Removes)> BorderStoryboards(Border border)
+    {
+        if (border.Style == null) yield break;
+        foreach (TriggerBase trigger in border.Style.Triggers)
+        {
+            bool matches = trigger switch
+            {
+                DataTrigger single => (single.Binding as Binding)?.Path?.Path?.EndsWith("IsRunning", StringComparison.Ordinal) == true,
+                MultiDataTrigger multi => multi.Conditions.Any(condition => (condition.Binding as Binding)?.Path?.Path?.EndsWith("IsRunning", StringComparison.Ordinal) == true),
+                _ => false
+            };
+            if (!matches) continue;
+            TriggerActionCollection enter = trigger is DataTrigger data ? data.EnterActions : ((MultiDataTrigger)trigger).EnterActions;
+            TriggerActionCollection exit = trigger is DataTrigger dataExit ? dataExit.ExitActions : ((MultiDataTrigger)trigger).ExitActions;
+            foreach (var begin in enter.OfType<BeginStoryboard>())
+            {
+                bool removes = exit.OfType<RemoveStoryboard>().Any(action => action.BeginStoryboardName == begin.Name);
+                if (removes || exit.OfType<StopStoryboard>().Any(action => action.BeginStoryboardName == begin.Name))
+                    yield return (begin.Storyboard, begin.Name, removes);
+            }
+        }
+    }
+
+    private static void CheckBorderRepeat(BindingErrors errors)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            errors.Clear();
+            using var model = Model(Sample());
+            var view = new Standard_non_QQuri_Run1 { DataContext = model };
+            using var host = Host(view);
+            Border[] borders = Nodes(view).OfType<Border>().Where(border => BorderStoryboards(border).Any()).ToArray();
+            model.IsRunning = true; CheckBorderState(view, model, borders, true, "standalone " + i);
+            model.IsRunning = false; CheckBorderState(view, model, borders, false, "standalone stopped " + i);
+            model.IsRunning = true; CheckBorderState(view, model, borders, true, "standalone restarted " + i);
+            host.RootVisual = null; Pump();
+            Program.Check(!view.IsLoaded, "standalone unload: " + i);
+            CheckBorderState(view, model, borders, false, "standalone unloaded " + i);
+            host.RootVisual = view; Pump();
+            CheckBorderState(view, model, borders, true, "standalone reload " + i);
+            model.IsRunning = false; CheckBorderState(view, model, borders, false, "standalone reload stopped " + i);
+            host.RootVisual = null; Pump();
+            AssertNoErrors(errors, "standalone border " + i);
+        }
+    }
+
+    private static void CheckPilotBorders(BindingErrors errors)
+    {
+        var views = new UserControl[]
+        {
+            new Standard_non_QQuri_Run1(),
+            new CowAuctionSmall.Views.Size128_64.Running.SokchoRunning1_64(),
+            new CowAuctionSmall.Views.SIze_160_64.Running.AuctionRunning1_160_64(),
+            new CowAuctionSmall.Views.Size_320_64.Running.AuctionRunning1_320_64(),
+            new Standard_Goat_Run()
+        };
+        foreach (var view in views)
+        {
+            errors.Clear();
+            using var model = Model(Sample());
+            view.DataContext = model;
+            using var host = Host(view);
+            var borders = Nodes(view).OfType<Border>().Where(border => BorderStoryboards(border).Any()).ToArray();
+            Program.Check(borders.Length == 1 && BorderStoryboards(borders[0]).Single().Removes, "pilot target and removal: " + view.GetType().Name);
+            model.IsRunning = true; CheckBorderState(view, model, borders, true, "pilot " + view.GetType().Name);
+            host.RootVisual = null; Pump();
+            CheckBorderState(view, model, borders, false, "pilot unloaded " + view.GetType().Name);
+            Program.Check(model.IsRunning && borders.All(border => !DependencyPropertyHelper.GetValueSource(border, Border.BorderBrushProperty).IsAnimated), "pilot removes clock without changing running state: " + view.GetType().Name);
+            host.RootVisual = view; Pump();
+            CheckBorderState(view, model, borders, true, "pilot reload " + view.GetType().Name);
+            for (int i = 0; i < 3; i++) { host.RootVisual = null; Pump(); host.RootVisual = view; Pump(); }
+            CheckBorderState(view, model, borders, true, "pilot rapid reload " + view.GetType().Name);
+            model.IsRunning = false; CheckBorderState(view, model, borders, false, "pilot stopped " + view.GetType().Name);
+            if (view is Standard_Goat_Run)
+            {
+                model.IsBatchGoatBorderHighlighted = true; model.IsRunning = true; Pump();
+                Program.Check(borders[0].BorderBrush is SolidColorBrush brush && brush.Color == Color.FromRgb(255, 165, 0)
+                    && !DependencyPropertyHelper.GetValueSource(borders[0], Border.BorderBrushProperty).IsAnimated, "goat batch orange overrides blinking");
+                model.IsBatchGoatBorderHighlighted = false;
+                CheckBorderState(view, model, borders, true, "goat batch cleared");
+                model.IsRunning = false; CheckBorderState(view, model, borders, false, "goat stopped");
+            }
+            host.RootVisual = null; Pump();
+            AssertNoErrors(errors, "pilot " + view.GetType().Name);
+        }
+        using var wrapperModel = Model(Sample());
+        var page = new Standard_non_QQuri_Run1 { DataContext = wrapperModel };
+        var wrapper = new RunningNoteHost128 { PageContent = page, ScrollOwner = wrapperModel, ItemDisplay = wrapperModel.ItemDisplay };
+        using var wrapperHost = Host(wrapper);
+        var wrapperBorders = Nodes(page).OfType<Border>().Where(border => BorderStoryboards(border).Any()).ToArray();
+        wrapperModel.IsRunning = true; CheckBorderState(page, wrapperModel, wrapperBorders, true, "pilot note host");
+        wrapper.PageContent = new Grid(); Pump();
+        CheckBorderState(page, wrapperModel, wrapperBorders, false, "pilot note host detached page");
+        wrapper.PageContent = page; Pump();
+        CheckBorderState(page, wrapperModel, wrapperBorders, true, "pilot note host reattached page");
+        wrapperModel.IsRunning = false; CheckBorderState(page, wrapperModel, wrapperBorders, false, "pilot note host stopped");
+        wrapperHost.RootVisual = null; Pump();
     }
 
     private static void AssertNoErrors(BindingErrors errors, string label) => Program.Check(errors.Text.Length == 0, "WPF binding errors in " + label + ": " + errors.Text);

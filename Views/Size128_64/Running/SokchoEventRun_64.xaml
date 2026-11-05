@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:entity="clr-namespace:CowAuctionSmall.Views.Common"
              FontFamily="굴림"
              TextOptions.TextFormattingMode="Display"
              TextOptions.TextRenderingMode="Aliased"
@@ -14,8 +15,7 @@
             <TextBlock Canvas.Left="31" Canvas.Top="0" Text="{Binding CowInfo.OwnerName}" Foreground="Cyan" FontSize="11"/>
 
             <TextBlock Canvas.Left="2" Canvas.Top="12" Text="개체:" Foreground="Lime" FontSize="11"/>
-            <TextBlock Canvas.Left="31" Canvas.Top="12" Text="{Binding CowInfo.EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" FontSize="11"/>
-            <TextBlock Canvas.Left="59" Canvas.Top="12" Text="{Binding CowInfo.EntityNumberShort}" Foreground="{DynamicResource EntityNumberShortForeground}" Background="{DynamicResource EntityNumberShortBackground}" FontSize="11"/>
+            <entity:EntityNumberText Canvas.Left="31" Canvas.Top="12" Number="{Binding CowInfo.EntityNumber}" Foreground="{DynamicResource EntityNumberForeground}" HighlightForeground="{DynamicResource EntityNumberShortForeground}" FontSize="11"/>
 
             <TextBlock Canvas.Left="2" Canvas.Top="24" Text="{Binding CowInfo.Birth}" Foreground="Cyan" FontSize="11"/>
             <TextBlock Canvas.Left="2" Canvas.Top="36" Text="성별:" Foreground="Lime" FontSize="11"/>
